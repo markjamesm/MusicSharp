@@ -18,11 +18,21 @@ namespace MusicSharp
         {
             Application.Init();
 
-            // Create the menubar. This will be refactored into a separate file.
+            // Create the menubar.
             var menu = new MenuBar(new MenuBarItem[]
             {
             new MenuBarItem("_File", new MenuItem[]
             {
+                new MenuItem("_Open", string.Empty, () =>
+                {
+                    // Insert code to open music files here.
+                }),
+
+                new MenuItem("_Open Stream", string.Empty, () =>
+                {
+                    // Insert code to open music streams here.
+                }),
+
                 new MenuItem("_Quit", string.Empty, () =>
                 {
                     Application.RequestStop();
@@ -33,12 +43,12 @@ namespace MusicSharp
             {
                 new MenuItem("_About", string.Empty, () =>
                 {
-                    Application.RequestStop();
+                    MessageBox.Query("Music Sharp 0.2.0", "\nMusic Sharp is a lightweight CLI\n music player written in C#.\n\nCreated by Mark-James McDougall and licensed\nunder the GPL v3.", "Close");
                 }),
             }),
             });
 
-            // Creates the top-level window to show
+            // Creates the top-level window to show.
             var win = new Window("MusicSharp")
             {
                 X = 0,

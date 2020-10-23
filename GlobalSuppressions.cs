@@ -5,4 +5,5 @@
 
 using System.Diagnostics.CodeAnalysis;
 
-[assembly: SuppressMessage("StyleCop.CSharp.ReadabilityRules", "SA1118:Parameter should not span multiple lines", Justification = "<Pending>", Scope = "member", Target = "~M:Program.Main")]
+[assembly: SuppressMessage("StyleCop.CSharp.ReadabilityRules", "SA1118:Parameter should not span multiple lines", Justification = "Anonymous methods (including lambda expressions) may span multiple lines", Scope = "member", Target = "~M:Program.Main")]
+[assembly: SuppressMessage("StyleCop.CSharp.ReadabilityRules", "SA1118:Parameter should not span multiple lines", Justification = "Anonymous methods (including lambda expressions) may span multiple lines", Scope = "member", Target = "~M:MusicSharp.Player.Start")]

@@ -4,51 +4,26 @@
 
 namespace MusicSharp
 {
+    using Microsoft.VisualBasic;
     using Terminal.Gui;
 
     /// <summary>
-    /// Class which houses the CLI methods.
+    /// The Player class houses the methods needed to create MusicSharp.
     /// </summary>
-    public class Player
+    public static class Player
     {
         /// <summary>
-        /// Method to create and start the CLI.
+        /// The Start method builds the user interface.
         /// </summary>
         public static void Start()
         {
+            // Creates a instance of MainLoop to process input events, handle timers and other sources of data.
             Application.Init();
 
-            // Create the menubar.
-            var menu = new MenuBar(new MenuBarItem[]
-            {
-            new MenuBarItem("_File", new MenuItem[]
-            {
-                new MenuItem("_Open", string.Empty, () =>
-                {
-                    // Insert code to open music files here.
-                }),
+            var top = Application.Top;
+            var tframe = top.Frame;
 
-                new MenuItem("_Open Stream", string.Empty, () =>
-                {
-                    // Insert code to open music streams here.
-                }),
-
-                new MenuItem("_Quit", string.Empty, () =>
-                {
-                    Application.RequestStop();
-                }),
-            }),
-
-            new MenuBarItem("_Help", new MenuItem[]
-            {
-                new MenuItem("_About", string.Empty, () =>
-                {
-                    MessageBox.Query("Music Sharp 0.2.0", "\nMusic Sharp is a lightweight CLI\n music player written in C#.\n\nDeveloped by Mark-James McDougall\nand licensed under the GPL v3.", "Close");
-                }),
-            }),
-            });
-
-            // Creates the top-level window to show.
+            // Create the top-level window.
             var win = new Window("MusicSharp")
             {
                 X = 0,
@@ -61,8 +36,61 @@ namespace MusicSharp
                 Height = Dim.Fill() - 1,
             };
 
-            Application.Top.Add(win, menu);
+            // Create the menubar.
+            var menu = new MenuBar(new MenuBarItem[]
+            {
+            new MenuBarItem("_File", new MenuItem[]
+            {
+                new MenuItem("_Open", "Open a music file", () => OpenFile()),
+
+                new MenuItem("_Open Stream", "Open a stream", () => OpenStream()),
+
+                new MenuItem("_Quit", "Exit MusicSharp", () => Application.RequestStop()),
+            }),
+
+            new MenuBarItem("_Help", new MenuItem[]
+            {
+                new MenuItem("_About", string.Empty, () =>
+                {
+                    MessageBox.Query("Music Sharp 0.2.0", "\nMusic Sharp is a lightweight CLI\n music player written in C#.\n\nDeveloped by Mark-James McDougall\nand licensed under the GPL v3.", "Close");
+                }),
+            }),
+            });
+
+            // Add the layout elements and run the app.
+            top.Add(win, menu);
             Application.Run();
+        }
+
+        // Component Methods.
+        private static void OpenFile()
+        {
+            // Create vars for the button and add them to the Dialog.
+            var ok = new Button("Ok", is_default: true);
+            var cancel = new Button("Cancel");
+
+            ok.Clicked += () => { Application.RequestStop(); };
+            cancel.Clicked += () => { Application.RequestStop(); };
+
+            var d = new Dialog(
+                "Feature not yet implemented", ok, cancel);
+
+            Application.Run(d);
+        }
+
+        private static void OpenStream()
+        {
+            // Create vars for the button and add them to the Dialog.
+            var ok = new Button("Ok", is_default: true);
+            var cancel = new Button("Cancel");
+
+            ok.Clicked += () => { Application.RequestStop(); };
+            cancel.Clicked += () => { Application.RequestStop(); };
+
+            var d = new Dialog(
+                "Feature not yet implemented", ok, cancel);
+
+            Application.Run(d);
         }
     }
 }

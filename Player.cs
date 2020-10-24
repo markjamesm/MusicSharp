@@ -4,7 +4,6 @@
 
 namespace MusicSharp
 {
-    using Microsoft.VisualBasic;
     using Terminal.Gui;
 
     /// <summary>

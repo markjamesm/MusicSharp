@@ -15,6 +15,6 @@ public class Program
     public static void Main()
     {
         // Start MusicSharp.
-        Player.Start();
+        Gui.Start();
     }
 }

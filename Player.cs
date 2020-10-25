@@ -4,92 +4,30 @@
 
 namespace MusicSharp
 {
-    using Terminal.Gui;
+    using System.Threading;
+    using NAudio.Wave;
 
     /// <summary>
-    /// The Player class houses the methods needed to create MusicSharp.
+    /// The Player class handles audio playback.
     /// </summary>
     public static class Player
     {
         /// <summary>
-        /// The Start method builds the user interface.
+        /// Method that implements audio playback from a file.
         /// </summary>
-        public static void Start()
+        public static void PlayAudioFile()
         {
-            // Creates a instance of MainLoop to process input events, handle timers and other sources of data.
-            Application.Init();
-
-            var top = Application.Top;
-            var tframe = top.Frame;
-
-            // Create the top-level window.
-            var win = new Window("MusicSharp")
+            string file = @"C:\MusicSharp\example.mp3";
+            using (var audioFile = new AudioFileReader(file))
+            using (var outputDevice = new WaveOutEvent())
             {
-                X = 0,
-                Y = 1, // Leave one row for the toplevel menu
-
-                // By using Dim.Fill(), it will automatically resize without manual intervention
-                Width = Dim.Fill(),
-
-                // Subtract one row for the statusbar
-                Height = Dim.Fill() - 1,
-            };
-
-            // Create the menubar.
-            var menu = new MenuBar(new MenuBarItem[]
-            {
-            new MenuBarItem("_File", new MenuItem[]
-            {
-                new MenuItem("_Open", "Open a music file", () => OpenFile()),
-
-                new MenuItem("_Open Stream", "Open a stream", () => OpenStream()),
-
-                new MenuItem("_Quit", "Exit MusicSharp", () => Application.RequestStop()),
-            }),
-
-            new MenuBarItem("_Help", new MenuItem[]
-            {
-                new MenuItem("_About", string.Empty, () =>
+                outputDevice.Init(audioFile);
+                outputDevice.Play();
+                while (outputDevice.PlaybackState == PlaybackState.Playing)
                 {
-                    MessageBox.Query("Music Sharp 0.2.0", "\nMusic Sharp is a lightweight CLI\n music player written in C#.\n\nDeveloped by Mark-James McDougall\nand licensed under the GPL v3.", "Close");
-                }),
-            }),
-            });
-
-            // Add the layout elements and run the app.
-            top.Add(win, menu);
-            Application.Run();
-        }
-
-        // Component Methods.
-        private static void OpenFile()
-        {
-            // Create vars for the button and add them to the Dialog.
-            var ok = new Button("Ok", is_default: true);
-            var cancel = new Button("Cancel");
-
-            ok.Clicked += () => { Application.RequestStop(); };
-            cancel.Clicked += () => { Application.RequestStop(); };
-
-            var d = new Dialog(
-                "Feature not yet implemented", ok, cancel);
-
-            Application.Run(d);
-        }
-
-        private static void OpenStream()
-        {
-            // Create vars for the button and add them to the Dialog.
-            var ok = new Button("Ok", is_default: true);
-            var cancel = new Button("Cancel");
-
-            ok.Clicked += () => { Application.RequestStop(); };
-            cancel.Clicked += () => { Application.RequestStop(); };
-
-            var d = new Dialog(
-                "Feature not yet implemented", ok, cancel);
-
-            Application.Run(d);
+                    Thread.Sleep(1000);
+                }
+            }
         }
     }
 }

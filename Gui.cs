@@ -42,7 +42,7 @@ namespace MusicSharp
             {
                 new MenuItem("_Open", "Open a music file", () => Player.PlayAudioFile()),
 
-                new MenuItem("_Open Stream", "Open a stream", () => OpenStream()),
+                new MenuItem("_Load Stream", "Load a stream", () => OpenStream()),
 
                 new MenuItem("_Quit", "Exit MusicSharp", () => Application.RequestStop()),
             }),

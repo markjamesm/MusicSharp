@@ -18,15 +18,18 @@ namespace MusicSharp
         public static void PlayAudioFile()
         {
             string file = @"C:\MusicSharp\example.mp3";
-            using (var audioFile = new AudioFileReader(file))
-            using (var outputDevice = new WaveOutEvent())
+
+            // Load the audio file and select an output device.
+            using var audioFile = new AudioFileReader(file);
+            using var outputDevice = new WaveOutEvent();
+
+            outputDevice.Init(audioFile);
+            outputDevice.Play();
+
+            // Sleep until playback is finished.
+            while (outputDevice.PlaybackState == PlaybackState.Playing)
             {
-                outputDevice.Init(audioFile);
-                outputDevice.Play();
-                while (outputDevice.PlaybackState == PlaybackState.Playing)
-                {
-                    Thread.Sleep(1000);
-                }
+                Thread.Sleep(1000);
             }
         }
     }

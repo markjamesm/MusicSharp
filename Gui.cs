@@ -9,12 +9,23 @@ namespace MusicSharp
     /// <summary>
     /// The Gui class houses the CLI elements of MusicSharp.
     /// </summary>
-    public static class Gui
+    public class Gui
     {
+        private readonly IPlayer player;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Gui"/> class.
+        /// </summary>
+        /// <param name="player">The audio player to implement.</param>
+        public Gui(IPlayer player)
+        {
+            this.player = player;
+        }
+
         /// <summary>
         /// The Start method builds the user interface.
         /// </summary>
-        public static void Start()
+        public void Start()
         {
             // Creates a instance of MainLoop to process input events, handle timers and other sources of data.
             Application.Init();
@@ -40,7 +51,7 @@ namespace MusicSharp
             {
             new MenuBarItem("_File", new MenuItem[]
             {
-                new MenuItem("_Open", "Open a music file", () => Player.PlayAudioFile()),
+                new MenuItem("_Open", "Open a music file", () => this.player.PlayAudioFile()),
 
                 new MenuItem("_Load Stream", "Load a stream", () => OpenStream()),
 
@@ -51,7 +62,7 @@ namespace MusicSharp
             {
                 new MenuItem("_About", string.Empty, () =>
                 {
-                    MessageBox.Query("Music Sharp 0.2.0", "\nMusic Sharp is a lightweight CLI\n music player written in C#.\n\nDeveloped by Mark-James McDougall\nand licensed under the GPL v3.\n ", "Close");
+                    MessageBox.Query("Music Sharp 0.3.0", "\nMusic Sharp is a lightweight CLI\n music player written in C#.\n\nDeveloped by Mark-James McDougall\nand licensed under the GPL v3.\n ", "Close");
                 }),
             }),
             });

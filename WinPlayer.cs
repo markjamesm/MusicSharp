@@ -10,12 +10,12 @@ namespace MusicSharp
     /// <summary>
     /// The Player class handles audio playback.
     /// </summary>
-    public static class Player
+    public class WinPlayer : IPlayer
     {
         /// <summary>
         /// Method that implements audio playback from a file.
         /// </summary>
-        public static void PlayAudioFile()
+        public void PlayAudioFile()
         {
             string file = @"C:\MusicSharp\example.mp3";
 

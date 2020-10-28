@@ -14,11 +14,8 @@ public class Program
     /// </summary>
     public static void Main()
     {
-        // Create a new instance of Player class.
-        IPlayer player = new WinPlayer();
-
         // Start MusicSharp.
-        Gui gui = new Gui(player);
-        gui.Start();
+        Player musicSharp = new Player();
+        musicSharp.Start();
     }
 }

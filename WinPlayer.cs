@@ -15,6 +15,8 @@ namespace MusicSharp
     {
         private static Mutex mut = new Mutex();
 
+        private WaveOutEvent outputDevice = new WaveOutEvent();
+
         /// <summary>
         /// Method that implements audio playback from a file.
         /// </summary>
@@ -31,13 +33,12 @@ namespace MusicSharp
                 {
                     // Load the audio file and select an output device.
                     using var audioFile = new AudioFileReader(filepath);
-                    using var outputDevice = new WaveOutEvent();
                     {
-                        outputDevice.Init(audioFile);
-                        outputDevice.Play();
+                        this.outputDevice.Init(audioFile);
+                        this.outputDevice.Play();
 
                         // Sleep until playback is finished.
-                        while (outputDevice.PlaybackState == PlaybackState.Playing)
+                        while (this.outputDevice.PlaybackState == PlaybackState.Playing)
                         {
                             Thread.Sleep(1000);
                         }
@@ -50,8 +51,14 @@ namespace MusicSharp
                     System.Console.WriteLine("Error", e);
                 }
 
-                // Throw an exception if the file isn't found.
+                // Throw an exception if the file isn't playable.
                 catch (System.Runtime.InteropServices.COMException e)
+                {
+                    System.Console.WriteLine("Error", e);
+                }
+
+                // Throw an exception if the user cancels the dialog without choosing a file.
+                catch (System.ArgumentException e)
                 {
                     System.Console.WriteLine("Error", e);
                 }
@@ -59,6 +66,14 @@ namespace MusicSharp
                 // Release the thread.
                 mut.ReleaseMutex();
             });
+        }
+
+        /// <summary>
+        /// Method to stop playing audio.
+        /// </summary>
+        public void Stop()
+        {
+            this.outputDevice.Stop();
         }
     }
 }

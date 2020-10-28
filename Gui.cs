@@ -27,6 +27,7 @@ namespace MusicSharp
         /// </summary>
         public void Start()
         {
+
             // Creates a instance of MainLoop to process input events, handle timers and other sources of data.
             Application.Init();
 
@@ -46,6 +47,16 @@ namespace MusicSharp
                 Height = Dim.Fill() - 1,
             };
 
+            // Add components to our window
+
+            var stopBtn = new Button(3, 5, "Stop");
+            stopBtn.Clicked += () =>
+            {
+                this.player.Stop();
+            };
+
+            win.Add(stopBtn);
+
             // Create the menubar.
             var menu = new MenuBar(new MenuBarItem[]
             {
@@ -62,13 +73,14 @@ namespace MusicSharp
             {
                 new MenuItem("_About", string.Empty, () =>
                 {
-                    MessageBox.Query("Music Sharp 0.3.1", "\nMusic Sharp is a lightweight CLI\n music player written in C#.\n\nDeveloped by Mark-James McDougall\nand licensed under the GPL v3.\n ", "Close");
+                    MessageBox.Query("Music Sharp 0.3.4", "\nMusic Sharp is a lightweight CLI\n music player written in C#.\n\nDeveloped by Mark-James McDougall\nand licensed under the GPL v3.\n ", "Close");
                 }),
             }),
             });
 
             // Add the layout elements and run the app.
-            top.Add(win, menu);
+            top.Add(menu, win);
+
             Application.Run();
         }
 

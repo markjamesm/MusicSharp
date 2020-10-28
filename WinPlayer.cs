@@ -18,7 +18,8 @@ namespace MusicSharp
         /// <summary>
         /// Method that implements audio playback from a file.
         /// </summary>
-        public void PlayAudioFile()
+        /// <param name="filepath">The Path to the audio file to play.</param>
+        public void PlayAudioFile(string filepath)
         {
             // Play the audio inside a new thread to prevent our GUI from blocking.
             Task.Run(() =>
@@ -26,12 +27,10 @@ namespace MusicSharp
                 // Block this section of the thread so only one audio file plays at once.
                 mut.WaitOne();
 
-                var file = @"C:\MusicSharp\example.mp3";
-
                 try
                 {
                     // Load the audio file and select an output device.
-                    using var audioFile = new AudioFileReader(file);
+                    using var audioFile = new AudioFileReader(filepath);
                     using var outputDevice = new WaveOutEvent();
                     {
                         outputDevice.Init(audioFile);
@@ -44,7 +43,15 @@ namespace MusicSharp
                         }
                     }
                 }
+
+                // Throw an exception if the file isn't found.
                 catch (System.IO.FileNotFoundException e)
+                {
+                    System.Console.WriteLine("Error", e);
+                }
+
+                // Throw an exception if the file isn't found.
+                catch (System.Runtime.InteropServices.COMException e)
                 {
                     System.Console.WriteLine("Error", e);
                 }

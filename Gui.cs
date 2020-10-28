@@ -51,9 +51,9 @@ namespace MusicSharp
             {
             new MenuBarItem("_File", new MenuItem[]
             {
-                new MenuItem("_Open", "Open a music file", () => this.player.PlayAudioFile()),
+                new MenuItem("_Open", "Open a music file", () => this.player.PlayAudioFile(OpenFile())),
 
-                new MenuItem("_Load Stream", "Load a stream", () => OpenStream()),
+                new MenuItem("_Load Stream", "Load a stream", () => OpenFile()),
 
                 new MenuItem("_Quit", "Exit MusicSharp", () => Application.RequestStop()),
             }),
@@ -72,21 +72,18 @@ namespace MusicSharp
             Application.Run();
         }
 
-        // Component Methods.
-        // Placeholder method until the functionality is implemented.
-        private static void OpenStream()
+        // Method to display a file open dialog and return the path of the user selected file.
+        private static string OpenFile()
         {
-            // Create vars for the button and add them to the Dialog.
-            var ok = new Button("Ok", is_default: true);
-            var cancel = new Button("Cancel");
-
-            ok.Clicked += () => { Application.RequestStop(); };
-            cancel.Clicked += () => { Application.RequestStop(); };
-
-            var d = new Dialog(
-                "Feature not yet implemented", ok, cancel);
-
+            var d = new OpenDialog("Open", "Open an audio file") { AllowsMultipleSelection = false };
             Application.Run(d);
+
+            if (!d.Canceled)
+            {
+                return d.FilePath.ToString();
+            }
+
+            return string.Empty;
         }
     }
 }

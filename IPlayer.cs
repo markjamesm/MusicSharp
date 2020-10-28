@@ -12,6 +12,7 @@ namespace MusicSharp
         /// <summary>
         /// Method to play audio.
         /// </summary>
-        void PlayAudioFile();
+        /// <param name="filepath">The Path to the audio file to play.</param>
+        void PlayAudioFile(string filepath);
     }
 }

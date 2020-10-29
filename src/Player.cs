@@ -15,6 +15,7 @@ namespace MusicSharp
         // Create an audio output device.
         private WaveOutEvent outputDevice;
         private AudioFileReader audioFile;
+        private string lastFileOpened;
 
         /// <summary>
         /// The Start method builds the user interface.
@@ -41,13 +42,38 @@ namespace MusicSharp
             };
 
             // Add components to our window
-            var stopBtn = new Button(3, 5, "Stop");
+            var stopBtn = new Button(24, 22, "Stop");
             stopBtn.Clicked += () =>
             {
-                this.OnButtonStopClick();
+                this.Stop();
             };
 
-            win.Add(stopBtn);
+            var playBtn = new Button(3, 22, "Play");
+            playBtn.Clicked += () =>
+            {
+                if (this.lastFileOpened != null && this.outputDevice != null)
+                {
+                    try
+                    {
+                        this.outputDevice.Play();
+                    }
+                    catch (System.NullReferenceException)
+                    {
+                    }
+                }
+                else
+                {
+                    this.OpenFile();
+                }
+            };
+
+            var pauseBtn = new Button(13, 22, "Pause");
+            pauseBtn.Clicked += () =>
+            {
+                this.Pause();
+            };
+
+            win.Add(playBtn, stopBtn, pauseBtn);
 
             // Create the menubar.
             var menu = new MenuBar(new MenuBarItem[]
@@ -65,7 +91,7 @@ namespace MusicSharp
             {
                 new MenuItem("_About MusicSharp", string.Empty, () =>
                 {
-                    MessageBox.Query("Music Sharp 0.4.0", "\nMusic Sharp is a lightweight CLI\n music player written in C#.\n\nDeveloped by Mark-James McDougall\nand licensed under the GPL v3.\n ", "Close");
+                    MessageBox.Query("Music Sharp 0.4.1", "\nMusic Sharp is a lightweight CLI\n music player written in C#.\n\nDeveloped by Mark-James McDougall\nand licensed under the GPL v3.\n ", "Close");
                 }),
             }),
             });
@@ -76,12 +102,23 @@ namespace MusicSharp
             Application.Run();
         }
 
-        private void OnButtonStopClick()
+        // Method to stop audio playback
+        private void Stop()
         {
-            this.outputDevice?.Stop();
+            if (this.outputDevice != null)
+            {
+                try
+                {
+                    this.outputDevice?.Stop();
+                    this.outputDevice.PlaybackStopped += this.OnPlaybackStopped;
+                }
+                catch (System.NullReferenceException)
+                {
+                }
+            }
         }
 
-        // Method to display a file open dialog and return the path of the user selected file.
+        // Display a file open dialog and return the path of the user selected file.
         private void OpenFile()
         {
             var d = new OpenDialog("Open", "Open an audio file") { AllowsMultipleSelection = false };
@@ -89,24 +126,54 @@ namespace MusicSharp
 
             if (!d.Canceled)
             {
-                if (this.outputDevice == null)
-                {
-                    this.outputDevice = new WaveOutEvent();
-                    this.outputDevice.PlaybackStopped += this.OnPlaybackStopped;
-                }
+                this.lastFileOpened = d.FilePath.ToString();
+                this.Play(d.FilePath.ToString());
+            }
+        }
 
-                if (this.audioFile == null)
+        // Start playing audio
+        private void Play(string path)
+        {
+            if (this.outputDevice == null)
+            {
+                this.outputDevice = new WaveOutEvent();
+                this.outputDevice.PlaybackStopped += this.OnPlaybackStopped;
+            }
+
+            if (this.audioFile == null)
+            {
+                try
                 {
-                    try
-                    {
-                        this.audioFile = new AudioFileReader(d.FilePath.ToString());
-                        this.outputDevice.Init(this.audioFile);
-                        this.outputDevice.Play();
-                    }
-                    catch (System.Runtime.InteropServices.COMException)
-                    {
-                    }
+                    this.audioFile = new AudioFileReader(path);
+                    this.outputDevice.Init(this.audioFile);
+                    this.outputDevice.Play();
                 }
+                catch (System.Runtime.InteropServices.COMException)
+                {
+                }
+            }
+
+            if (this.audioFile != null)
+            {
+                try
+                {
+                    this.outputDevice.Play();
+                }
+                catch (System.Runtime.InteropServices.COMException)
+                {
+                }
+            }
+        }
+
+        // Pause our audio player
+        private void Pause()
+        {
+            try
+            {
+                this.outputDevice?.Pause();
+            }
+            catch (System.NullReferenceException)
+            {
             }
         }
 
@@ -117,11 +184,12 @@ namespace MusicSharp
         {
             this.outputDevice.Dispose();
             this.outputDevice = null;
-            this.audioFile.Dispose();
+
+            // this.audioFile.Dispose();
 
             // By resetting the audioFIle position to 0, playback can start again.
             // this.audioFile.Position = 0;
-            this.audioFile = null;
+            //   this.audioFile = null;
         }
     }
 }

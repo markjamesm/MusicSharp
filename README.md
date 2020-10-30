@@ -3,7 +3,7 @@
 
 MusicSharp is a CLI based music player for Windows written in C# with the goal of being minimalistic and light on resources.
 
-Currently in an early alpha beta stage, MusicSharp makes use of the [NAudio](https://github.com/naudio/NAudio) and [and gui.cs](https://github.com/migueldeicaza/gui.cs) libraries.
+Currently in an early alpha beta stage, MusicSharp makes use of the [NAudio](https://github.com/naudio/NAudio) and [Terminal.Gui](https://github.com/migueldeicaza/gui.cs) libraries.
 
 ## Planned Features
 

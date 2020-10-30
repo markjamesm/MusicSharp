@@ -12,7 +12,7 @@ namespace MusicSharp
     public interface IPlayer
     {
         /// <summary>
-        /// Gets the last file opened by the player.
+        /// Gets or sets the last file opened by the player.
         /// </summary>
         string LastFileOpened { get; set; }
 

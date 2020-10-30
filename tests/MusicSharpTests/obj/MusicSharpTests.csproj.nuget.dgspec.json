@@ -1,0 +1,150 @@
+{
+  "format": 1,
+  "restore": {
+    "C:\\Users\\mjmcd\\Desktop\\Programming\\Git Pulls\\MusicSharp\\tests\\MusicSharpTests\\MusicSharpTests.csproj": {}
+  },
+  "projects": {
+    "C:\\Users\\mjmcd\\Desktop\\Programming\\Git Pulls\\MusicSharp\\src\\MusicSharp.csproj": {
+      "version": "0.4.6",
+      "restore": {
+        "projectUniqueName": "C:\\Users\\mjmcd\\Desktop\\Programming\\Git Pulls\\MusicSharp\\src\\MusicSharp.csproj",
+        "projectName": "MusicSharp",
+        "projectPath": "C:\\Users\\mjmcd\\Desktop\\Programming\\Git Pulls\\MusicSharp\\src\\MusicSharp.csproj",
+        "packagesPath": "C:\\Users\\mjmcd\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\mjmcd\\Desktop\\Programming\\Git Pulls\\MusicSharp\\src\\obj\\",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "C:\\Users\\mjmcd\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        ],
+        "originalTargetFrameworks": [
+          "netcoreapp3.1"
+        ],
+        "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "netcoreapp3.1": {
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "netcoreapp3.1": {
+          "dependencies": {
+            "NAudio": {
+              "target": "Package",
+              "version": "[1.10.0, )"
+            },
+            "StyleCop.Analyzers": {
+              "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[1.1.118, )"
+            },
+            "Terminal.Gui": {
+              "target": "Package",
+              "version": "[0.90.3, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.1.403\\RuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "C:\\Users\\mjmcd\\Desktop\\Programming\\Git Pulls\\MusicSharp\\tests\\MusicSharpTests\\MusicSharpTests.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "C:\\Users\\mjmcd\\Desktop\\Programming\\Git Pulls\\MusicSharp\\tests\\MusicSharpTests\\MusicSharpTests.csproj",
+        "projectName": "MusicSharpTests",
+        "projectPath": "C:\\Users\\mjmcd\\Desktop\\Programming\\Git Pulls\\MusicSharp\\tests\\MusicSharpTests\\MusicSharpTests.csproj",
+        "packagesPath": "C:\\Users\\mjmcd\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\mjmcd\\Desktop\\Programming\\Git Pulls\\MusicSharp\\tests\\MusicSharpTests\\obj\\",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "C:\\Users\\mjmcd\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        ],
+        "originalTargetFrameworks": [
+          "netcoreapp3.1"
+        ],
+        "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "netcoreapp3.1": {
+            "projectReferences": {
+              "C:\\Users\\mjmcd\\Desktop\\Programming\\Git Pulls\\MusicSharp\\src\\MusicSharp.csproj": {
+                "projectPath": "C:\\Users\\mjmcd\\Desktop\\Programming\\Git Pulls\\MusicSharp\\src\\MusicSharp.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "netcoreapp3.1": {
+          "dependencies": {
+            "MSTest.TestAdapter": {
+              "target": "Package",
+              "version": "[2.1.0, )"
+            },
+            "MSTest.TestFramework": {
+              "target": "Package",
+              "version": "[2.1.0, )"
+            },
+            "Microsoft.NET.Test.Sdk": {
+              "target": "Package",
+              "version": "[16.5.0, )"
+            },
+            "coverlet.collector": {
+              "target": "Package",
+              "version": "[1.2.0, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.1.403\\RuntimeIdentifierGraph.json"
+        }
+      }
+    }
+  }
+}

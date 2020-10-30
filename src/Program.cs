@@ -16,6 +16,5 @@ public class Program
     {
         // Start MusicSharp.
         Player musicSharp = new Player();
-        musicSharp.Start();
     }
 }

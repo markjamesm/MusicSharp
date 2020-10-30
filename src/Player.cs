@@ -15,12 +15,12 @@ namespace MusicSharp
         // Create an audio output device.
         private WaveOutEvent outputDevice;
         private AudioFileReader audioFile;
-        private string lastFileOpened;
+        private string lastFileOpened = "Testing";
 
         /// <summary>
-        /// The Start method builds the user interface.
+        /// Initializes a new instance of the <see cref="Player"/> class.
         /// </summary>
-        public void Start()
+        public Player()
         {
             // Creates a instance of MainLoop to process input events, handle timers and other sources of data.
             Application.Init();
@@ -73,7 +73,15 @@ namespace MusicSharp
                 this.Pause();
             };
 
-            win.Add(playBtn, stopBtn, pauseBtn);
+            var nowPlaying = new Label(this.lastFileOpened)
+            {
+                X = 1,
+                Y = 1,
+                Width = 20,
+                Height = 4,
+            };
+
+            win.Add(playBtn, stopBtn, pauseBtn, nowPlaying);
 
             // Create the menubar.
             var menu = new MenuBar(new MenuBarItem[]
@@ -102,6 +110,19 @@ namespace MusicSharp
             Application.Run();
         }
 
+        // Display a file open dialog and return the path of the user selected file.
+        private void OpenFile()
+        {
+            var d = new OpenDialog("Open", "Open an audio file") { AllowsMultipleSelection = false };
+            Application.Run(d);
+
+            if (!d.Canceled)
+            {
+                this.lastFileOpened = d.FilePath.ToString();
+                this.Play(d.FilePath.ToString());
+            }
+        }
+
         // Method to stop audio playback
         private void Stop()
         {
@@ -115,19 +136,6 @@ namespace MusicSharp
                 catch (System.NullReferenceException)
                 {
                 }
-            }
-        }
-
-        // Display a file open dialog and return the path of the user selected file.
-        private void OpenFile()
-        {
-            var d = new OpenDialog("Open", "Open an audio file") { AllowsMultipleSelection = false };
-            Application.Run(d);
-
-            if (!d.Canceled)
-            {
-                this.lastFileOpened = d.FilePath.ToString();
-                this.Play(d.FilePath.ToString());
             }
         }
 

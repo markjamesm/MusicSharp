@@ -15,6 +15,9 @@ public class Program
     public static void Main()
     {
         // Start MusicSharp.
-        Player musicSharp = new Player();
+        IPlayer player = new WinPlayer();
+
+        Gui gui = new Gui(player);
+        gui.Start();
     }
 }

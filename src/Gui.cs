@@ -1,4 +1,4 @@
-﻿// <copyright file="Player.cs" company="Mark-James McDougall">
+﻿// <copyright file="Gui.cs" company="Mark-James McDougall">
 // Licensed under the GNU GPL v3 License. See LICENSE in the project root for license information.
 // </copyright>
 
@@ -10,17 +10,26 @@ namespace MusicSharp
     /// <summary>
     /// The Gui class houses the CLI elements of MusicSharp.
     /// </summary>
-    public class Player
+    public class Gui
     {
-        // Create an audio output device.
-        private WaveOutEvent outputDevice;
-        private AudioFileReader audioFile;
-        private string lastFileOpened = "Testing";
+        /// <summary>
+        /// Create a new instance of the audio player engine.
+        /// </summary>
+        private readonly IPlayer player;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="Player"/> class.
+        /// Initializes a new instance of the <see cref="Gui"/> class.
         /// </summary>
-        public Player()
+        /// <param name="player">The player to be injected.</param>
+        public Gui(IPlayer player)
+        {
+            this.player = player;
+        }
+
+        /// <summary>
+        /// Start the UI.
+        /// </summary>
+        public void Start()
         {
             // Creates a instance of MainLoop to process input events, handle timers and other sources of data.
             Application.Init();
@@ -45,17 +54,17 @@ namespace MusicSharp
             var stopBtn = new Button(24, 22, "Stop");
             stopBtn.Clicked += () =>
             {
-                this.Stop();
+                this.player.Stop();
             };
 
             var playBtn = new Button(3, 22, "Play");
             playBtn.Clicked += () =>
             {
-                if (this.lastFileOpened != null && this.outputDevice != null)
+                if (this.player.LastFileOpened != null && this.player.OutputDevice != null)
                 {
                     try
                     {
-                        this.outputDevice.Play();
+                        this.player.OutputDevice.Play();
                     }
                     catch (System.NullReferenceException)
                     {
@@ -70,10 +79,10 @@ namespace MusicSharp
             var pauseBtn = new Button(13, 22, "Pause");
             pauseBtn.Clicked += () =>
             {
-                this.Pause();
+                this.player.Pause();
             };
 
-            var nowPlaying = new Label(this.lastFileOpened)
+            var nowPlaying = new Label("Test")
             {
                 X = 1,
                 Y = 1,
@@ -118,86 +127,9 @@ namespace MusicSharp
 
             if (!d.Canceled)
             {
-                this.lastFileOpened = d.FilePath.ToString();
-                this.Play(d.FilePath.ToString());
+                this.player.LastFileOpened = d.FilePath.ToString();
+                this.player.Play(d.FilePath.ToString());
             }
-        }
-
-        // Method to stop audio playback
-        private void Stop()
-        {
-            if (this.outputDevice != null)
-            {
-                try
-                {
-                    this.outputDevice?.Stop();
-                    this.outputDevice.PlaybackStopped += this.OnPlaybackStopped;
-                }
-                catch (System.NullReferenceException)
-                {
-                }
-            }
-        }
-
-        // Start playing audio
-        private void Play(string path)
-        {
-            if (this.outputDevice == null)
-            {
-                this.outputDevice = new WaveOutEvent();
-                this.outputDevice.PlaybackStopped += this.OnPlaybackStopped;
-            }
-
-            if (this.audioFile == null)
-            {
-                try
-                {
-                    this.audioFile = new AudioFileReader(path);
-                    this.outputDevice.Init(this.audioFile);
-                    this.outputDevice.Play();
-                }
-                catch (System.Runtime.InteropServices.COMException)
-                {
-                }
-            }
-
-            if (this.audioFile != null)
-            {
-                try
-                {
-                    this.outputDevice.Play();
-                }
-                catch (System.Runtime.InteropServices.COMException)
-                {
-                }
-            }
-        }
-
-        // Pause our audio player
-        private void Pause()
-        {
-            try
-            {
-                this.outputDevice?.Pause();
-            }
-            catch (System.NullReferenceException)
-            {
-            }
-        }
-
-        // Dispose of our device and audioFile once playback is stopped.
-        // These will be changed in the future as we might want to allow
-        // users to carry on playback from where they left off.
-        private void OnPlaybackStopped(object sender, StoppedEventArgs args)
-        {
-            this.outputDevice.Dispose();
-            this.outputDevice = null;
-
-            // this.audioFile.Dispose();
-
-            // By resetting the audioFIle position to 0, playback can start again.
-            // this.audioFile.Position = 0;
-            //   this.audioFile = null;
         }
     }
 }

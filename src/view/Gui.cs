@@ -4,6 +4,7 @@
 
 namespace MusicSharp
 {
+    using System.Collections.Generic;
     using Terminal.Gui;
 
     /// <summary>
@@ -11,6 +12,13 @@ namespace MusicSharp
     /// </summary>
     public class Gui
     {
+        private static List<string> categories;
+        private static ListView categoryListView;
+        private static FrameView leftPane;
+        private static FrameView rightPane;
+        private static FrameView playbackControls;
+        private static ListView scenarioListView;
+
         /// <summary>
         /// Create a new instance of the audio player engine.
         /// </summary>
@@ -36,27 +44,36 @@ namespace MusicSharp
             var top = Application.Top;
             var tframe = top.Frame;
 
-            // Create the top-level window.
-            var win = new Window("MusicSharp")
+            // Create the menubar.
+            var menu = new MenuBar(new MenuBarItem[]
+            {
+            new MenuBarItem("_File", new MenuItem[]
+            {
+                new MenuItem("_Open", "Open a music file", () => this.OpenFile()),
+
+                new MenuItem("_Quit", "Exit MusicSharp", () => Application.RequestStop()),
+            }),
+
+            new MenuBarItem("_Help", new MenuItem[]
+            {
+                new MenuItem("_About MusicSharp", string.Empty, () =>
+                {
+                    MessageBox.Query("Music Sharp 0.5.0", "\nMusic Sharp is a lightweight CLI\n music player written in C#.\n\nDeveloped by Mark-James McDougall\nand licensed under the GPL v3.\n ", "Close");
+                }),
+            }),
+            });
+
+            // Create the playback controls frame.
+            playbackControls = new FrameView("Playback")
             {
                 X = 0,
-                Y = 1, // Leave one row for the toplevel menu
-
-                // By using Dim.Fill(), it will automatically resize without manual intervention
+                Y = 24,
                 Width = Dim.Fill(),
-
-                // Subtract one row for the statusbar
-                Height = Dim.Fill() - 1,
+                Height = Dim.Fill(),
+                CanFocus = false,
             };
 
-            // Add components to our window
-            var stopBtn = new Button(24, 22, "Stop");
-            stopBtn.Clicked += () =>
-            {
-                this.player.Stop();
-            };
-
-            var playBtn = new Button(3, 22, "Play");
+            var playBtn = new Button(1, 1, "Play");
             playBtn.Clicked += () =>
             {
                 if (this.player.LastFileOpened != null && this.player.OutputDevice != null)
@@ -75,45 +92,70 @@ namespace MusicSharp
                 }
             };
 
-            var pauseBtn = new Button(13, 22, "Pause");
+            var pauseBtn = new Button(10, 1, "Pause");
             pauseBtn.Clicked += () =>
             {
                 this.player.Pause();
             };
 
-            var nowPlaying = new Label("Test")
+            // Add the playback components.
+            var stopBtn = new Button(20, 1, "Stop");
+            stopBtn.Clicked += () =>
             {
-                X = 1,
-                Y = 1,
-                Width = 20,
-                Height = 4,
+                this.player.Stop();
             };
 
-            win.Add(playBtn, stopBtn, pauseBtn, nowPlaying);
+            playbackControls.Add(stopBtn, pauseBtn, playBtn);
 
-            // Create the menubar.
-            var menu = new MenuBar(new MenuBarItem[]
+            // Create the left-hand playlists view.
+            leftPane = new FrameView("Playlists")
             {
-            new MenuBarItem("_File", new MenuItem[]
+                X = 0,
+                Y = 1, // for menu
+                Width = 25,
+                Height = 40,
+                CanFocus = false,
+            };
+
+            categories = new List<string>();
+            categories.Add("Rockin' Tunes");
+            categoryListView = new ListView(categories)
             {
-                new MenuItem("_Open", "Open a music file", () => this.OpenFile()),
-
-                new MenuItem("_Load Stream", "Load a stream", () => this.OpenFile()), // Replace this with an OpenStream() method.
-
-                new MenuItem("_Quit", "Exit MusicSharp", () => Application.RequestStop()),
-            }),
-
-            new MenuBarItem("_Help", new MenuItem[]
+                X = 0,
+                Y = 0,
+                Width = Dim.Fill(0),
+                Height = Dim.Fill(0),
+                AllowsMarking = false,
+                CanFocus = true,
+            };
+            categoryListView.OpenSelectedItem += (a) => 
             {
-                new MenuItem("_About MusicSharp", string.Empty, () =>
-                {
-                    MessageBox.Query("Music Sharp 0.5.0", "\nMusic Sharp is a lightweight CLI\n music player written in C#.\n\nDeveloped by Mark-James McDougall\nand licensed under the GPL v3.\n ", "Close");
-                }),
-            }),
-            });
+                rightPane.SetFocus();
+            };
+
+            leftPane.Add(categoryListView);
+
+            rightPane = new FrameView("Media")
+            {
+                X = 25,
+                Y = 1, // for menu
+                Width = Dim.Fill(),
+                Height = Dim.Fill(1),
+                CanFocus = true,
+            };
+
+            scenarioListView = new ListView()
+            {
+                X = 0,
+                Y = 0,
+                Width = Dim.Fill(0),
+                Height = Dim.Fill(0),
+                AllowsMarking = false,
+                CanFocus = true,
+            };
 
             // Add the layout elements and run the app.
-            top.Add(menu, win);
+            top.Add(menu, leftPane, rightPane, playbackControls);
 
             Application.Run();
         }

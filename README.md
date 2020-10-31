@@ -16,7 +16,11 @@ Currently in an early alpha beta stage, MusicSharp makes use of the [NAudio](htt
 
 ## Want to Contribute?
 
-NAudio currently isn't cross-platform, but the player class is loosely coupled to the GUI by using Dependency Injection (DI). Currently, the GUI injects [Winplayer](https://github.com/markjamesm/MusicSharp/blob/main/src/model/WinPlayer.cs) to handle audio processing. Conceivably, one could write a Linux or MacOS player class which conforms to IPlayer using a cross-platform C# audio library such as [Bassoon](https://gitlab.com/define-private-public/Bassoon), and this would be a great contribution to the project. To see how you can submit PRs, be sure to check out our [contributing page](https://github.com/markjamesm/MusicSharp/blob/main/CONTRIBUTING.md). There's also several [issues](https://github.com/markjamesm/MusicSharp/issues) which could use work on.
+To see how you can submit PRs, be sure to check out our [contributing page](https://github.com/markjamesm/MusicSharp/blob/main/CONTRIBUTING.md).
+
+NAudio currently isn't cross-platform, but the player class is loosely coupled to the GUI by using Dependency Injection (DI). Currently, the GUI injects [Winplayer](https://github.com/markjamesm/MusicSharp/blob/main/src/model/WinPlayer.cs) to handle audio processing. Conceivably, one could write a Linux or MacOS player class which conforms to IPlayer using a cross-platform C# audio library such as [Bassoon](https://gitlab.com/define-private-public/Bassoon), and this would be a great contribution to the project. 
+
+There's also several [issues](https://github.com/markjamesm/MusicSharp/issues) which could use work on.
 
 ## Screenshot
 

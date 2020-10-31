@@ -13,4 +13,4 @@ Currently in an early alpha beta stage, MusicSharp makes use of the [NAudio](htt
 
 ## Screenshot
 
-<img src="https://user-images.githubusercontent.com/20845425/97771006-11154c80-1b0f-11eb-9532-cb4e53040e11.png" alt="Screenshot of MusicSharp 0.5.0.">
+<img src="https://user-images.githubusercontent.com/20845425/97771186-c8f72980-1b10-11eb-9082-cf053eb8fd5a.png" alt="Screenshot of MusicSharp 0.6.1.">

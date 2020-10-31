@@ -69,7 +69,7 @@ namespace MusicSharp
                 X = 0,
                 Y = 24,
                 Width = Dim.Fill(),
-                Height = Dim.Fill(),
+                Height = 5,
                 CanFocus = false,
             };
 
@@ -113,7 +113,7 @@ namespace MusicSharp
                 X = 0,
                 Y = 1, // for menu
                 Width = 25,
-                Height = 40,
+                Height = 23,
                 CanFocus = false,
             };
 
@@ -123,12 +123,12 @@ namespace MusicSharp
             {
                 X = 0,
                 Y = 0,
-                Width = Dim.Fill(0),
-                Height = Dim.Fill(0),
+                Width = Dim.Fill(),
+                Height = 23,
                 AllowsMarking = false,
                 CanFocus = true,
             };
-            categoryListView.OpenSelectedItem += (a) => 
+            categoryListView.OpenSelectedItem += (a) =>
             {
                 rightPane.SetFocus();
             };
@@ -140,7 +140,7 @@ namespace MusicSharp
                 X = 25,
                 Y = 1, // for menu
                 Width = Dim.Fill(),
-                Height = Dim.Fill(1),
+                Height = 23,
                 CanFocus = true,
             };
 
@@ -148,8 +148,8 @@ namespace MusicSharp
             {
                 X = 0,
                 Y = 0,
-                Width = Dim.Fill(0),
-                Height = Dim.Fill(0),
+                Width = Dim.Fill(),
+                Height = 23,
                 AllowsMarking = false,
                 CanFocus = true,
             };

@@ -4,8 +4,6 @@
 
 namespace MusicSharp
 {
-    using NAudio.Wave;
-
     /// <summary>
     /// Defines the methods an audio player class should implement.
     /// </summary>
@@ -15,16 +13,6 @@ namespace MusicSharp
         /// Gets or sets the last file opened by the player.
         /// </summary>
         string LastFileOpened { get; set; }
-
-        /// <summary>
-        /// Gets or sets the audio output device.
-        /// </summary>
-        WaveOutEvent OutputDevice { get; set; }
-
-        /// <summary>
-        /// Gets or sets the audio file to load.
-        /// </summary>
-        AudioFileReader AudioFile { get; set; }
 
         /// <summary>
         /// Method to play audio.
@@ -41,12 +29,5 @@ namespace MusicSharp
         /// Method to stop audio playback.
         /// </summary>
         void Stop();
-
-        /// <summary>
-        /// Method to dispose of resources when audio playback is finished.
-        /// </summary>
-        /// <param name="sender">The object.</param>
-        /// <param name="args">StoppedEventArgs.</param>
-        void OnPlaybackStopped(object sender, StoppedEventArgs args);
     }
 }

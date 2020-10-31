@@ -76,20 +76,12 @@ namespace MusicSharp
             var playBtn = new Button(1, 1, "Play");
             playBtn.Clicked += () =>
             {
-                if (this.player.LastFileOpened != null && this.player.OutputDevice != null)
-                {
-                    try
-                    {
-                        this.player.OutputDevice.Play();
-                    }
-                    catch (System.NullReferenceException)
-                    {
-                    }
-                }
-                else
-                {
+                if(this.player.LastFileOpened == null) {
                     this.OpenFile();
+                    return;
                 }
+
+                this.player.Play(this.player.LastFileOpened);
             };
 
             var pauseBtn = new Button(10, 1, "Pause");
@@ -169,7 +161,7 @@ namespace MusicSharp
             if (!d.Canceled)
             {
                 this.player.LastFileOpened = d.FilePath.ToString();
-                this.player.Play(d.FilePath.ToString());
+                this.player.Play(this.player.LastFileOpened);
             }
         }
     }

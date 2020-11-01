@@ -11,116 +11,49 @@ namespace MusicSharp
     /// </summary>
     public class WinPlayer : IPlayer
     {
-        private WaveOutEvent outputDevice;
-        private AudioFileReader audioFile;
+        private readonly WaveOutEvent outputDevice;
+        private AudioFileReader audioFileReader;
 
         /// <inheritdoc/>
         public string LastFileOpened { get; set; }
 
-        /// <inheritdoc/>
-        public WaveOutEvent OutputDevice
+        public WinPlayer() 
         {
-            get
-            {
-                return this.outputDevice;
-            }
-
-            set
-            {
-                this.outputDevice = this.OutputDevice;
-            }
-        }
-
-        /// <inheritdoc/>
-        public AudioFileReader AudioFile
-        {
-            get
-            {
-                return this.audioFile;
-            }
-
-            set
-            {
-                this.audioFile = this.AudioFile;
-            }
+            this.outputDevice = new WaveOutEvent();
+            this.outputDevice.PlaybackStopped += this.OnPlaybackStopped;
         }
 
         /// <inheritdoc/>
         public void Stop()
         {
-            if (this.outputDevice != null)
-            {
-                try
-                {
-                    this.outputDevice?.Stop();
-                    this.outputDevice.PlaybackStopped += this.OnPlaybackStopped;
-                }
-                catch (System.NullReferenceException)
-                {
-                }
-            }
+            this.outputDevice.Stop();
         }
 
         /// <inheritdoc/>
         public void Play(string path)
         {
-            if (this.outputDevice == null)
+            if (this.outputDevice.PlaybackState != PlaybackState.Stopped) 
             {
-                this.outputDevice = new WaveOutEvent();
-                this.outputDevice.PlaybackStopped += this.OnPlaybackStopped;
+                return;
             }
 
-            if (this.audioFile == null)
-            {
-                try
-                {
-                    this.audioFile = new AudioFileReader(this.LastFileOpened);
-                    this.outputDevice.Init(this.audioFile);
-                    this.outputDevice.Play();
-                }
-                catch (System.Runtime.InteropServices.COMException)
-                {
-                }
-            }
-
-            if (this.audioFile != null)
-            {
-                try
-                {
-                    this.outputDevice.Play();
-                }
-                catch (System.Runtime.InteropServices.COMException)
-                {
-                }
-            }
+            this.audioFileReader = new AudioFileReader(path);
+            this.outputDevice.Init(this.audioFileReader);
+            this.outputDevice.Play();
         }
 
         /// <inheritdoc/>
         public void Pause()
         {
-            try
-            {
-                this.outputDevice?.Pause();
-            }
-            catch (System.NullReferenceException)
-            {
-            }
+            this.outputDevice.Pause();
         }
 
         /// <inheritdoc/>
-        // Dispose of our device and AudioFile once playback is stopped.
-        // These will be changed in the future as we might want to allow
-        // users to carry on playback from where they left off.
+        // Dispose of our device once playback is stopped.
         public void OnPlaybackStopped(object sender, StoppedEventArgs args)
         {
+            this.audioFileReader.Dispose();
             this.outputDevice.Dispose();
-            this.outputDevice = null;
-
-            // this.AudioFile.Dispose();
-
-            // By resetting the AudioFile position to 0, playback can start again.
-            // this.AudioFile.Position = 0;
-            //   this.AudioFile = null;
         }
     }
 }

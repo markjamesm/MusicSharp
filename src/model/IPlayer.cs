@@ -29,5 +29,9 @@ namespace MusicSharp
         /// Method to stop audio playback.
         /// </summary>
         void Stop();
+
+        void IncreaseVolume();
+
+        void DecreaseVolume();
     }
 }

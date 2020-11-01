@@ -60,5 +60,31 @@ namespace MusicSharp
             this.audioFileReader.Dispose();
             this.outputDevice.Dispose();
         }
+
+        public void IncreaseVolume()
+        {
+            // Use this construct to prevent edge cases going over 1.0f
+            // This is caused by using floats in WaveOutEvent
+            if (this.outputDevice.Volume > 0.9f)
+            {
+                this.outputDevice.Volume = 1.0f;
+                return;
+            }
+
+            this.outputDevice.Volume += 0.1f;
+        }
+
+        public void DecreaseVolume()
+        {
+            // Use this construct to prevent edge cases going under 0.0f
+            // This is caused by using floats in WaveOutEvent
+            if (this.outputDevice.Volume < 0.1f)
+            {
+                this.outputDevice.Volume = 0.0f;
+                return;
+            }
+
+            this.outputDevice.Volume -= 0.1f;
+        }
     }
 }

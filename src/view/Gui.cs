@@ -76,7 +76,8 @@ namespace MusicSharp
             var playBtn = new Button(1, 1, "Play");
             playBtn.Clicked += () =>
             {
-                if(this.player.LastFileOpened == null) {
+                if (this.player.LastFileOpened == null)
+                {
                     this.OpenFile();
                     return;
                 }
@@ -90,14 +91,25 @@ namespace MusicSharp
                 this.player.Pause();
             };
 
-            // Add the playback components.
             var stopBtn = new Button(20, 1, "Stop");
             stopBtn.Clicked += () =>
             {
                 this.player.Stop();
             };
 
-            playbackControls.Add(stopBtn, pauseBtn, playBtn);
+            var increaseVolumeButton = new Button(29, 1, "+ Volume");
+            increaseVolumeButton.Clicked += () =>
+            {
+                this.player.IncreaseVolume();
+            };
+
+            var decreaseVolumeButton = new Button(42, 1, "- Volume");
+            decreaseVolumeButton.Clicked += () =>
+            {
+                this.player.DecreaseVolume();
+            };
+
+            playbackControls.Add(playBtn, pauseBtn, stopBtn, increaseVolumeButton, decreaseVolumeButton);
 
             // Create the left-hand playlists view.
             leftPane = new FrameView("Playlists")
@@ -120,6 +132,7 @@ namespace MusicSharp
                 AllowsMarking = false,
                 CanFocus = true,
             };
+
             categoryListView.OpenSelectedItem += (a) =>
             {
                 rightPane.SetFocus();

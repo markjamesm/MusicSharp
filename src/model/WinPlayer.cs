@@ -61,6 +61,9 @@ namespace MusicSharp
             this.outputDevice.Dispose();
         }
 
+        /// <summary>
+        /// Method to increase audio playback volume.
+        /// </summary>
         public void IncreaseVolume()
         {
             // Use this construct to prevent edge cases going over 1.0f
@@ -74,6 +77,9 @@ namespace MusicSharp
             this.outputDevice.Volume += 0.1f;
         }
 
+        /// <summary>
+        /// Method to decrease audio playback volume.
+        /// </summary>
         public void DecreaseVolume()
         {
             // Use this construct to prevent edge cases going under 0.0f

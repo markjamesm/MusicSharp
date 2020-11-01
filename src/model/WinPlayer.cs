@@ -14,14 +14,17 @@ namespace MusicSharp
         private readonly WaveOutEvent outputDevice;
         private AudioFileReader audioFileReader;
 
-        /// <inheritdoc/>
-        public string LastFileOpened { get; set; }
-
-        public WinPlayer() 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="WinPlayer"/> class.
+        /// </summary>
+        public WinPlayer()
         {
             this.outputDevice = new WaveOutEvent();
             this.outputDevice.PlaybackStopped += this.OnPlaybackStopped;
         }
+
+        /// <inheritdoc/>
+        public string LastFileOpened { get; set; }
 
         /// <inheritdoc/>
         public void Stop()
@@ -32,13 +35,12 @@ namespace MusicSharp
         /// <inheritdoc/>
         public void Play(string path)
         {
-            if (this.outputDevice.PlaybackState != PlaybackState.Stopped) 
+            if (this.outputDevice.PlaybackState == PlaybackState.Stopped)
             {
-                return;
+                this.audioFileReader = new AudioFileReader(path);
+                this.outputDevice.Init(this.audioFileReader);
             }
 
-            this.audioFileReader = new AudioFileReader(path);
-            this.outputDevice.Init(this.audioFileReader);
             this.outputDevice.Play();
         }
 
@@ -48,8 +50,11 @@ namespace MusicSharp
             this.outputDevice.Pause();
         }
 
-        /// <inheritdoc/>
-        // Dispose of our device once playback is stopped.
+        /// <summary>
+        /// Dispose of our device once playback is stopped.
+        /// </summary>
+        /// <param name="sender">The object sender.</param>
+        /// <param name="args">The StoppedEventArgs.</param>
         public void OnPlaybackStopped(object sender, StoppedEventArgs args)
         {
             this.audioFileReader.Dispose();

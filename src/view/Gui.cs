@@ -169,9 +169,9 @@ namespace MusicSharp
         private void OpenFile()
         {
             var d = new OpenDialog("Open", "Open an audio file") { AllowsMultipleSelection = false };
+
             // This will filter the dialog on basis of the allowed file types in the array.
-            
-            d.AllowedFileTypes = new string[] {".mp3", ".wav", ".flac"};
+            d.AllowedFileTypes = new string[] { ".mp3", ".wav", ".flac" };
             Application.Run(d);
 
             if (!d.Canceled)

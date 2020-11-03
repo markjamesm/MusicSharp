@@ -17,6 +17,7 @@ namespace MusicSharp
         private static FrameView leftPane;
         private static FrameView rightPane;
         private static FrameView playbackControls;
+        private static FrameView nowPlaying;
         private static ListView scenarioListView;
 
         /// <summary>
@@ -32,6 +33,11 @@ namespace MusicSharp
         {
             this.player = player;
         }
+
+        /// <summary>
+        ///  Gets and sets the current audio file play progress.
+        /// </summary>
+        internal ProgressBar AudioProgressBar { get; private set; }
 
         /// <summary>
         /// Start the UI.
@@ -58,7 +64,7 @@ namespace MusicSharp
             {
                 new MenuItem("_About MusicSharp", string.Empty, () =>
                 {
-                    MessageBox.Query("Music Sharp 0.6.0", "\nMusic Sharp is a lightweight CLI\n music player written in C#.\n\nDeveloped by Mark-James McDougall\nand licensed under the GPL v3.\n ", "Close");
+                    MessageBox.Query("Music Sharp 0.6.6", "\nMusic Sharp is a lightweight CLI\n music player written in C#.\n\nDeveloped by Mark-James McDougall\nand licensed under the GPL v3.\n ", "Close");
                 }),
             }),
             });
@@ -68,9 +74,9 @@ namespace MusicSharp
             {
                 X = 0,
                 Y = 24,
-                Width = Dim.Fill(),
+                Width = 70,
                 Height = 5,
-                CanFocus = false,
+                CanFocus = true,
             };
 
             var playBtn = new Button(1, 1, "Play");
@@ -97,13 +103,13 @@ namespace MusicSharp
                 this.player.Stop();
             };
 
-            var increaseVolumeButton = new Button(29, 1, "+ Volume");
+            var increaseVolumeButton = new Button(55, 0, "+ Volume");
             increaseVolumeButton.Clicked += () =>
             {
                 this.player.IncreaseVolume();
             };
 
-            var decreaseVolumeButton = new Button(42, 1, "- Volume");
+            var decreaseVolumeButton = new Button(55, 2, "- Volume");
             decreaseVolumeButton.Clicked += () =>
             {
                 this.player.DecreaseVolume();
@@ -159,8 +165,30 @@ namespace MusicSharp
                 CanFocus = true,
             };
 
+            // Create the audio progress bar frame.
+            nowPlaying = new FrameView("Now Playing")
+            {
+                X = 70,
+                Y = 24,
+                Width = Dim.Fill(),
+                Height = 5,
+                CanFocus = false,
+            };
+
+            this.AudioProgressBar = new ProgressBar()
+            {
+                X = 1,
+                Y = 2,
+                Width = Dim.Fill() - 1,
+                Height = 1,
+                Fraction = 0.4F,
+                ColorScheme = Colors.Error,
+            };
+
+            nowPlaying.Add(this.AudioProgressBar);
+
             // Add the layout elements and run the app.
-            top.Add(menu, leftPane, rightPane, playbackControls);
+            top.Add(menu, leftPane, rightPane, playbackControls, nowPlaying);
 
             Application.Run();
         }

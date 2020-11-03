@@ -22,4 +22,4 @@ A list of open tasks can be found on our [issues page](https://github.com/markja
 
 ## Screenshot
 
-<img src="https://user-images.githubusercontent.com/20845425/97815753-61e78b00-1c5e-11eb-8800-35ad232b44b2.png" alt="Screenshot of MusicSharp">
+<img src="https://user-images.githubusercontent.com/20845425/97947646-ecfa7b00-1d5b-11eb-8337-49e1acf3f3ea.png" alt="Screenshot of MusicSharp">

@@ -30,8 +30,14 @@ namespace MusicSharp
         /// </summary>
         void Stop();
 
+        /// <summary>
+        /// Method to increase audio playback volume.
+        /// </summary>
         void IncreaseVolume();
 
+        /// <summary>
+        /// Method to decrease audio playback volume.
+        /// </summary>
         void DecreaseVolume();
     }
 }

@@ -57,7 +57,11 @@ namespace MusicSharp
         /// <param name="args">The StoppedEventArgs.</param>
         public void OnPlaybackStopped(object sender, StoppedEventArgs args)
         {
-            this.audioFileReader.Dispose();
+            if (this.audioFileReader != null)
+            {
+                this.audioFileReader.Dispose();
+            }
+
             this.outputDevice.Dispose();
         }
 
@@ -91,6 +95,25 @@ namespace MusicSharp
             }
 
             this.outputDevice.Volume -= 0.1f;
+        }
+
+        /// <inheritdoc/>
+        public void PlayStream(string streamURL)
+        {
+            try
+            {
+                using (var mf = new MediaFoundationReader(streamURL))
+                {
+                    this.outputDevice.Init(mf);
+                    this.outputDevice.Play();
+                }
+            }
+            catch (System.ArgumentException)
+            {
+            }
+            catch (System.IO.FileNotFoundException)
+            {
+            }
         }
     }
 }

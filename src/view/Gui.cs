@@ -120,7 +120,7 @@ namespace MusicSharp
             playbackControls.Add(playBtn, pauseBtn, stopBtn, increaseVolumeButton, decreaseVolumeButton);
 
             // Create the left-hand playlists view.
-            leftPane = new FrameView("Playlists")
+            leftPane = new FrameView("Artists")
             {
                 X = 0,
                 Y = 1, // for menu
@@ -130,7 +130,7 @@ namespace MusicSharp
             };
 
             categories = new List<string>();
-            categories.Add("Rockin' Tunes");
+            categories.Add("Zhund");
             categoryListView = new ListView(categories)
             {
                 X = 0,
@@ -148,7 +148,7 @@ namespace MusicSharp
 
             leftPane.Add(categoryListView);
 
-            rightPane = new FrameView("Media")
+            rightPane = new FrameView("Tracks")
             {
                 X = 25,
                 Y = 1, // for menu
@@ -215,8 +215,7 @@ namespace MusicSharp
         {
             var d = new Dialog("Open Stream", 50, 15);
 
-            // Type text here: ______
-            var editLabel = new Label("Enter the url of the audio stream to load\n(MP3 only):")
+            var editLabel = new Label("Enter the url of the audio stream to load:\n(.mp3 only)")
             {
                 X = 0,
                 Y = 0,
@@ -230,9 +229,12 @@ namespace MusicSharp
                 Width = 42,
             };
 
+           // d.KeyPress += (a) => streamURL.Text = a.KeyEvent.ToString();
+
             var loadStream = new Button(12, 7, "Load Stream");
             loadStream.Clicked += () =>
             {
+                this.player.PlayStream(streamURL.Text.ToString());
                 Application.RequestStop();
             };
 

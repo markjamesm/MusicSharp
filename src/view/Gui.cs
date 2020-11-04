@@ -57,6 +57,8 @@ namespace MusicSharp
             {
                 new MenuItem("_Open", "Open a music file", () => this.OpenFile()),
 
+                new MenuItem("_Open Stream", "Open a music stream", () => this.OpenStream()),
+
                 new MenuItem("_Quit", "Exit MusicSharp", () => Application.RequestStop()),
             }),
 
@@ -208,5 +210,43 @@ namespace MusicSharp
                 this.player.Play(this.player.LastFileOpened);
             }
         }
-    }
+
+        private void OpenStream()
+        {
+            var d = new Dialog("Open Stream", 50, 15);
+
+            // Type text here: ______
+            var editLabel = new Label("Enter the url of the audio stream to load\n(MP3 only):")
+            {
+                X = 0,
+                Y = 0,
+                Width = Dim.Fill(),
+            };
+
+            var streamURL = new TextField(string.Empty)
+            {
+                X = 3,
+                Y = 4,
+                Width = 42,
+            };
+
+            var loadStream = new Button(12, 7, "Load Stream");
+            loadStream.Clicked += () =>
+            {
+                Application.RequestStop();
+            };
+
+            var cancelStream = new Button(29, 7, "Cancel");
+            cancelStream.Clicked += () =>
+            {
+                Application.RequestStop();
+            };
+
+            d.AddButton(loadStream);
+            d.AddButton(cancelStream);
+            d.Add(editLabel, streamURL);
+            Application.Run(d);
+        }
+
+}
 }

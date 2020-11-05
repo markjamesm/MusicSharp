@@ -72,7 +72,8 @@ namespace MusicSharp
             }),
             });
 
-            var statusBar = new StatusBar(new StatusItem[] {
+            statusBar = new StatusBar(new StatusItem[] 
+            {
             new StatusItem(Key.F1, "~F1~ Open file", () => this.OpenFile()),
             new StatusItem(Key.F2, "~F2~ Open stream", () => this.OpenStream()),
             new StatusItem(Key.F3, "~F3~ Quit", () => Application.RequestStop()),

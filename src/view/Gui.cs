@@ -19,6 +19,7 @@ namespace MusicSharp
         private static FrameView playbackControls;
         private static FrameView nowPlaying;
         private static ListView scenarioListView;
+        private static StatusBar statusBar;
 
         /// <summary>
         /// Create a new instance of the audio player engine.
@@ -69,6 +70,12 @@ namespace MusicSharp
                     MessageBox.Query("Music Sharp 0.6.6", "\nMusic Sharp is a lightweight CLI\n music player written in C#.\n\nDeveloped by Mark-James McDougall\nand licensed under the GPL v3.\n ", "Close");
                 }),
             }),
+            });
+
+            var statusBar = new StatusBar(new StatusItem[] {
+            new StatusItem(Key.F1, "~F1~ Open file", () => this.OpenFile()),
+            new StatusItem(Key.F2, "~F2~ Open stream", () => this.OpenStream()),
+            new StatusItem(Key.F3, "~F3~ Quit", () => Application.RequestStop()),
             });
 
             // Create the playback controls frame.
@@ -190,7 +197,7 @@ namespace MusicSharp
             nowPlaying.Add(this.AudioProgressBar);
 
             // Add the layout elements and run the app.
-            top.Add(menu, leftPane, rightPane, playbackControls, nowPlaying);
+            top.Add(menu, leftPane, rightPane, playbackControls, nowPlaying, statusBar);
 
             Application.Run();
         }
@@ -229,8 +236,7 @@ namespace MusicSharp
                 Width = 42,
             };
 
-           // d.KeyPress += (a) => streamURL.Text = a.KeyEvent.ToString();
-
+            // d.KeyPress += (a) => streamURL.Text = a.KeyEvent.ToString();
             var loadStream = new Button(12, 7, "Load Stream");
             loadStream.Clicked += () =>
             {

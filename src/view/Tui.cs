@@ -10,7 +10,7 @@ namespace MusicSharp
     /// <summary>
     /// The Gui class houses the CLI elements of MusicSharp.
     /// </summary>
-    public class Gui
+    public class Tui
     {
         private static List<string> categories;
         private static ListView categoryListView;
@@ -27,10 +27,10 @@ namespace MusicSharp
         private readonly IPlayer player;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="Gui"/> class.
+        /// Initializes a new instance of the <see cref="Tui"/> class.
         /// </summary>
         /// <param name="player">The player to be injected.</param>
-        public Gui(IPlayer player)
+        public Tui(IPlayer player)
         {
             this.player = player;
         }

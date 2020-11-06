@@ -17,7 +17,7 @@ public class Program
         // Start MusicSharp.
         IPlayer player = new WinPlayer();
 
-        Gui gui = new Gui(player);
+        Tui gui = new Tui(player);
         gui.Start();
     }
 }

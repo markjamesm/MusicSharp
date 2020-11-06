@@ -1,4 +1,4 @@
-﻿// <copyright file="Gui.cs" company="Mark-James McDougall">
+﻿// <copyright file="Tui.cs" company="Mark-James McDougall">
 // Licensed under the GNU GPL v3 License. See LICENSE in the project root for license information.
 // </copyright>
 
@@ -262,6 +262,21 @@ namespace MusicSharp
             d.AddButton(cancelStream);
             d.Add(editLabel, streamURL);
             Application.Run(d);
+        }
+
+        private void LoadPlaylist()
+        {
+            var d = new OpenDialog("Open", "Open a playlist") { AllowsMultipleSelection = false };
+
+            // This will filter the dialog on basis of the allowed file types in the array.
+            d.AllowedFileTypes = new string[] { ".m3u" };
+            Application.Run(d);
+
+            if (!d.Canceled)
+            {
+                this.player.LastFileOpened = d.FilePath.ToString();
+                this.player.Play(this.player.LastFileOpened);
+            }
         }
     }
 }

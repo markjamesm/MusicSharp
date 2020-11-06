@@ -58,9 +58,17 @@ namespace MusicSharp
             {
                 new MenuItem("_Open", "Open a music file", () => this.OpenFile()),
 
-                new MenuItem("_Open Stream", "Open a music stream", () => this.OpenStream()),
+                new MenuItem("Open S_tream", "Open a music stream", () => this.OpenStream()),
 
                 new MenuItem("_Quit", "Exit MusicSharp", () => Application.RequestStop()),
+            }),
+
+            new MenuBarItem("_Playlists", new MenuItem[]
+            {
+                new MenuItem("Open Pla_ylist", string.Empty, () =>
+                {
+                    MessageBox.Query("Notice", "\nFeature not yet implemented.\n ", "Close");
+                }),
             }),
 
             new MenuBarItem("_Help", new MenuItem[]
@@ -72,7 +80,7 @@ namespace MusicSharp
             }),
             });
 
-            statusBar = new StatusBar(new StatusItem[] 
+            statusBar = new StatusBar(new StatusItem[]
             {
             new StatusItem(Key.F1, "~F1~ Open file", () => this.OpenFile()),
             new StatusItem(Key.F2, "~F2~ Open stream", () => this.OpenStream()),
@@ -237,7 +245,6 @@ namespace MusicSharp
                 Width = 42,
             };
 
-            // d.KeyPress += (a) => streamURL.Text = a.KeyEvent.ToString();
             var loadStream = new Button(12, 7, "Load Stream");
             loadStream.Clicked += () =>
             {
@@ -256,6 +263,5 @@ namespace MusicSharp
             d.Add(editLabel, streamURL);
             Application.Run(d);
         }
-
-}
+    }
 }

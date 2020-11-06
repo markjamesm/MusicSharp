@@ -1,9 +1,10 @@
-﻿// <copyright file="Tui.cs" company="Mark-James McDougall">
+﻿// <copyright file="Gui.cs" company="Mark-James McDougall">
 // Licensed under the GNU GPL v3 License. See LICENSE in the project root for license information.
 // </copyright>
 
 namespace MusicSharp
 {
+    using System;
     using System.Collections.Generic;
     using Terminal.Gui;
 
@@ -54,37 +55,37 @@ namespace MusicSharp
             // Create the menubar.
             var menu = new MenuBar(new MenuBarItem[]
             {
-            new MenuBarItem("_File", new MenuItem[]
-            {
-                new MenuItem("_Open", "Open a music file", () => this.OpenFile()),
-
-                new MenuItem("Open S_tream", "Open a music stream", () => this.OpenStream()),
-
-                new MenuItem("_Quit", "Exit MusicSharp", () => Application.RequestStop()),
-            }),
-
-            new MenuBarItem("_Playlists", new MenuItem[]
-            {
-                new MenuItem("Open Pla_ylist", string.Empty, () =>
+                new MenuBarItem("_File", new MenuItem[]
                 {
-                    MessageBox.Query("Notice", "\nFeature not yet implemented.\n ", "Close");
-                }),
-            }),
+                    new MenuItem("_Open", "Open a music file", () => this.OpenFile()),
 
-            new MenuBarItem("_Help", new MenuItem[]
-            {
-                new MenuItem("_About MusicSharp", string.Empty, () =>
-                {
-                    MessageBox.Query("Music Sharp 0.6.6", "\nMusic Sharp is a lightweight CLI\n music player written in C#.\n\nDeveloped by Mark-James McDougall\nand licensed under the GPL v3.\n ", "Close");
+                    new MenuItem("Open S_tream", "Open a music stream", () => this.OpenStream()),
+
+                    new MenuItem("_Quit", "Exit MusicSharp", () => Application.RequestStop()),
                 }),
-            }),
+
+                new MenuBarItem("_Playlists", new MenuItem[]
+                {
+                    new MenuItem("Open Pla_ylist", string.Empty, () =>
+                    {
+                        MessageBox.Query("Notice", "\nFeature not yet implemented.\n ", "Close");
+                    }),
+                }),
+
+                new MenuBarItem("_Help", new MenuItem[]
+                {
+                    new MenuItem("_About MusicSharp", string.Empty, () =>
+                    {
+                        MessageBox.Query("Music Sharp 0.6.6", "\nMusic Sharp is a lightweight CLI\n music player written in C#.\n\nDeveloped by Mark-James McDougall\nand licensed under the GPL v3.\n ", "Close");
+                    }),
+                }),
             });
 
             statusBar = new StatusBar(new StatusItem[]
             {
-            new StatusItem(Key.F1, "~F1~ Open file", () => this.OpenFile()),
-            new StatusItem(Key.F2, "~F2~ Open stream", () => this.OpenStream()),
-            new StatusItem(Key.F3, "~F3~ Quit", () => Application.RequestStop()),
+                new StatusItem(Key.F1, "~F1~ Open file", () => this.OpenFile()),
+                new StatusItem(Key.F2, "~F2~ Open stream", () => this.OpenStream()),
+                new StatusItem(Key.F3, "~F3~ Quit", () => Application.RequestStop()),
             });
 
             // Create the playback controls frame.
@@ -216,6 +217,8 @@ namespace MusicSharp
         {
             var d = new OpenDialog("Open", "Open an audio file") { AllowsMultipleSelection = false };
 
+            d.DirectoryPath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+
             // This will filter the dialog on basis of the allowed file types in the array.
             d.AllowedFileTypes = new string[] { ".mp3", ".wav", ".flac" };
             Application.Run(d);
@@ -262,21 +265,6 @@ namespace MusicSharp
             d.AddButton(cancelStream);
             d.Add(editLabel, streamURL);
             Application.Run(d);
-        }
-
-        private void LoadPlaylist()
-        {
-            var d = new OpenDialog("Open", "Open a playlist") { AllowsMultipleSelection = false };
-
-            // This will filter the dialog on basis of the allowed file types in the array.
-            d.AllowedFileTypes = new string[] { ".m3u" };
-            Application.Run(d);
-
-            if (!d.Canceled)
-            {
-                this.player.LastFileOpened = d.FilePath.ToString();
-                this.player.Play(this.player.LastFileOpened);
-            }
         }
     }
 }

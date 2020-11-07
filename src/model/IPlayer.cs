@@ -18,12 +18,18 @@ namespace MusicSharp
         /// Method to play audio.
         /// </summary>
         /// <param name="path">The filepath of the audio file to play.</param>
-        void Play(string path);
+        void OpenFile(string path);
+
+        /// <summary>
+        /// Method to play an audio stream from a URL.
+        /// </summary>
+        /// <param name="streamURL">The stream URL of the audio file to play.</param>
+        void OpenStream(string streamURL);
 
         /// <summary>
         /// Method to pause audio playback.
         /// </summary>
-        void Pause();
+        void PlayPause();
 
         /// <summary>
         /// Method to stop audio playback.
@@ -39,11 +45,5 @@ namespace MusicSharp
         /// Method to decrease audio playback volume.
         /// </summary>
         void DecreaseVolume();
-
-        /// <summary>
-        /// Method to play an audio stream from a URL.
-        /// </summary>
-        /// <param name="streamURL">The stream URL of the audio file to play.</param>
-        void PlayStream(string streamURL);
     }
 }

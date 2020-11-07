@@ -13,7 +13,7 @@
             var player = new WinPlayer();
 
             // act and assert
-            Assert.ThrowsException<System.NullReferenceException>(() => player.Play(null));
+            Assert.ThrowsException<System.NullReferenceException>(() => player.OpenFile(null));
         }
     }
 }

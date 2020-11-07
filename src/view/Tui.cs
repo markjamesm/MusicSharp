@@ -100,26 +100,21 @@ namespace MusicSharp
                 CanFocus = true,
             };
 
-            var playBtn = new Button(1, 1, "Play");
-            playBtn.Clicked += () =>
+            var playPauseButton = new Button(1, 1, "Play / Pause");
+            playPauseButton.Clicked += () =>
             {
-                if (this.player.LastFileOpened == null)
+                try 
                 {
-                    this.OpenFile();
-                    return;
+                    this.player.PlayPause();
+                } 
+                catch(Exception) 
+                {
+                    MessageBox.Query("Warning", "Select a file or stream first.", "Close");
                 }
-
-                this.player.Play(this.player.LastFileOpened);
             };
 
-            var pauseBtn = new Button(10, 1, "Pause");
-            pauseBtn.Clicked += () =>
-            {
-                this.player.Pause();
-            };
-
-            var stopBtn = new Button(20, 1, "Stop");
-            stopBtn.Clicked += () =>
+            var stopButton = new Button(20, 1, "Stop");
+            stopButton.Clicked += () =>
             {
                 this.player.Stop();
             };
@@ -136,7 +131,7 @@ namespace MusicSharp
                 this.player.DecreaseVolume();
             };
 
-            playbackControls.Add(playBtn, pauseBtn, stopBtn, increaseVolumeButton, decreaseVolumeButton);
+            playbackControls.Add(playPauseButton, stopButton, increaseVolumeButton, decreaseVolumeButton);
 
             // Create the left-hand playlists view.
             leftPane = new FrameView("Artists")
@@ -172,6 +167,7 @@ namespace MusicSharp
                 X = 25,
                 Y = 1, // for menu
                 Width = Dim.Fill(),
+
                 Height = 23,
                 CanFocus = true,
             };
@@ -228,7 +224,7 @@ namespace MusicSharp
             if (!d.Canceled)
             {
                 this.player.LastFileOpened = d.FilePath.ToString();
-                this.player.Play(this.player.LastFileOpened);
+                this.player.OpenFile(this.player.LastFileOpened);
             }
         }
 
@@ -253,7 +249,7 @@ namespace MusicSharp
             var loadStream = new Button(12, 7, "Load Stream");
             loadStream.Clicked += () =>
             {
-                this.player.PlayStream(streamURL.Text.ToString());
+                this.player.OpenStream(streamURL.Text.ToString());
                 Application.RequestStop();
             };
 

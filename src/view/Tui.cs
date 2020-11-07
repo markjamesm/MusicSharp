@@ -23,13 +23,12 @@ namespace MusicSharp
         private static ListView scenarioListView;
         private static StatusBar statusBar;
 
-        private List<string> playlist;
-
         /// <summary>
         /// Create a new instance of the audio player engine.
         /// </summary>
         private readonly IPlayer player;
 
+        private List<string> playlist = new List<string>();
         private PlaylistLoader playlistLoader = new PlaylistLoader();
 
         /// <summary>
@@ -221,7 +220,7 @@ namespace MusicSharp
             var d = new OpenDialog("Open", "Open an audio file") { AllowsMultipleSelection = false };
 
             d.DirectoryPath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-            
+
             // This will filter the dialog on basis of the allowed file types in the array.
             d.AllowedFileTypes = new string[] { ".mp3", ".wav", ".flac" };
             Application.Run(d);
@@ -282,9 +281,16 @@ namespace MusicSharp
             {
                 this.playlist = this.playlistLoader.LoadPlaylist(d.FilePath.ToString());
 
-                if (this.playlist != null)
+                if (this.playlist == null)
                 {
-                    var success = new Dialog("Playlist loaded!", 50, 15);
+                    Application.RequestStop();
+                }
+                else
+                {
+                    foreach (string track in this.playlist)
+                    {
+                        MessageBox.Query(track, "Close");
+                    }
                 }
             }
         }

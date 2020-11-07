@@ -14,26 +14,25 @@ namespace MusicSharp
     /// </summary>
     public class PlaylistLoader
     {
-        /// <summary>
-        /// This will be used in the future to allow for playlist types beyond M3U.
-        /// </summary>
+        // This will be used in the future to allow for playlist types beyond M3U.
         // public virtual void LoadPlaylist() { }
 
+        /// <summary>
+        /// Load an M3U playlist.
+        /// </summary>
         /// <returns>Returns a list of playlist information.</returns>
+        /// <param name="userPlaylist">The user specified playlist path.</param>
         public List<string> LoadPlaylist(string userPlaylist)
         {
-            M3uContent content = new M3uContent();
+            var parser = PlaylistParserFactory.GetPlaylistParser(".m3u");
 
             // convert string to stream
             byte[] byteArray = Encoding.UTF8.GetBytes(userPlaylist);
             MemoryStream stream = new MemoryStream(byteArray);
 
-            // M3uContent playlist = userPlaylist;
-
-            var playlist = content.GetFromStream(stream);
+            IBasePlaylist playlist = parser.GetFromStream(stream);
 
             return playlist.GetTracksPaths();
         }
-
     }
 }

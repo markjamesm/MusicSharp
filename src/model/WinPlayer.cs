@@ -33,21 +33,29 @@ namespace MusicSharp
         }
 
         /// <inheritdoc/>
-        public void Play(string path)
+        public void OpenFile(string path)
         {
-            if (this.outputDevice.PlaybackState == PlaybackState.Stopped)
-            {
-                this.audioFileReader = new AudioFileReader(path);
-                this.outputDevice.Init(this.audioFileReader);
-            }
-
+            this.audioFileReader = new AudioFileReader(path);
+            this.outputDevice.Init(this.audioFileReader);
             this.outputDevice.Play();
         }
 
         /// <inheritdoc/>
-        public void Pause()
+        public void PlayPause()
         {
-            this.outputDevice.Pause();
+            if (
+                this.outputDevice.PlaybackState == PlaybackState.Paused ||
+                this.outputDevice.PlaybackState == PlaybackState.Stopped
+            ) 
+            {
+                this.outputDevice.Play();
+                return;
+            }
+
+            if (this.outputDevice.PlaybackState == PlaybackState.Playing) 
+            {
+                this.outputDevice.Pause();
+            }
         }
 
         /// <summary>
@@ -98,7 +106,7 @@ namespace MusicSharp
         }
 
         /// <inheritdoc/>
-        public void PlayStream(string streamURL)
+        public void OpenStream(string streamURL)
         {
             try
             {

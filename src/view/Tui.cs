@@ -84,10 +84,11 @@ namespace MusicSharp
 
             statusBar = new StatusBar(new StatusItem[]
             {
-            new StatusItem(Key.F1, "~F1~ Open file", () => this.OpenFile()),
-            new StatusItem(Key.F2, "~F2~ Open stream", () => this.OpenStream()),
-            new StatusItem(Key.F3, "~F3~ Load playlist", () => this.LoadPlaylist()),
-            new StatusItem(Key.F4, "~F4~ Quit", () => Application.RequestStop()),
+                new StatusItem(Key.F1, "~F1~ Open file", () => this.OpenFile()),
+                new StatusItem(Key.F2, "~F2~ Open stream", () => this.OpenStream()),
+                new StatusItem(Key.F3, "~F3~ Load playlist", () => this.LoadPlaylist()),
+                new StatusItem(Key.F4, "~F4~ Quit", () => Application.RequestStop()),
+                new StatusItem(Key.Space, "~Space~ Play/Pause", () => this.PlayPause()),
             });
 
             // Create the playback controls frame.
@@ -100,26 +101,14 @@ namespace MusicSharp
                 CanFocus = true,
             };
 
-            var playBtn = new Button(1, 1, "Play");
-            playBtn.Clicked += () =>
+            var playPauseButton = new Button(1, 1, "Play/Pause");
+            playPauseButton.Clicked += () =>
             {
-                if (this.player.LastFileOpened == null)
-                {
-                    this.OpenFile();
-                    return;
-                }
-
-                this.player.Play(this.player.LastFileOpened);
+                this.PlayPause();
             };
 
-            var pauseBtn = new Button(10, 1, "Pause");
-            pauseBtn.Clicked += () =>
-            {
-                this.player.Pause();
-            };
-
-            var stopBtn = new Button(20, 1, "Stop");
-            stopBtn.Clicked += () =>
+            var stopButton = new Button(16, 1, "Stop");
+            stopButton.Clicked += () =>
             {
                 this.player.Stop();
             };
@@ -136,7 +125,7 @@ namespace MusicSharp
                 this.player.DecreaseVolume();
             };
 
-            playbackControls.Add(playBtn, pauseBtn, stopBtn, increaseVolumeButton, decreaseVolumeButton);
+            playbackControls.Add(playPauseButton, stopButton, increaseVolumeButton, decreaseVolumeButton);
 
             // Create the left-hand playlists view.
             leftPane = new FrameView("Artists")
@@ -172,6 +161,7 @@ namespace MusicSharp
                 X = 25,
                 Y = 1, // for menu
                 Width = Dim.Fill(),
+
                 Height = 23,
                 CanFocus = true,
             };
@@ -214,6 +204,18 @@ namespace MusicSharp
             Application.Run();
         }
 
+        private void PlayPause()
+        {
+            try 
+            {
+                this.player.PlayPause();
+            } 
+            catch(Exception) 
+            {
+                MessageBox.Query("Warning", "Select a file or stream first.", "Close");
+            }
+        }
+
         // Display a file open dialog and return the path of the user selected file.
         private void OpenFile()
         {
@@ -228,7 +230,7 @@ namespace MusicSharp
             if (!d.Canceled)
             {
                 this.player.LastFileOpened = d.FilePath.ToString();
-                this.player.Play(this.player.LastFileOpened);
+                this.player.OpenFile(this.player.LastFileOpened);
             }
         }
 
@@ -253,7 +255,7 @@ namespace MusicSharp
             var loadStream = new Button(12, 7, "Load Stream");
             loadStream.Clicked += () =>
             {
-                this.player.PlayStream(streamURL.Text.ToString());
+                this.player.OpenStream(streamURL.Text.ToString());
                 Application.RequestStop();
             };
 

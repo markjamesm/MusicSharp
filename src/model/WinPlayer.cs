@@ -32,7 +32,10 @@ namespace MusicSharp
             this.outputDevice.Stop();
         }
 
-        /// <inheritdoc/>
+        /// <summary>
+        /// Opens an audio file and then plays it.
+        /// </summary>
+        /// <param name="path">The filepath.</param>
         public void OpenFile(string path)
         {
             this.audioFileReader = new AudioFileReader(path);
@@ -40,19 +43,20 @@ namespace MusicSharp
             this.outputDevice.Play();
         }
 
-        /// <inheritdoc/>
+        /// <summary>
+        /// Method to play and pause audio playback depending on PlaybackState.
+        /// </summary>
         public void PlayPause()
         {
             if (
                 this.outputDevice.PlaybackState == PlaybackState.Paused ||
-                this.outputDevice.PlaybackState == PlaybackState.Stopped
-            ) 
+                this.outputDevice.PlaybackState == PlaybackState.Stopped)
             {
                 this.outputDevice.Play();
                 return;
             }
 
-            if (this.outputDevice.PlaybackState == PlaybackState.Playing) 
+            if (this.outputDevice.PlaybackState == PlaybackState.Playing)
             {
                 this.outputDevice.Pause();
             }
@@ -105,7 +109,10 @@ namespace MusicSharp
             this.outputDevice.Volume -= 0.1f;
         }
 
-        /// <inheritdoc/>
+        /// <summary>
+        /// Method to open an audio stream.
+        /// </summary>
+        /// <param name="streamURL">The URL of the stream.</param>
         public void OpenStream(string streamURL)
         {
             try

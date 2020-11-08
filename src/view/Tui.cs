@@ -206,11 +206,11 @@ namespace MusicSharp
 
         private void PlayPause()
         {
-            try 
+            try
             {
                 this.player.PlayPause();
-            } 
-            catch(Exception) 
+            }
+            catch (Exception)
             {
                 MessageBox.Query("Warning", "Select a file or stream first.", "Close");
             }

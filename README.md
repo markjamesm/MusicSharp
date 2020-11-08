@@ -7,7 +7,9 @@ Currently in an early alpha stage, MusicSharp makes use of the [NAudio](https://
 
 ## Features
 
-- Load and play audio files.
+- Play audio files.
+- Audio streaming.
+- Lightweight
 
 ## Planned
 

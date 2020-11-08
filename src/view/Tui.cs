@@ -84,10 +84,11 @@ namespace MusicSharp
 
             statusBar = new StatusBar(new StatusItem[]
             {
-            new StatusItem(Key.F1, "~F1~ Open file", () => this.OpenFile()),
-            new StatusItem(Key.F2, "~F2~ Open stream", () => this.OpenStream()),
-            new StatusItem(Key.F3, "~F3~ Load playlist", () => this.LoadPlaylist()),
-            new StatusItem(Key.F4, "~F4~ Quit", () => Application.RequestStop()),
+                new StatusItem(Key.F1, "~F1~ Open file", () => this.OpenFile()),
+                new StatusItem(Key.F2, "~F2~ Open stream", () => this.OpenStream()),
+                new StatusItem(Key.F3, "~F3~ Load playlist", () => this.LoadPlaylist()),
+                new StatusItem(Key.F4, "~F4~ Quit", () => Application.RequestStop()),
+                new StatusItem(Key.Space, "~Space~ Play/Pause", () => this.PlayPause()),
             });
 
             // Create the playback controls frame.
@@ -100,20 +101,13 @@ namespace MusicSharp
                 CanFocus = true,
             };
 
-            var playPauseButton = new Button(1, 1, "Play / Pause");
+            var playPauseButton = new Button(1, 1, "Play/Pause");
             playPauseButton.Clicked += () =>
             {
-                try 
-                {
-                    this.player.PlayPause();
-                } 
-                catch(Exception) 
-                {
-                    MessageBox.Query("Warning", "Select a file or stream first.", "Close");
-                }
+                this.PlayPause();
             };
 
-            var stopButton = new Button(20, 1, "Stop");
+            var stopButton = new Button(16, 1, "Stop");
             stopButton.Clicked += () =>
             {
                 this.player.Stop();
@@ -208,6 +202,18 @@ namespace MusicSharp
             top.Add(menu, leftPane, rightPane, playbackControls, nowPlaying, statusBar);
 
             Application.Run();
+        }
+
+        private void PlayPause()
+        {
+            try 
+            {
+                this.player.PlayPause();
+            } 
+            catch(Exception) 
+            {
+                MessageBox.Query("Warning", "Select a file or stream first.", "Close");
+            }
         }
 
         // Display a file open dialog and return the path of the user selected file.

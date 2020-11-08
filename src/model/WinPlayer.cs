@@ -37,6 +37,7 @@ namespace MusicSharp
         {
             this.audioFileReader = new AudioFileReader(path);
             this.outputDevice.Init(this.audioFileReader);
+            this.outputDevice.Play();
         }
 
         /// <inheritdoc/>

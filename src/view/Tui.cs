@@ -14,7 +14,7 @@ namespace MusicSharp
     /// </summary>
     public class Tui
     {
-        private static List<string> categories;
+        private static List<string> playlistTracks;
         private static ListView categoryListView;
         private static FrameView leftPane;
         private static FrameView rightPane;
@@ -137,9 +137,9 @@ namespace MusicSharp
                 CanFocus = false,
             };
 
-            categories = new List<string>();
-            categories.Add("Zhund");
-            categoryListView = new ListView(categories)
+            playlistTracks = new List<string>();
+            playlistTracks.Add("Zhund");
+            categoryListView = new ListView(playlistTracks)
             {
                 X = 0,
                 Y = 0,
@@ -291,7 +291,7 @@ namespace MusicSharp
                 {
                     foreach (string track in this.playlist)
                     {
-                        MessageBox.Query(track, "Close");
+                        playlistTracks.Add(track);
                     }
                 }
             }

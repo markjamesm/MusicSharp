@@ -5,9 +5,10 @@ namespace MusicSharp
 {
     using System.Collections.Generic;
     using System.IO;
+
     using System.Text;
-    using PlaylistsNET.Content;
-    using PlaylistsNET.Models;
+    using ATL;
+    using ATL.Playlist;
 
     /// <summary>
     /// The PlaylistLoader class loads a playlist of a given type.
@@ -24,15 +25,16 @@ namespace MusicSharp
         /// <param name="userPlaylist">The user specified playlist path.</param>
         public List<string> LoadPlaylist(string userPlaylist)
         {
-            var parser = PlaylistParserFactory.GetPlaylistParser(".m3u");
+            IPlaylistIO theReader = PlaylistIOFactory.GetInstance().GetPlaylistIO(userPlaylist);
 
-            // convert string to stream
-            byte[] byteArray = Encoding.UTF8.GetBytes(userPlaylist);
-            MemoryStream stream = new MemoryStream(byteArray);
+            List<string> filePaths = new List<string>();
 
-            IBasePlaylist playlist = parser.GetFromStream(stream);
+            foreach (string s in theReader.FilePaths)
+            {
+                filePaths.Add(s);
+            }
 
-            return playlist.GetTracksPaths();
+            return filePaths;
         }
     }
 }

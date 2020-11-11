@@ -45,5 +45,11 @@ namespace MusicSharp
         /// Method to decrease audio playback volume.
         /// </summary>
         void DecreaseVolume();
+
+        /// <summary>
+        /// Play an audio file contained in a playlist.
+        /// </summary>
+        /// <param name="path">The path to the audio file.</param>
+        void PlayFromPlaylist(string path);
     }
 }

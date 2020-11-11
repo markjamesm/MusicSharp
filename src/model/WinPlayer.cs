@@ -62,6 +62,25 @@ namespace MusicSharp
             }
         }
 
+        public void PlayFromPlaylist(string path)
+        {
+            if (this.outputDevice != null)
+            {
+                this.outputDevice.Dispose();
+
+                try
+                {
+                    this.audioFileReader = new AudioFileReader(path);
+                    this.outputDevice.Init(this.audioFileReader);
+                    this.outputDevice.Play();
+                }
+                catch (System.IO.FileNotFoundException)
+                {
+                }
+            }
+
+        }
+
         /// <summary>
         /// Dispose of our device once playback is stopped.
         /// </summary>

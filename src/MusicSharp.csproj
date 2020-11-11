@@ -20,12 +20,12 @@
 
   <ItemGroup>
     <PackageReference Include="NAudio" Version="1.10.0" />
-    <PackageReference Include="PlaylistsNET" Version="1.1.2" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.1.118">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Terminal.Gui" Version="0.90.3" />
+    <PackageReference Include="z440.atl.core" Version="3.13.0" />
   </ItemGroup>
 
   <ItemGroup>

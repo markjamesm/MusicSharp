@@ -8,12 +8,13 @@ Currently in an early alpha stage, MusicSharp makes use of the [NAudio](https://
 ## Features
 
 - Play audio files.
+- Load music playlists (M3U)
 - Audio streaming.
 - Lightweight
 
 ## Planned
 
-- Save/Load playlists.
+- Save playlists.
 - Cross platform support.
 
 ## Want to Contribute?

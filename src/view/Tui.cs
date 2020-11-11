@@ -15,12 +15,10 @@ namespace MusicSharp
     public class Tui
     {
         private static List<string> playlistTracks;
-        private static ListView categoryListView;
-        private static FrameView leftPane;
-        private static FrameView rightPane;
+        private static ListView playlistView;
+        private static FrameView playlistPane;
         private static FrameView playbackControls;
         private static FrameView nowPlaying;
-        private static ListView scenarioListView;
         private static StatusBar statusBar;
 
         /// <summary>
@@ -65,12 +63,9 @@ namespace MusicSharp
 
                 new MenuItem("Open S_tream", "Open a music stream", () => this.OpenStream()),
 
-                new MenuItem("_Quit", "Exit MusicSharp", () => Application.RequestStop()),
-            }),
+                new MenuItem("Open Pla_ylist", "Load a playlist", () => this.LoadPlaylist()),
 
-            new MenuBarItem("_Playlists", new MenuItem[]
-            {
-                new MenuItem("Open Pla_ylist", string.Empty, () => this.LoadPlaylist()),
+                new MenuItem("_Quit", "Exit MusicSharp", () => Application.RequestStop()),
             }),
 
             new MenuBarItem("_Help", new MenuItem[]
@@ -128,18 +123,19 @@ namespace MusicSharp
             playbackControls.Add(playPauseButton, stopButton, increaseVolumeButton, decreaseVolumeButton);
 
             // Create the left-hand playlists view.
-            leftPane = new FrameView("Artists")
+            playlistPane = new FrameView("Tracks")
             {
                 X = 0,
                 Y = 1, // for menu
-                Width = 25,
+                Width = Dim.Fill(),
                 Height = 23,
                 CanFocus = false,
             };
 
+            // The list of tracks in the playlist.
             playlistTracks = new List<string>();
-            playlistTracks.Add("Zhund");
-            categoryListView = new ListView(playlistTracks)
+
+            playlistView = new ListView(playlistTracks)
             {
                 X = 0,
                 Y = 0,
@@ -149,32 +145,14 @@ namespace MusicSharp
                 CanFocus = true,
             };
 
-            categoryListView.OpenSelectedItem += (a) =>
+            // Play the selection when a playlist path is clicked.
+            playlistView.OpenSelectedItem += (a) =>
             {
-                rightPane.SetFocus();
+                this.player.LastFileOpened = a.Value.ToString();
+                this.player.PlayFromPlaylist(this.player.LastFileOpened);
             };
 
-            leftPane.Add(categoryListView);
-
-            rightPane = new FrameView("Tracks")
-            {
-                X = 25,
-                Y = 1, // for menu
-                Width = Dim.Fill(),
-
-                Height = 23,
-                CanFocus = true,
-            };
-
-            scenarioListView = new ListView()
-            {
-                X = 0,
-                Y = 0,
-                Width = Dim.Fill(),
-                Height = 23,
-                AllowsMarking = false,
-                CanFocus = true,
-            };
+            playlistPane.Add(playlistView);
 
             // Create the audio progress bar frame.
             nowPlaying = new FrameView("Now Playing")
@@ -199,7 +177,7 @@ namespace MusicSharp
             nowPlaying.Add(this.AudioProgressBar);
 
             // Add the layout elements and run the app.
-            top.Add(menu, leftPane, rightPane, playbackControls, nowPlaying, statusBar);
+            top.Add(menu, playlistPane, playbackControls, nowPlaying, statusBar);
 
             Application.Run();
         }
@@ -234,6 +212,7 @@ namespace MusicSharp
             }
         }
 
+        // Open and play an audio stream.
         private void OpenStream()
         {
             var d = new Dialog("Open Stream", 50, 15);
@@ -271,6 +250,7 @@ namespace MusicSharp
             Application.Run(d);
         }
 
+        // Load a playlist file. Currently, only M3U is supported.
         private void LoadPlaylist()
         {
             var d = new OpenDialog("Open", "Open a playlist") { AllowsMultipleSelection = false };
@@ -293,6 +273,8 @@ namespace MusicSharp
                     {
                         playlistTracks.Add(track);
                     }
+
+                    Application.Run();
                 }
             }
         }

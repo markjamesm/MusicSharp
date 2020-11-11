@@ -8,12 +8,13 @@ Currently in an early alpha stage, MusicSharp makes use of the [NAudio](https://
 ## Features
 
 - Play audio files.
+- Load music playlists (M3U)
 - Audio streaming.
 - Lightweight
 
 ## Planned
 
-- Save/Load playlists.
+- Save playlists.
 - Cross platform support.
 
 ## Want to Contribute?
@@ -24,4 +25,4 @@ A list of open tasks can be found on our [issues page](https://github.com/markja
 
 ## Screenshot
 
-<img src="https://user-images.githubusercontent.com/20845425/98765417-1e062b80-23ac-11eb-9cb7-4046d8e979e9.png" alt="Screenshot of MusicSharp">
+<img src="https://markjames.dev/img/posts/music-sharp/musicsharp-playlist.png" alt="Screenshot of MusicSharp">

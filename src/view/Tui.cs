@@ -123,7 +123,7 @@ namespace MusicSharp
             playbackControls.Add(playPauseButton, stopButton, increaseVolumeButton, decreaseVolumeButton);
 
             // Create the left-hand playlists view.
-            playlistPane = new FrameView("Tracks")
+            playlistPane = new FrameView("Playlist Tracks")
             {
                 X = 0,
                 Y = 1, // for menu

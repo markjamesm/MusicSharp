@@ -62,6 +62,7 @@ namespace MusicSharp
             }
         }
 
+        /// <inheritdoc/>
         public void PlayFromPlaylist(string path)
         {
             if (this.outputDevice != null)
@@ -78,7 +79,6 @@ namespace MusicSharp
                 {
                 }
             }
-
         }
 
         /// <summary>

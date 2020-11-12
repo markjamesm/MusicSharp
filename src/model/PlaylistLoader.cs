@@ -4,10 +4,6 @@
 namespace MusicSharp
 {
     using System.Collections.Generic;
-    using System.IO;
-
-    using System.Text;
-    using ATL;
     using ATL.Playlist;
 
     /// <summary>

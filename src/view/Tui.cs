@@ -7,6 +7,7 @@ namespace MusicSharp
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
+    using System.IO;
     using Terminal.Gui;
 
     /// <summary>
@@ -210,9 +211,16 @@ namespace MusicSharp
 
             if (!d.Canceled)
             {
+                if (File.Exists(d.FilePath.ToString()))
+                {
                 this.player.LastFileOpened = d.FilePath.ToString();
                 this.player.OpenFile(this.player.LastFileOpened);
                 this.NowPlaying(this.player.LastFileOpened);
+                }
+                else
+                {
+                    // This is a good spot for an error message, should one be wanted/needed
+                }
             }
         }
 

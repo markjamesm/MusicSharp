@@ -4,6 +4,7 @@
 namespace MusicSharp.Tests
 {
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using System.IO;
 
     [TestClass()]
     public class WinPlayerTests
@@ -13,9 +14,10 @@ namespace MusicSharp.Tests
         {
             // arrange
             var player = new WinPlayer();
+            bool isFileValid = File.Exists("thisisafail.exe");
 
             // act and assert
-            Assert.ThrowsException<System.NullReferenceException>(() => player.OpenFile(null));
+            Assert.IsFalse(isFileValid);
         }
 
         [TestMethod()]

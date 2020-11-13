@@ -4,6 +4,7 @@
 
 namespace MusicSharp
 {
+    using System.IO;
     using NAudio.Wave;
 
     /// <summary>
@@ -38,9 +39,17 @@ namespace MusicSharp
         /// <param name="path">The filepath.</param>
         public void OpenFile(string path)
         {
-            this.audioFileReader = new AudioFileReader(path);
-            this.outputDevice.Init(this.audioFileReader);
-            this.outputDevice.Play();
+            bool isFileValid = File.Exists(path);
+            if (isFileValid == true)
+            {
+                this.audioFileReader = new AudioFileReader(path);
+                this.outputDevice.Init(this.audioFileReader);
+                this.outputDevice.Play();
+            }
+            else
+            {
+                // Space for error message, should one be wanted/needed
+            }
         }
 
         /// <summary>

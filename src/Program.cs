@@ -7,7 +7,7 @@ using MusicSharp;
 /// <summary>
 /// Entry Point class.
 /// </summary>
-public class Program
+public static class Program
 {
     /// <summary>
     /// Entry point.

@@ -4,8 +4,8 @@
 
 namespace MusicSharp
 {
-    using NAudio.Wave;
     using System.IO;
+    using NAudio.Wave;
 
     /// <summary>
     /// The audio player implementation for Windows using NAudio.
@@ -40,7 +40,7 @@ namespace MusicSharp
         public void OpenFile(string path)
         {
             bool isFileValid = File.Exists(path);
-            if(isFileValid == true)
+            if (isFileValid == true)
             {
                 this.audioFileReader = new AudioFileReader(path);
                 this.outputDevice.Init(this.audioFileReader);
@@ -48,7 +48,7 @@ namespace MusicSharp
             }
             else
             {
-                //Space for error message, should one be wanted/needed
+                // Space for error message, should one be wanted/needed
             }
         }
 

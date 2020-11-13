@@ -219,7 +219,7 @@ namespace MusicSharp
                 }
                 else
                 {
-                    //This is a good spot for an error message, should one be wanted/needed
+                    // This is a good spot for an error message, should one be wanted/needed
                 }
             }
         }

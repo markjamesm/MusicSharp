@@ -21,6 +21,8 @@ namespace MusicSharp
         private static FrameView nowPlaying;
         private static StatusBar statusBar;
 
+        private static Label trackName;
+
         /// <summary>
         /// Create a new instance of the audio player engine.
         /// </summary>
@@ -150,6 +152,7 @@ namespace MusicSharp
             {
                 this.player.LastFileOpened = a.Value.ToString();
                 this.player.PlayFromPlaylist(this.player.LastFileOpened);
+                this.NowPlaying(this.player.LastFileOpened);
             };
 
             playlistPane.Add(playlistView);
@@ -209,6 +212,7 @@ namespace MusicSharp
             {
                 this.player.LastFileOpened = d.FilePath.ToString();
                 this.player.OpenFile(this.player.LastFileOpened);
+                this.NowPlaying(this.player.LastFileOpened);
             }
         }
 
@@ -277,6 +281,18 @@ namespace MusicSharp
                     Application.Run();
                 }
             }
+        }
+
+        private void NowPlaying(string track)
+        {
+            trackName = new Label(track)
+            {
+                X = 0,
+                Y = 0,
+                Width = Dim.Fill(),
+            };
+
+            nowPlaying.Add(trackName);
         }
     }
 }

@@ -40,7 +40,7 @@ namespace MusicSharp
         public void OpenFile(string path)
         {
             bool isFileValid = File.Exists(path);
-            if (isFileValid == true)
+            if (isFileValid)
             {
                 this.audioFileReader = new AudioFileReader(path);
                 this.outputDevice.Init(this.audioFileReader);

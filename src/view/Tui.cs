@@ -8,6 +8,7 @@ namespace MusicSharp
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.IO;
+    using System.Threading;
     using Terminal.Gui;
 
     /// <summary>
@@ -23,6 +24,9 @@ namespace MusicSharp
         private static StatusBar statusBar;
 
         private static Label trackName;
+        private static Label trackLength;
+
+        internal ProgressBar ActivityProgressBar { get; private set; }
 
         /// <summary>
         /// Create a new instance of the audio player engine.
@@ -154,6 +158,7 @@ namespace MusicSharp
                 this.player.LastFileOpened = a.Value.ToString();
                 this.player.PlayFromPlaylist(this.player.LastFileOpened);
                 this.NowPlaying(this.player.LastFileOpened);
+                this.TrackLength();
             };
 
             playlistPane.Add(playlistView);
@@ -216,6 +221,7 @@ namespace MusicSharp
                 this.player.LastFileOpened = d.FilePath.ToString();
                 this.player.OpenFile(this.player.LastFileOpened);
                 this.NowPlaying(this.player.LastFileOpened);
+                this.TrackLength();
                 }
                 else
                 {
@@ -301,6 +307,26 @@ namespace MusicSharp
             };
 
             nowPlaying.Add(trackName);
+        }
+
+        private void TrackLength()
+        {
+            trackLength = new Label(this.player.TrackLength())
+            {
+                X = 0,
+                Y = 0,
+                Width = Dim.Fill(),
+            };
+
+            nowPlaying.Add(trackLength);
+        }
+
+        private void TimePlayed()
+        {
+            Application.MainLoop.Invoke(() =>
+            {
+                this.player.CurrentTime();
+            });
         }
     }
 }

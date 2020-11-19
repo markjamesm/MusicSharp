@@ -51,5 +51,17 @@ namespace MusicSharp
         /// </summary>
         /// <param name="path">The path to the audio file.</param>
         void PlayFromPlaylist(string path);
+
+        /// <summary>
+        /// Returns the current playtime of the audioFileReader instance.
+        /// </summary>
+        /// <returns>The current time played as TimeSpan.</returns>
+        System.TimeSpan CurrentTime();
+
+        /// <summary>
+        /// Returns the total track length in string format.
+        /// </summary>
+        /// <returns>The length of the track in string format.</returns>
+        string TrackLength();
     }
 }

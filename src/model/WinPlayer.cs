@@ -158,5 +158,17 @@ namespace MusicSharp
             {
             }
         }
+
+        /// <inheritdoc/>
+        public System.TimeSpan CurrentTime()
+        {
+            return this.audioFileReader.CurrentTime;
+        }
+
+        /// <inheritdoc/>
+        public string TrackLength()
+        {
+            return this.audioFileReader.TotalTime.ToString(@"mm\:ss");
+        }
     }
 }

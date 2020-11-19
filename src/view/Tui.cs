@@ -313,8 +313,8 @@ namespace MusicSharp
         {
             trackLength = new Label(this.player.TrackLength())
             {
-                X = 0,
-                Y = 0,
+                X = 40,
+                Y = 1,
                 Width = Dim.Fill(),
             };
 

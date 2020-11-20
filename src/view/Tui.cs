@@ -326,7 +326,7 @@ namespace MusicSharp
         private object mainLoopTimeout = null;
         private uint mainLooopTimeoutTick = 1000; // ms
 
-        private Stopwatch trackTimer = new Stopwatch();
+       // private Stopwatch trackTimer = new Stopwatch();
 
         private void TimePlayed()
         {
@@ -334,19 +334,25 @@ namespace MusicSharp
 
             this.mainLoopTimeout = Application.MainLoop.AddTimeout(TimeSpan.FromMilliseconds(this.mainLooopTimeoutTick), (loop) =>
             {
-                this.trackTimer.Start();
-                this.AudioProgressBar.Fraction += (float)(this.player.TrackLength().TotalSeconds / 100);
-                var playtimeInSec = this.trackTimer.ElapsedMilliseconds / 1000;
-                this.PlayTime(playtimeInSec.ToString());
+             //   this.trackTimer.Start();
+                this.AudioProgressBar.Fraction += (float)(this.player.TrackLength().TotalSeconds / 1000);
+                try
+                {
+                    this.TimePlayedLabel(this.player.CurrentTime().ToString(@"mm\:ss"));
+                }
+                catch (NullReferenceException)
+                {
+                }
+
                 return true;
             });
         }
 
-        private void PlayTime(string timePlayed)
+        private void TimePlayedLabel(string timePlayed)
         {
-            trackName = new Label(timePlayed)
+            trackName = new Label($"{timePlayed} / ")
             {
-                X = 35,
+                X = 32,
                 Y = 1,
             };
 

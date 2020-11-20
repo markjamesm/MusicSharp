@@ -4,6 +4,7 @@
 
 namespace MusicSharp
 {
+    using System;
     using System.IO;
     using NAudio.Wave;
 
@@ -162,7 +163,16 @@ namespace MusicSharp
         /// <inheritdoc/>
         public System.TimeSpan CurrentTime()
         {
-            return this.audioFileReader.CurrentTime;
+            TimeSpan zeroTime = new TimeSpan(0);
+
+            if (this.outputDevice.PlaybackState != PlaybackState.Stopped)
+            {
+                return this.audioFileReader.CurrentTime;
+            }
+            else
+            {
+                return zeroTime;
+            }
         }
 
         /// <inheritdoc/>

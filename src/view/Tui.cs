@@ -23,11 +23,14 @@ namespace MusicSharp
         private static FrameView nowPlaying;
         private static StatusBar statusBar;
 
-        private Action TrackPlaying;
-        private Action StopTrackPlaying;
-
         private static Label trackName;
         private static Label trackLength;
+
+        private Action trackPlaying;
+        private Action stopTrackPlaying;
+
+        private object mainLoopTimeout = null;
+        private uint mainLooopTimeoutTick = 1000; // ms
 
         /// <summary>
         /// Create a new instance of the audio player engine.
@@ -323,28 +326,24 @@ namespace MusicSharp
             nowPlaying.Add(trackLength);
         }
 
-        private object mainLoopTimeout = null;
-        private uint mainLooopTimeoutTick = 1000; // ms
-
-       // private Stopwatch trackTimer = new Stopwatch();
-
         private void TimePlayed()
         {
             this.AudioProgressBar.Fraction = 0F;
 
+            double counter = Convert.ToInt32(this.player.TrackLength().TotalSeconds);
+
             this.mainLoopTimeout = Application.MainLoop.AddTimeout(TimeSpan.FromMilliseconds(this.mainLooopTimeoutTick), (loop) =>
             {
-             //   this.trackTimer.Start();
-                this.AudioProgressBar.Fraction += (float)(this.player.TrackLength().TotalSeconds / 1000);
-                try
+                while (counter != 0)
                 {
+                    //    this.AudioProgressBar.Fraction += (float)(this.player.TrackLength().TotalSeconds / 60);
+                    this.AudioProgressBar.Fraction += .01f;
                     this.TimePlayedLabel(this.player.CurrentTime().ToString(@"mm\:ss"));
-                }
-                catch (NullReferenceException)
-                {
+                    counter -= 1;
+                    return true;
                 }
 
-                return true;
+                return false;
             });
         }
 

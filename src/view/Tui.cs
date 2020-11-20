@@ -163,6 +163,7 @@ namespace MusicSharp
                 this.player.PlayFromPlaylist(this.player.LastFileOpened);
                 this.NowPlaying(this.player.LastFileOpened);
                 this.TrackLength();
+                this.TimePlayed();
             };
 
             playlistPane.Add(playlistView);
@@ -336,8 +337,7 @@ namespace MusicSharp
             {
                 while (counter != 0)
                 {
-                    //    this.AudioProgressBar.Fraction += (float)(this.player.TrackLength().TotalSeconds / 60);
-                    this.AudioProgressBar.Fraction += .01f;
+                    this.AudioProgressBar.Fraction += (float)(1 / this.player.TrackLength().TotalSeconds);
                     this.TimePlayedLabel(this.player.CurrentTime().ToString(@"mm\:ss"));
                     counter -= 1;
                     return true;

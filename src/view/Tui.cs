@@ -23,10 +23,11 @@ namespace MusicSharp
         private static FrameView nowPlaying;
         private static StatusBar statusBar;
 
+        private Action TrackPlaying;
+        private Action StopTrackPlaying;
+
         private static Label trackName;
         private static Label trackLength;
-
-        internal ProgressBar ActivityProgressBar { get; private set; }
 
         /// <summary>
         /// Create a new instance of the audio player engine.
@@ -179,8 +180,8 @@ namespace MusicSharp
                 Y = 2,
                 Width = Dim.Fill() - 1,
                 Height = 1,
-                Fraction = 0.4F,
-                ColorScheme = Colors.Error,
+                Fraction = 0.0F,
+                ColorScheme = Colors.Base,
             };
 
             nowPlaying.Add(this.AudioProgressBar);
@@ -196,6 +197,7 @@ namespace MusicSharp
             try
             {
                 this.player.PlayPause();
+                this.TimePlayed();
             }
             catch (Exception)
             {
@@ -222,6 +224,7 @@ namespace MusicSharp
                 this.player.OpenFile(this.player.LastFileOpened);
                 this.NowPlaying(this.player.LastFileOpened);
                 this.TrackLength();
+                this.TimePlayed();
                 }
                 else
                 {
@@ -311,22 +314,43 @@ namespace MusicSharp
 
         private void TrackLength()
         {
-            trackLength = new Label(this.player.TrackLength())
+            trackLength = new Label(this.player.TrackLength().ToString(@"mm\:ss"))
             {
                 X = 40,
                 Y = 1,
-                Width = Dim.Fill(),
             };
 
             nowPlaying.Add(trackLength);
         }
 
+        private object mainLoopTimeout = null;
+        private uint mainLooopTimeoutTick = 1000; // ms
+
+        private Stopwatch trackTimer = new Stopwatch();
+
         private void TimePlayed()
         {
-            Application.MainLoop.Invoke(() =>
+            this.AudioProgressBar.Fraction = 0F;
+
+            this.mainLoopTimeout = Application.MainLoop.AddTimeout(TimeSpan.FromMilliseconds(this.mainLooopTimeoutTick), (loop) =>
             {
-                this.player.CurrentTime();
+                this.trackTimer.Start();
+                this.AudioProgressBar.Fraction += (float)(this.player.TrackLength().TotalSeconds / 100);
+                var playtimeInSec = this.trackTimer.ElapsedMilliseconds / 1000;
+                this.PlayTime(playtimeInSec.ToString());
+                return true;
             });
+        }
+
+        private void PlayTime(string timePlayed)
+        {
+            trackName = new Label(timePlayed)
+            {
+                X = 35,
+                Y = 1,
+            };
+
+            nowPlaying.Add(trackName);
         }
     }
 }

@@ -59,9 +59,9 @@ namespace MusicSharp
         System.TimeSpan CurrentTime();
 
         /// <summary>
-        /// Returns the total track length in string format.
+        /// Returns the total track length in Timespan format.
         /// </summary>
         /// <returns>The length of the track in string format.</returns>
-        string TrackLength();
+        System.TimeSpan TrackLength();
     }
 }

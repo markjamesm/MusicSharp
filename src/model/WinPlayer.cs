@@ -166,9 +166,9 @@ namespace MusicSharp
         }
 
         /// <inheritdoc/>
-        public string TrackLength()
+        public System.TimeSpan TrackLength()
         {
-            return this.audioFileReader.TotalTime.ToString(@"mm\:ss");
+            return this.audioFileReader.TotalTime;
         }
     }
 }

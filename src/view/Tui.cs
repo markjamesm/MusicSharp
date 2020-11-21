@@ -16,11 +16,6 @@ namespace MusicSharp
     /// </summary>
     public class Tui
     {
-        /// <summary>
-        /// Create a new instance of the audio player engine.
-        /// </summary>
-        private readonly IPlayer player;
-
         private static List<string> playlistTracks;
         private static ListView playlistView;
         private static FrameView playlistPane;
@@ -30,6 +25,11 @@ namespace MusicSharp
 
         private static Label trackName;
         private static Label trackLength;
+
+        /// <summary>
+        /// Create a new instance of the audio player engine.
+        /// </summary>
+        private readonly IPlayer player;
 
         private object mainLoopTimeout = null;
         private uint mainLooopTimeoutTick = 1000; // ms
@@ -341,21 +341,18 @@ namespace MusicSharp
 
             double counter = Convert.ToInt32(this.player.TrackLength().TotalSeconds);
 
-            if (this.mainLoopTimeout == null)
-            {
-                this.mainLoopTimeout = Application.MainLoop.AddTimeout(TimeSpan.FromMilliseconds(this.mainLooopTimeoutTick), (loop) =>
+            this.mainLoopTimeout = Application.MainLoop.AddTimeout(TimeSpan.FromMilliseconds(this.mainLooopTimeoutTick), (loop) =>
                 {
                     while (counter != 0 && this.player.IsAudioPlaying)
                     {
                         this.AudioProgressBar.Fraction += (float)(1 / this.player.TrackLength().TotalSeconds);
                         this.TimePlayedLabel(this.player.CurrentTime().ToString(@"mm\:ss"));
-                        counter -= 1;
+                        counter--;
                         return true;
                     }
 
                     return false;
                 });
-            }
         }
 
         private void TimePlayedLabel(string timePlayed)

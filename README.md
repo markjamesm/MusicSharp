@@ -25,4 +25,4 @@ A list of open tasks can be found on our [issues page](https://github.com/markja
 
 ## Screenshot
 
-<img src="https://markjames.dev/img/posts/music-sharp/musicsharp-playlist.png" alt="Screenshot of MusicSharp">
+<img src="https://user-images.githubusercontent.com/20845425/99861949-06763200-2b66-11eb-9d5a-9bf2ea5151ee.png" alt="Screenshot of MusicSharp">

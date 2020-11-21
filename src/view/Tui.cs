@@ -80,7 +80,7 @@ namespace MusicSharp
             {
                 new MenuItem("_About MusicSharp", string.Empty, () =>
                 {
-                    MessageBox.Query("Music Sharp 0.6.6", "\nMusic Sharp is a lightweight CLI\n music player written in C#.\n\nDeveloped by Mark-James McDougall\nand licensed under the GPL v3.\n ", "Close");
+                    MessageBox.Query("Music Sharp 0.7.5", "\nMusic Sharp is a lightweight CLI\n music player written in C#.\n\nDeveloped by Mark-James McDougall\nand licensed under the GPL v3.\n ", "Close");
                 }),
             }),
             });

@@ -25,6 +25,8 @@ namespace MusicSharp
             this.outputDevice.PlaybackStopped += this.OnPlaybackStopped;
         }
 
+        public bool IsAudioPlaying { get; set; } = false;
+
         /// <inheritdoc/>
         public string LastFileOpened { get; set; }
 
@@ -32,6 +34,7 @@ namespace MusicSharp
         public void Stop()
         {
             this.outputDevice.Stop();
+            this.IsAudioPlaying = false;
         }
 
         /// <summary>
@@ -46,6 +49,7 @@ namespace MusicSharp
                 this.audioFileReader = new AudioFileReader(path);
                 this.outputDevice.Init(this.audioFileReader);
                 this.outputDevice.Play();
+                this.IsAudioPlaying = true;
             }
             else
             {
@@ -63,12 +67,14 @@ namespace MusicSharp
                 this.outputDevice.PlaybackState == PlaybackState.Stopped)
             {
                 this.outputDevice.Play();
+                this.IsAudioPlaying = true;
                 return;
             }
 
             if (this.outputDevice.PlaybackState == PlaybackState.Playing)
             {
                 this.outputDevice.Pause();
+                this.IsAudioPlaying = false;
             }
         }
 
@@ -84,6 +90,7 @@ namespace MusicSharp
                     this.audioFileReader = new AudioFileReader(path);
                     this.outputDevice.Init(this.audioFileReader);
                     this.outputDevice.Play();
+                    this.IsAudioPlaying = true;
                 }
                 catch (System.IO.FileNotFoundException)
                 {
@@ -150,6 +157,7 @@ namespace MusicSharp
                 {
                     this.outputDevice.Init(mf);
                     this.outputDevice.Play();
+
                 }
             }
             catch (System.ArgumentException)
@@ -165,7 +173,7 @@ namespace MusicSharp
         {
             TimeSpan zeroTime = new TimeSpan(0);
 
-            if (this.outputDevice.PlaybackState != PlaybackState.Stopped)
+            if (this.outputDevice.PlaybackState != PlaybackState.Stopped && this.outputDevice.PlaybackState != PlaybackState.Paused)
             {
                 return this.audioFileReader.CurrentTime;
             }

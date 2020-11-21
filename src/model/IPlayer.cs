@@ -10,6 +10,11 @@ namespace MusicSharp
     public interface IPlayer
     {
         /// <summary>
+        ///Gets or sets if the audio player is playing.
+        /// </summary>
+        bool IsAudioPlaying { get; set; }
+
+        /// <summary>
         /// Gets or sets the last file opened by the player.
         /// </summary>
         string LastFileOpened { get; set; }
@@ -51,5 +56,17 @@ namespace MusicSharp
         /// </summary>
         /// <param name="path">The path to the audio file.</param>
         void PlayFromPlaylist(string path);
+
+        /// <summary>
+        /// Returns the current playtime of the audioFileReader instance.
+        /// </summary>
+        /// <returns>The current time played as TimeSpan.</returns>
+        System.TimeSpan CurrentTime();
+
+        /// <summary>
+        /// Returns the total track length in timespan format.
+        /// </summary>
+        /// <returns>The length of the track in timespan format.</returns>
+        System.TimeSpan TrackLength();
     }
 }

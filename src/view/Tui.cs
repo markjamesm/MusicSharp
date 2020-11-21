@@ -8,6 +8,7 @@ namespace MusicSharp
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.IO;
+    using System.Threading;
     using Terminal.Gui;
 
     /// <summary>
@@ -23,11 +24,15 @@ namespace MusicSharp
         private static StatusBar statusBar;
 
         private static Label trackName;
+        private static Label trackLength;
 
         /// <summary>
         /// Create a new instance of the audio player engine.
         /// </summary>
         private readonly IPlayer player;
+
+        private object mainLoopTimeout = null;
+        private uint mainLooopTimeoutTick = 1000; // ms
 
         private List<string> playlist = new List<string>();
         private PlaylistLoader playlistLoader = new PlaylistLoader();
@@ -94,7 +99,7 @@ namespace MusicSharp
             {
                 X = 0,
                 Y = 24,
-                Width = 70,
+                Width = 55,
                 Height = 5,
                 CanFocus = true,
             };
@@ -111,19 +116,31 @@ namespace MusicSharp
                 this.player.Stop();
             };
 
-            var increaseVolumeButton = new Button(55, 0, "+ Volume");
+            var seekForward = new Button(26, 0, "Seek  5s");
+            stopButton.Clicked += () =>
+            {
+                this.player.Stop();
+            };
+
+            var seekBackward = new Button(26, 2, "Seek -5s");
+            stopButton.Clicked += () =>
+            {
+                this.player.Stop();
+            };
+
+            var increaseVolumeButton = new Button(39, 0, "+ Volume");
             increaseVolumeButton.Clicked += () =>
             {
                 this.player.IncreaseVolume();
             };
 
-            var decreaseVolumeButton = new Button(55, 2, "- Volume");
+            var decreaseVolumeButton = new Button(39, 2, "- Volume");
             decreaseVolumeButton.Clicked += () =>
             {
                 this.player.DecreaseVolume();
             };
 
-            playbackControls.Add(playPauseButton, stopButton, increaseVolumeButton, decreaseVolumeButton);
+            playbackControls.Add(playPauseButton, stopButton, increaseVolumeButton, decreaseVolumeButton, seekBackward, seekForward);
 
             // Create the left-hand playlists view.
             playlistPane = new FrameView("Playlist Tracks")
@@ -154,6 +171,8 @@ namespace MusicSharp
                 this.player.LastFileOpened = a.Value.ToString();
                 this.player.PlayFromPlaylist(this.player.LastFileOpened);
                 this.NowPlaying(this.player.LastFileOpened);
+                this.TrackLength();
+                this.TimePlayed();
             };
 
             playlistPane.Add(playlistView);
@@ -161,7 +180,7 @@ namespace MusicSharp
             // Create the audio progress bar frame.
             nowPlaying = new FrameView("Now Playing")
             {
-                X = 70,
+                X = 55,
                 Y = 24,
                 Width = Dim.Fill(),
                 Height = 5,
@@ -170,12 +189,11 @@ namespace MusicSharp
 
             this.AudioProgressBar = new ProgressBar()
             {
-                X = 1,
+                X = 0,
                 Y = 2,
-                Width = Dim.Fill() - 1,
+                Width = Dim.Fill() - 15,
                 Height = 1,
-                Fraction = 0.4F,
-                ColorScheme = Colors.Error,
+                ColorScheme = Colors.Base,
             };
 
             nowPlaying.Add(this.AudioProgressBar);
@@ -191,6 +209,7 @@ namespace MusicSharp
             try
             {
                 this.player.PlayPause();
+                this.TimePlayed();
             }
             catch (Exception)
             {
@@ -216,6 +235,8 @@ namespace MusicSharp
                 this.player.LastFileOpened = d.FilePath.ToString();
                 this.player.OpenFile(this.player.LastFileOpened);
                 this.NowPlaying(this.player.LastFileOpened);
+                this.TrackLength();
+                this.TimePlayed();
                 }
                 else
                 {
@@ -298,6 +319,48 @@ namespace MusicSharp
                 X = 0,
                 Y = 0,
                 Width = Dim.Fill(),
+            };
+
+            nowPlaying.Add(trackName);
+        }
+
+        private void TrackLength()
+        {
+            trackLength = new Label(this.player.TrackLength().ToString(@"mm\:ss"))
+            {
+                X = Pos.Right(this.AudioProgressBar) + 7,
+                Y = 2,
+            };
+
+            nowPlaying.Add(trackLength);
+        }
+
+        private void TimePlayed()
+        {
+            this.AudioProgressBar.Fraction = 0F;
+
+            double counter = Convert.ToInt32(this.player.TrackLength().TotalSeconds);
+
+            this.mainLoopTimeout = Application.MainLoop.AddTimeout(TimeSpan.FromMilliseconds(this.mainLooopTimeoutTick), (loop) =>
+                {
+                    while (counter != 0 && this.player.IsAudioPlaying)
+                    {
+                        this.AudioProgressBar.Fraction += (float)(1 / this.player.TrackLength().TotalSeconds);
+                        this.TimePlayedLabel(this.player.CurrentTime().ToString(@"mm\:ss"));
+                        counter--;
+                        return true;
+                    }
+
+                    return false;
+                });
+        }
+
+        private void TimePlayedLabel(string timePlayed)
+        {
+            trackName = new Label($"{timePlayed} / ")
+            {
+                X = Pos.Right(this.AudioProgressBar),
+                Y = 2,
             };
 
             nowPlaying.Add(trackName);

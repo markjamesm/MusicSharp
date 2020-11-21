@@ -4,6 +4,7 @@
 
 namespace MusicSharp
 {
+    using System;
     using System.IO;
     using NAudio.Wave;
 
@@ -24,6 +25,8 @@ namespace MusicSharp
             this.outputDevice.PlaybackStopped += this.OnPlaybackStopped;
         }
 
+        public bool IsAudioPlaying { get; set; } = false;
+
         /// <inheritdoc/>
         public string LastFileOpened { get; set; }
 
@@ -31,6 +34,7 @@ namespace MusicSharp
         public void Stop()
         {
             this.outputDevice.Stop();
+            this.IsAudioPlaying = false;
         }
 
         /// <summary>
@@ -40,11 +44,12 @@ namespace MusicSharp
         public void OpenFile(string path)
         {
             bool isFileValid = File.Exists(path);
-            if (isFileValid == true)
+            if (isFileValid)
             {
                 this.audioFileReader = new AudioFileReader(path);
                 this.outputDevice.Init(this.audioFileReader);
                 this.outputDevice.Play();
+                this.IsAudioPlaying = true;
             }
             else
             {
@@ -62,12 +67,14 @@ namespace MusicSharp
                 this.outputDevice.PlaybackState == PlaybackState.Stopped)
             {
                 this.outputDevice.Play();
+                this.IsAudioPlaying = true;
                 return;
             }
 
             if (this.outputDevice.PlaybackState == PlaybackState.Playing)
             {
                 this.outputDevice.Pause();
+                this.IsAudioPlaying = false;
             }
         }
 
@@ -83,6 +90,7 @@ namespace MusicSharp
                     this.audioFileReader = new AudioFileReader(path);
                     this.outputDevice.Init(this.audioFileReader);
                     this.outputDevice.Play();
+                    this.IsAudioPlaying = true;
                 }
                 catch (System.IO.FileNotFoundException)
                 {
@@ -149,6 +157,7 @@ namespace MusicSharp
                 {
                     this.outputDevice.Init(mf);
                     this.outputDevice.Play();
+
                 }
             }
             catch (System.ArgumentException)
@@ -157,6 +166,27 @@ namespace MusicSharp
             catch (System.IO.FileNotFoundException)
             {
             }
+        }
+
+        /// <inheritdoc/>
+        public System.TimeSpan CurrentTime()
+        {
+            TimeSpan zeroTime = new TimeSpan(0);
+
+            if (this.outputDevice.PlaybackState != PlaybackState.Stopped && this.outputDevice.PlaybackState != PlaybackState.Paused)
+            {
+                return this.audioFileReader.CurrentTime;
+            }
+            else
+            {
+                return zeroTime;
+            }
+        }
+
+        /// <inheritdoc/>
+        public System.TimeSpan TrackLength()
+        {
+            return this.audioFileReader.TotalTime;
         }
     }
 }

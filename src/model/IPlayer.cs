@@ -10,7 +10,7 @@ namespace MusicSharp
     public interface IPlayer
     {
         /// <summary>
-        ///Gets or sets if the audio player is playing.
+        /// Gets or sets a value indicating whether the audio player is playing.
         /// </summary>
         bool IsAudioPlaying { get; set; }
 
@@ -68,5 +68,15 @@ namespace MusicSharp
         /// </summary>
         /// <returns>The length of the track in timespan format.</returns>
         System.TimeSpan TrackLength();
+
+        /// <summary>
+        /// Skip ahead in the audio file 5s.
+        /// </summary>
+        public void SeekForward();
+
+        /// <summary>
+        /// Skip back in the audio file 5s.
+        /// </summary>
+        public void SeekBackwards();
     }
 }

@@ -1,5 +1,5 @@
 # MusicSharp
-[![Build status](https://github.com/markjamesm/MusicSharp/workflows/.NET%20Core/badge.svg?branch=main)](https://github.com/markjamesm/MusicSharp/actions) [![Platforms](https://img.shields.io/badge/Platforms-Windows-blue)]() [![C#](https://img.shields.io/badge/Language-CSharp-darkgreen.svg)](https://en.wikipedia.org/wiki/C_Sharp_(programming_language)) [![License](https://img.shields.io/badge/License-GPL-orange.svg)](https://www.gnu.org/licenses/gpl-3.0.en.html)
+[![Build status](https://github.com/markjamesm/MusicSharp/workflows/.NET%20Core/badge.svg?branch=main)](https://github.com/markjamesm/MusicSharp/actions) [![C#](https://img.shields.io/badge/Language-CSharp-darkgreen.svg)](https://en.wikipedia.org/wiki/C_Sharp_(programming_language)) [![License](https://img.shields.io/badge/License-GPL-orange.svg)](https://www.gnu.org/licenses/gpl-3.0.en.html)
 
 MusicSharp is a cross-platform Terminal User Interface (TUI) music player written in C# with the goal of being minimalistic and light on resources.
 

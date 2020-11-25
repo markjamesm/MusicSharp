@@ -117,15 +117,15 @@ namespace MusicSharp
             };
 
             var seekForward = new Button(26, 0, "Seek  5s");
-            stopButton.Clicked += () =>
+            seekForward.Clicked += () =>
             {
-                this.player.Stop();
+                this.player.SeekForward();
             };
 
             var seekBackward = new Button(26, 2, "Seek -5s");
-            stopButton.Clicked += () =>
+            seekBackward.Clicked += () =>
             {
-                this.player.Stop();
+                this.player.SeekBackwards();
             };
 
             var increaseVolumeButton = new Button(39, 0, "+ Volume");

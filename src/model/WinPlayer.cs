@@ -25,6 +25,7 @@ namespace MusicSharp
             this.outputDevice.PlaybackStopped += this.OnPlaybackStopped;
         }
 
+        /// <inheritdoc/>
         public bool IsAudioPlaying { get; set; } = false;
 
         /// <inheritdoc/>
@@ -157,7 +158,6 @@ namespace MusicSharp
                 {
                     this.outputDevice.Init(mf);
                     this.outputDevice.Play();
-
                 }
             }
             catch (System.ArgumentException)
@@ -187,6 +187,24 @@ namespace MusicSharp
         public System.TimeSpan TrackLength()
         {
             return this.audioFileReader.TotalTime;
+        }
+
+        /// <inheritdoc/>
+        public void SeekForward()
+        {
+            if (this.audioFileReader != null)
+            {
+                this.audioFileReader.CurrentTime = audioFileReader.CurrentTime.Add(TimeSpan.FromSeconds(5));
+            }
+        }
+
+        /// <inheritdoc/>
+        public void SeekBackwards()
+        {
+            if (this.audioFileReader != null)
+            {
+                this.audioFileReader.CurrentTime = audioFileReader.CurrentTime.Subtract(TimeSpan.FromSeconds(5));
+            }
         }
     }
 }

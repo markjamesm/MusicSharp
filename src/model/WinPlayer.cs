@@ -192,18 +192,18 @@ namespace MusicSharp
         /// <inheritdoc/>
         public void SeekForward()
         {
-            if (this.audioFileReader != null)
+            if (this.audioFileReader != null && this.audioFileReader.CurrentTime <= this.audioFileReader.TotalTime)
             {
-                this.audioFileReader.CurrentTime = audioFileReader.CurrentTime.Add(TimeSpan.FromSeconds(5));
+                this.audioFileReader.CurrentTime = this.audioFileReader.CurrentTime.Add(TimeSpan.FromSeconds(5));
             }
         }
 
         /// <inheritdoc/>
         public void SeekBackwards()
         {
-            if (this.audioFileReader != null)
+            if (this.audioFileReader != null && this.audioFileReader.CurrentTime >= TimeSpan.FromSeconds(5))
             {
-                this.audioFileReader.CurrentTime = audioFileReader.CurrentTime.Subtract(TimeSpan.FromSeconds(5));
+                this.audioFileReader.CurrentTime = this.audioFileReader.CurrentTime.Subtract(TimeSpan.FromSeconds(5));
             }
         }
     }

@@ -3,7 +3,7 @@
 
 MusicSharp is a cross-platform Terminal User Interface (TUI) music player written in C# with the goal of being minimalistic and light on resources.
 
-Currently in an early alpha stage, MusicSharp makes use of the [NAudio](https://github.com/naudio/NAudio) and [Terminal.Gui](https://github.com/migueldeicaza/gui.cs) libraries.
+Currently in beta, MusicSharp makes use of the [NAudio](https://github.com/naudio/NAudio) and [Terminal.Gui](https://github.com/migueldeicaza/gui.cs) libraries. A project build log can be [found here](https://markjames.dev/2020-10-25-developing-a-cli-music-player-csharp/)
 
 ## Features
 
@@ -16,6 +16,10 @@ Currently in an early alpha stage, MusicSharp makes use of the [NAudio](https://
 
 - Save playlists.
 - Cross platform support.
+
+## Installation
+
+Download the [latest release of MusicSharp](https://github.com/markjamesm/MusicSharp/releases) and follow the installation instructions.
 
 ## Want to Contribute?
 

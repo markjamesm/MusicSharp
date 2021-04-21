@@ -2,3 +2,6 @@
 
 # SA1118: Parameter should not span multiple lines
 dotnet_diagnostic.SA1118.severity = none
+
+# IDE0003: Remove qualification
+dotnet_diagnostic.IDE0003.severity = none

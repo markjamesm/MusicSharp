@@ -343,7 +343,7 @@ namespace MusicSharp
 
             this.mainLoopTimeout = Application.MainLoop.AddTimeout(TimeSpan.FromMilliseconds(this.mainLooopTimeoutTick), (loop) =>
                 {
-                    while (counter != 0 && this.player.IsAudioPlaying)
+                    while (counter != 0 && this.player.PlayerStatus != PlayerStatus.Stopped)
                     {
                         this.AudioProgressBar.Fraction += (float)(1 / this.player.TrackLength().TotalSeconds);
                         this.TimePlayedLabel(this.player.CurrentTime().ToString(@"mm\:ss"));

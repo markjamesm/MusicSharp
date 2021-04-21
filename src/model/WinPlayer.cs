@@ -16,6 +16,9 @@ namespace MusicSharp
         private readonly WaveOutEvent outputDevice;
         private AudioFileReader audioFileReader;
 
+        /// <inheritdoc/>
+        public PlayerStatus PlayerStatus { get; set; } = PlayerStatus.Stopped;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="WinPlayer"/> class.
         /// </summary>
@@ -26,16 +29,13 @@ namespace MusicSharp
         }
 
         /// <inheritdoc/>
-        public bool IsAudioPlaying { get; set; } = false;
-
-        /// <inheritdoc/>
         public string LastFileOpened { get; set; }
 
         /// <inheritdoc/>
         public void Stop()
         {
             this.outputDevice.Stop();
-            this.IsAudioPlaying = false;
+            this.PlayerStatus = PlayerStatus.Stopped;
         }
 
         /// <summary>
@@ -50,7 +50,7 @@ namespace MusicSharp
                 this.audioFileReader = new AudioFileReader(path);
                 this.outputDevice.Init(this.audioFileReader);
                 this.outputDevice.Play();
-                this.IsAudioPlaying = true;
+                this.PlayerStatus = PlayerStatus.Playing;
             }
             else
             {
@@ -63,19 +63,22 @@ namespace MusicSharp
         /// </summary>
         public void PlayPause()
         {
-            if (
-                this.outputDevice.PlaybackState == PlaybackState.Paused ||
-                this.outputDevice.PlaybackState == PlaybackState.Stopped)
+            if (this.outputDevice.PlaybackState == PlaybackState.Stopped)
             {
                 this.outputDevice.Play();
-                this.IsAudioPlaying = true;
+                this.PlayerStatus = PlayerStatus.Playing;
                 return;
             }
-
-            if (this.outputDevice.PlaybackState == PlaybackState.Playing)
+            else if (this.outputDevice.PlaybackState == PlaybackState.Paused)
+            {
+                this.outputDevice.Play();
+                this.PlayerStatus = PlayerStatus.Playing;
+                return;
+            }
+            else if (this.outputDevice.PlaybackState == PlaybackState.Playing)
             {
                 this.outputDevice.Pause();
-                this.IsAudioPlaying = false;
+                this.PlayerStatus = PlayerStatus.Paused;
             }
         }
 
@@ -91,7 +94,7 @@ namespace MusicSharp
                     this.audioFileReader = new AudioFileReader(path);
                     this.outputDevice.Init(this.audioFileReader);
                     this.outputDevice.Play();
-                    this.IsAudioPlaying = true;
+                    this.PlayerStatus = PlayerStatus.Playing;
                 }
                 catch (System.IO.FileNotFoundException)
                 {

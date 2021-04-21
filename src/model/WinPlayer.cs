@@ -16,9 +16,6 @@ namespace MusicSharp
         private readonly WaveOutEvent outputDevice;
         private AudioFileReader audioFileReader;
 
-        /// <inheritdoc/>
-        public PlayerStatus PlayerStatus { get; set; } = PlayerStatus.Stopped;
-
         /// <summary>
         /// Initializes a new instance of the <see cref="WinPlayer"/> class.
         /// </summary>
@@ -27,6 +24,9 @@ namespace MusicSharp
             this.outputDevice = new WaveOutEvent();
             this.outputDevice.PlaybackStopped += this.OnPlaybackStopped;
         }
+
+        /// <inheritdoc/>
+        public PlayerStatus PlayerStatus { get; set; } = PlayerStatus.Stopped;
 
         /// <inheritdoc/>
         public string LastFileOpened { get; set; }
@@ -176,7 +176,7 @@ namespace MusicSharp
         {
             TimeSpan zeroTime = new TimeSpan(0);
 
-            if (this.outputDevice.PlaybackState != PlaybackState.Stopped && this.outputDevice.PlaybackState != PlaybackState.Paused)
+            if (this.outputDevice.PlaybackState != PlaybackState.Stopped)
             {
                 return this.audioFileReader.CurrentTime;
             }

@@ -32,7 +32,6 @@ namespace MusicSharp
         private readonly IPlayer player;
 
         private object mainLoopTimeout = null;
-        private uint mainLooopTimeoutTick = 1000; // ms
 
         private List<string> playlist = new List<string>();
         private PlaylistLoader playlistLoader = new PlaylistLoader();
@@ -339,24 +338,27 @@ namespace MusicSharp
         {
             this.AudioProgressBar.Fraction = 0F;
 
-            double counter = Convert.ToInt32(this.player.TrackLength().TotalSeconds);
-
-            this.mainLoopTimeout = Application.MainLoop.AddTimeout(TimeSpan.FromMilliseconds(this.mainLooopTimeoutTick), (loop) =>
+            this.mainLoopTimeout = Application.MainLoop.AddTimeout(TimeSpan.FromSeconds(1), (updateTimer) =>
                 {
-                    while (counter != 0 && this.player.PlayerStatus != PlayerStatus.Stopped)
+                    while (this.player.CurrentTime().Seconds < this.player.TrackLength().TotalSeconds && this.player.PlayerStatus != PlayerStatus.Stopped)
                     {
-                        this.AudioProgressBar.Fraction += (float)(1 / this.player.TrackLength().TotalSeconds);
-                        this.TimePlayedLabel(this.player.CurrentTime().ToString(@"mm\:ss"));
-                        counter--;
+                        if (this.player.PlayerStatus == PlayerStatus.Playing)
+                        {
+                            // this.AudioProgressBar.Fraction += (float)(1 / this.player.CurrentTime().TotalSeconds);
+                            this.AudioProgressBar.Pulse();
+                            this.TimePlayedLabel();
+                        }
+
                         return true;
                     }
 
-                    return false;
+                    return true;
                 });
         }
 
-        private void TimePlayedLabel(string timePlayed)
+        private void TimePlayedLabel()
         {
+            var timePlayed = this.player.CurrentTime().ToString(@"mm\:ss");
             trackName = new Label($"{timePlayed} / ")
             {
                 X = Pos.Right(this.AudioProgressBar),

@@ -106,12 +106,19 @@ namespace MusicSharp
             playPauseButton.Clicked += () =>
             {
                 this.PlayPause();
+
+                if (this.player.PlayerStatus != PlayerStatus.Stopped)
+                {
+                    this.UpdateProgressBar();
+                }
             };
 
             var stopButton = new Button(16, 1, "Stop");
             stopButton.Clicked += () =>
             {
                 this.player.Stop();
+                this.AudioProgressBar.Fraction = 0F;
+                this.TimePlayedLabel();
             };
 
             var seekForward = new Button(26, 0, "Seek  5s");
@@ -169,7 +176,7 @@ namespace MusicSharp
                 this.player.LastFileOpened = a.Value.ToString();
                 this.player.PlayFromPlaylist(this.player.LastFileOpened);
                 this.NowPlaying(this.player.LastFileOpened);
-                this.TimePlayed();
+                this.UpdateProgressBar();
             };
 
             playlistPane.Add(playlistView);
@@ -206,7 +213,11 @@ namespace MusicSharp
             try
             {
                 this.player.PlayPause();
-                this.TimePlayed();
+
+                if (this.player.PlayerStatus == PlayerStatus.Playing)
+                {
+                    this.UpdateProgressBar();
+                }
             }
             catch (Exception)
             {
@@ -229,10 +240,12 @@ namespace MusicSharp
             {
                 if (File.Exists(d.FilePath.ToString()))
                 {
-                this.player.LastFileOpened = d.FilePath.ToString();
-                this.player.OpenFile(this.player.LastFileOpened);
-                this.NowPlaying(this.player.LastFileOpened);
-                this.TimePlayed();
+                    this.player.LastFileOpened = d.FilePath.ToString();
+                    this.player.OpenFile(this.player.LastFileOpened);
+                    this.NowPlaying(this.player.LastFileOpened);
+                    this.AudioProgressBar.Fraction = 0F;
+                    this.UpdateProgressBar();
+                    this.TimePlayedLabel();
                 }
                 else
                 {
@@ -322,37 +335,43 @@ namespace MusicSharp
 
         private void TimePlayedLabel()
         {
-            var timePlayed = this.player.CurrentTime().ToString(@"mm\:ss");
-            var trackLength = this.player.TrackLength().ToString(@"mm\:ss");
-            trackName = new Label($"{timePlayed} / {trackLength}")
+            if (this.player.PlayerStatus != PlayerStatus.Stopped)
             {
-                X = Pos.Right(this.AudioProgressBar),
-                Y = 2,
-            };
+                var timePlayed = this.player.CurrentTime().ToString(@"mm\:ss");
+                var trackLength = this.player.TrackLength().ToString(@"mm\:ss");
+                trackName = new Label($"{timePlayed} / {trackLength}")
+                {
+                    X = Pos.Right(this.AudioProgressBar),
+                    Y = 2,
+                };
+            }
+            else
+            {
+                trackName = new Label($"00:00 / 00:00")
+                {
+                    X = Pos.Right(this.AudioProgressBar),
+                    Y = 2,
+                };
+            }
 
             nowPlaying.Add(trackName);
         }
 
-        private void TimePlayed()
+        private void UpdateProgressBar()
         {
-            this.AudioProgressBar.Fraction = 0F;
-
             this.mainLoopTimeout = Application.MainLoop.AddTimeout(TimeSpan.FromSeconds(1), (updateTimer) =>
+            {
+                while (this.player.CurrentTime().Seconds < this.player.TrackLength().TotalSeconds && this.player.PlayerStatus != PlayerStatus.Stopped)
                 {
-                    while (this.player.CurrentTime().Seconds < this.player.TrackLength().TotalSeconds && this.player.PlayerStatus != PlayerStatus.Stopped)
-                    {
-                        if (this.player.PlayerStatus == PlayerStatus.Playing)
-                        {
-                            // this.AudioProgressBar.Fraction += (float)(1 / this.player.CurrentTime().TotalSeconds);
-                            this.AudioProgressBar.Pulse();
-                            this.TimePlayedLabel();
-                        }
-
-                        return true;
-                    }
+                    // this.AudioProgressBar.Fraction += (float)(1 / this.player.CurrentTime().TotalSeconds);
+                    this.AudioProgressBar.Pulse();
+                    this.TimePlayedLabel();
 
                     return true;
-                });
+                }
+
+                return true;
+            });
         }
     }
 }

@@ -12,7 +12,7 @@ namespace MusicSharp
         /// <summary>
         /// Gets or sets a value indicating whether the audio player is playing.
         /// </summary>
-        bool IsAudioPlaying { get; set; }
+        PlayerStatus PlayerStatus { get; set; }
 
         /// <summary>
         /// Gets or sets the last file opened by the player.

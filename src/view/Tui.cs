@@ -24,7 +24,6 @@ namespace MusicSharp
         private static StatusBar statusBar;
 
         private static Label trackName;
-        private static Label trackLength;
 
         /// <summary>
         /// Create a new instance of the audio player engine.
@@ -170,7 +169,6 @@ namespace MusicSharp
                 this.player.LastFileOpened = a.Value.ToString();
                 this.player.PlayFromPlaylist(this.player.LastFileOpened);
                 this.NowPlaying(this.player.LastFileOpened);
-                this.TrackLength();
                 this.TimePlayed();
             };
 
@@ -234,7 +232,6 @@ namespace MusicSharp
                 this.player.LastFileOpened = d.FilePath.ToString();
                 this.player.OpenFile(this.player.LastFileOpened);
                 this.NowPlaying(this.player.LastFileOpened);
-                this.TrackLength();
                 this.TimePlayed();
                 }
                 else
@@ -323,15 +320,17 @@ namespace MusicSharp
             nowPlaying.Add(trackName);
         }
 
-        private void TrackLength()
+        private void TimePlayedLabel()
         {
-            trackLength = new Label(this.player.TrackLength().ToString(@"mm\:ss"))
+            var timePlayed = this.player.CurrentTime().ToString(@"mm\:ss");
+            var trackLength = this.player.TrackLength().ToString(@"mm\:ss");
+            trackName = new Label($"{timePlayed} / {trackLength}")
             {
-                X = Pos.Right(this.AudioProgressBar) + 7,
+                X = Pos.Right(this.AudioProgressBar),
                 Y = 2,
             };
 
-            nowPlaying.Add(trackLength);
+            nowPlaying.Add(trackName);
         }
 
         private void TimePlayed()
@@ -354,18 +353,6 @@ namespace MusicSharp
 
                     return true;
                 });
-        }
-
-        private void TimePlayedLabel()
-        {
-            var timePlayed = this.player.CurrentTime().ToString(@"mm\:ss");
-            trackName = new Label($"{timePlayed} / ")
-            {
-                X = Pos.Right(this.AudioProgressBar),
-                Y = 2,
-            };
-
-            nowPlaying.Add(trackName);
         }
     }
 }

@@ -361,16 +361,15 @@ namespace MusicSharp
         {
             this.mainLoopTimeout = Application.MainLoop.AddTimeout(TimeSpan.FromSeconds(1), (updateTimer) =>
             {
-                while (this.player.CurrentTime().Seconds < this.player.TrackLength().TotalSeconds && this.player.PlayerStatus != PlayerStatus.Stopped)
+                while (this.player.CurrentTime().Seconds < this.player.TrackLength().TotalSeconds && this.player.PlayerStatus is not PlayerStatus.Stopped)
                 {
-                    // this.AudioProgressBar.Fraction += (float)(1 / this.player.CurrentTime().TotalSeconds);
-                    this.AudioProgressBar.Pulse();
+                    this.AudioProgressBar.Fraction = (float)(this.player.CurrentTime().Seconds / this.player.TrackLength().TotalSeconds);
                     this.TimePlayedLabel();
 
                     return true;
                 }
 
-                return true;
+                return false;
             });
         }
     }

@@ -33,7 +33,6 @@ namespace MusicSharp
         private object mainLoopTimeout = null;
 
         private List<string> playlist = new List<string>();
-        private PlaylistLoader playlistLoader = new PlaylistLoader();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Tui"/> class.
@@ -303,7 +302,7 @@ namespace MusicSharp
 
             if (!d.Canceled)
             {
-                this.playlist = this.playlistLoader.LoadPlaylist(d.FilePath.ToString());
+                this.playlist = PlaylistLoader.LoadPlaylist(d.FilePath.ToString());
 
                 if (this.playlist == null)
                 {

@@ -1,6 +1,7 @@
 ﻿// <copyright file="PlaylistLoader.cs" company="Mark-James McDougall">
 // Licensed under the GNU GPL v3 License. See LICENSE in the project root for license information.
 // </copyright>
+
 namespace MusicSharp
 {
     using System.Collections.Generic;
@@ -9,7 +10,7 @@ namespace MusicSharp
     /// <summary>
     /// The PlaylistLoader class loads a playlist of a given type.
     /// </summary>
-    public class PlaylistLoader
+    public static class PlaylistLoader
     {
         // This will be used in the future to allow for playlist types beyond M3U.
         // public virtual void LoadPlaylist() { }
@@ -19,13 +20,12 @@ namespace MusicSharp
         /// </summary>
         /// <returns>Returns a list of playlist information.</returns>
         /// <param name="userPlaylist">The user specified playlist path.</param>
-        public List<string> LoadPlaylist(string userPlaylist)
+        public static List<string> LoadPlaylist(string userPlaylist)
         {
-            IPlaylistIO theReader = PlaylistIOFactory.GetInstance().GetPlaylistIO(userPlaylist);
+            var filePaths = new List<string>();
+            var theReader = PlaylistIOFactory.GetInstance().GetPlaylistIO(userPlaylist);
 
-            List<string> filePaths = new List<string>();
-
-            foreach (string s in theReader.FilePaths)
+            foreach (var s in theReader.FilePaths)
             {
                 filePaths.Add(s);
             }

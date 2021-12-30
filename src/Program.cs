@@ -2,7 +2,8 @@
 // Licensed under the GNU GPL v3 License. See LICENSE in the project root for license information.
 // </copyright>
 
-using MusicSharp;
+using MusicSharp.SoundEngines;
+using MusicSharp.View;
 
 /// <summary>
 /// Entry Point class.
@@ -14,10 +15,9 @@ public static class Program
     /// </summary>
     public static void Main()
     {
-        // Start MusicSharp.
-        IPlayer player = new WinPlayer();
+        var player = new WinPlayer();
+        var gui = new Tui(player);
 
-        Tui gui = new Tui(player);
         gui.Start();
     }
 }

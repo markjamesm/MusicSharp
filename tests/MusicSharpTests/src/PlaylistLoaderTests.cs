@@ -1,9 +1,11 @@
 ﻿// <copyright file="PlaylistLoaderTests.cs" company="Mark-James McDougall">
 // Licensed under the GNU GPL v3 License. See LICENSE in the project root for license information.
 // </copyright>
-namespace MusicSharp.Tests
-{
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+using MusicSharp.Models;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+namespace MusicSharpTests;
 
     [TestClass()]
     public class PlaylistLoaderTests
@@ -11,11 +13,7 @@ namespace MusicSharp.Tests
         [TestMethod()]
         public void Load_NullPlaylist()
         {
-            // Arrange
-            var playlist = new PlaylistLoader();
-
             // Act and assert
-            Assert.ThrowsException<System.NullReferenceException>(() => playlist.LoadPlaylist(null));
+            Assert.ThrowsException<System.NullReferenceException>(() => PlaylistLoader.LoadPlaylist(null));
         }
     }
-}

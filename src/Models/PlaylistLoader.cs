@@ -2,10 +2,10 @@
 // Licensed under the GNU GPL v3 License. See LICENSE in the project root for license information.
 // </copyright>
 
-namespace MusicSharp;
-
 using System.Collections.Generic;
 using ATL.Playlist;
+
+namespace MusicSharp.Models;
 
 /// <summary>
 /// The PlaylistLoader class loads a playlist of a given type.

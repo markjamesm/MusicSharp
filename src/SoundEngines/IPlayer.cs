@@ -2,7 +2,9 @@
 // Licensed under the GNU GPL v3 License. See LICENSE in the project root for license information.
 // </copyright>
 
-namespace MusicSharp;
+using MusicSharp.Enums;
+
+namespace MusicSharp.SoundEngines;
 
 /// <summary>
 /// Defines the methods an audio player class should implement.
@@ -12,7 +14,7 @@ public interface IPlayer
     /// <summary>
     /// Gets or sets a value indicating whether the audio player is playing.
     /// </summary>
-    PlayerStatus PlayerStatus { get; set; }
+    ePlayerStatus PlayerStatus { get; set; }
 
     /// <summary>
     /// Gets or sets the last file opened by the player.
@@ -28,8 +30,8 @@ public interface IPlayer
     /// <summary>
     /// Method to play an audio stream from a URL.
     /// </summary>
-    /// <param name="streamURL">The stream URL of the audio file to play.</param>
-    void OpenStream(string streamURL);
+    /// <param name="streamUrl">The stream URL of the audio file to play.</param>
+    void OpenStream(string streamUrl);
 
     /// <summary>
     /// Method to pause audio playback.

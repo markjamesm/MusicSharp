@@ -2,11 +2,12 @@
 // Licensed under the GNU GPL v3 License. See LICENSE in the project root for license information.
 // </copyright>
 
-namespace MusicSharp;
-
+using MusicSharp.Enums;
 using System;
 using System.IO;
 using NAudio.Wave;
+
+namespace MusicSharp.SoundEngines;
 
 /// <summary>
 /// The audio player implementation for Windows using NAudio.
@@ -26,7 +27,7 @@ public class WinPlayer : IPlayer
     }
 
     /// <inheritdoc/>
-    public PlayerStatus PlayerStatus { get; set; } = PlayerStatus.Stopped;
+    public ePlayerStatus PlayerStatus { get; set; } = ePlayerStatus.Stopped;
 
     /// <inheritdoc/>
     public string LastFileOpened { get; set; }
@@ -35,7 +36,7 @@ public class WinPlayer : IPlayer
     public void Stop()
     {
         _outputDevice.Stop();
-        PlayerStatus = PlayerStatus.Stopped;
+        PlayerStatus = ePlayerStatus.Stopped;
     }
 
     /// <summary>
@@ -44,18 +45,17 @@ public class WinPlayer : IPlayer
     /// <param name="path">The filepath.</param>
     public void OpenFile(string path)
     {
-        bool isFileValid = File.Exists(path);
+        var isFileValid = File.Exists(path);
+
         if (isFileValid)
         {
             _audioFileReader = new AudioFileReader(path);
             _outputDevice.Init(_audioFileReader);
             _outputDevice.Play();
-            PlayerStatus = PlayerStatus.Playing;
+            PlayerStatus = ePlayerStatus.Playing;
         }
-        else
-        {
-            // Space for error message, should one be wanted/needed
-        }
+
+        // Space for error message, should one be wanted/needed.
     }
 
     /// <summary>
@@ -66,19 +66,19 @@ public class WinPlayer : IPlayer
         if (_outputDevice.PlaybackState == PlaybackState.Stopped)
         {
             _outputDevice.Play();
-            PlayerStatus = PlayerStatus.Playing;
+            PlayerStatus = ePlayerStatus.Playing;
             return;
         }
-        else if (_outputDevice.PlaybackState == PlaybackState.Paused)
+        if (_outputDevice.PlaybackState == PlaybackState.Paused)
         {
             _outputDevice.Play();
-            PlayerStatus = PlayerStatus.Playing;
+            PlayerStatus = ePlayerStatus.Playing;
             return;
         }
-        else if (_outputDevice.PlaybackState == PlaybackState.Playing)
+        if (_outputDevice.PlaybackState == PlaybackState.Playing)
         {
             _outputDevice.Pause();
-            PlayerStatus = PlayerStatus.Paused;
+            PlayerStatus = ePlayerStatus.Paused;
         }
     }
 
@@ -94,7 +94,7 @@ public class WinPlayer : IPlayer
                 _audioFileReader = new AudioFileReader(path);
                 _outputDevice.Init(_audioFileReader);
                 _outputDevice.Play();
-                PlayerStatus = PlayerStatus.Playing;
+                PlayerStatus = ePlayerStatus.Playing;
             }
             catch (System.IO.FileNotFoundException)
             {
@@ -109,7 +109,7 @@ public class WinPlayer : IPlayer
     /// <param name="args">The StoppedEventArgs.</param>
     public void OnPlaybackStopped(object sender, StoppedEventArgs args)
     {
-        if (_audioFileReader != null)
+        if (_audioFileReader is not null)
         {
             _audioFileReader.Dispose();
         }
@@ -152,29 +152,28 @@ public class WinPlayer : IPlayer
     /// <summary>
     /// Method to open an audio stream.
     /// </summary>
-    /// <param name="streamURL">The URL of the stream.</param>
-    public void OpenStream(string streamURL)
+    /// <param name="streamUrl">The URL of the stream.</param>
+    public void OpenStream(string streamUrl)
     {
         try
         {
-            using (var mf = new MediaFoundationReader(streamURL))
-            {
-                _outputDevice.Init(mf);
-                _outputDevice.Play();
-            }
+            using var mf = new MediaFoundationReader(streamUrl);
+
+            _outputDevice.Init(mf);
+            _outputDevice.Play();
         }
-        catch (System.ArgumentException)
+        catch (ArgumentException)
         {
         }
-        catch (System.IO.FileNotFoundException)
+        catch (FileNotFoundException)
         {
         }
     }
 
     /// <inheritdoc/>
-    public System.TimeSpan CurrentTime()
+    public TimeSpan CurrentTime()
     {
-        TimeSpan zeroTime = new TimeSpan(0);
+        var zeroTime = new TimeSpan(0);
 
         if (_outputDevice.PlaybackState != PlaybackState.Stopped)
         {
@@ -187,7 +186,7 @@ public class WinPlayer : IPlayer
     }
 
     /// <inheritdoc/>
-    public System.TimeSpan TrackLength()
+    public TimeSpan TrackLength()
     {
         return _audioFileReader.TotalTime;
     }

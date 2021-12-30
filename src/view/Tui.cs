@@ -2,14 +2,15 @@
 // Licensed under the GNU GPL v3 License. See LICENSE in the project root for license information.
 // </copyright>
 
-namespace MusicSharp;
-
+using MusicSharp.Enums;
+using MusicSharp.SoundEngines;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
-using System.Threading;
+using MusicSharp.Models;
 using Terminal.Gui;
+
+namespace MusicSharp.View;
 
 /// <summary>
 /// The Gui class houses the CLI elements of MusicSharp.
@@ -105,7 +106,7 @@ public class Tui
         {
             PlayPause();
 
-            if (_player.PlayerStatus != PlayerStatus.Stopped)
+            if (_player.PlayerStatus != ePlayerStatus.Stopped)
             {
                 UpdateProgressBar();
             }
@@ -212,7 +213,7 @@ public class Tui
         {
             _player.PlayPause();
 
-            if (_player.PlayerStatus == PlayerStatus.Playing)
+            if (_player.PlayerStatus == ePlayerStatus.Playing)
             {
                 UpdateProgressBar();
             }
@@ -333,7 +334,7 @@ public class Tui
 
     private void TimePlayedLabel()
     {
-        if (_player.PlayerStatus != PlayerStatus.Stopped)
+        if (_player.PlayerStatus != ePlayerStatus.Stopped)
         {
             var timePlayed = _player.CurrentTime().ToString(@"mm\:ss");
             var trackLength = _player.TrackLength().ToString(@"mm\:ss");
@@ -359,7 +360,7 @@ public class Tui
     {
         _mainLoopTimeout = Application.MainLoop.AddTimeout(TimeSpan.FromSeconds(1), (updateTimer) =>
         {
-            while (_player.CurrentTime().Seconds < _player.TrackLength().TotalSeconds && _player.PlayerStatus is not PlayerStatus.Stopped)
+            while (_player.CurrentTime().Seconds < _player.TrackLength().TotalSeconds && _player.PlayerStatus is not ePlayerStatus.Stopped)
             {
                 AudioProgressBar.Fraction = (float)(_player.CurrentTime().Seconds / _player.TrackLength().TotalSeconds);
                 TimePlayedLabel();

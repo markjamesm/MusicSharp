@@ -1,9 +1,9 @@
-﻿namespace MusicSharp;
+﻿namespace MusicSharp.Enums;
 
 /// <summary>
 /// The status of the audio player.
 /// </summary>
-public enum PlayerStatus
+public enum ePlayerStatus
 {
     Playing,
     Paused,

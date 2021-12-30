@@ -3,11 +3,9 @@
 // </copyright>
 
 using MusicSharp.SoundEngines;
-
-namespace MusicSharpTests;
-
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.IO;
+namespace MusicSharpTests;
 
 [TestClass()]
 public class WinPlayerTests

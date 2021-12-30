@@ -5,6 +5,7 @@
 using MusicSharp.SoundEngines;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.IO;
+
 namespace MusicSharpTests;
 
 [TestClass()]

@@ -2,212 +2,211 @@
 // Licensed under the GNU GPL v3 License. See LICENSE in the project root for license information.
 // </copyright>
 
-namespace MusicSharp
+namespace MusicSharp;
+
+using System;
+using System.IO;
+using NAudio.Wave;
+
+/// <summary>
+/// The audio player implementation for Windows using NAudio.
+/// </summary>
+public class WinPlayer : IPlayer
 {
-    using System;
-    using System.IO;
-    using NAudio.Wave;
+    private readonly WaveOutEvent _outputDevice;
+    private AudioFileReader _audioFileReader;
 
     /// <summary>
-    /// The audio player implementation for Windows using NAudio.
+    /// Initializes a new instance of the <see cref="WinPlayer"/> class.
     /// </summary>
-    public class WinPlayer : IPlayer
+    public WinPlayer()
     {
-        private readonly WaveOutEvent outputDevice;
-        private AudioFileReader audioFileReader;
+        _outputDevice = new WaveOutEvent();
+        _outputDevice.PlaybackStopped += OnPlaybackStopped;
+    }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="WinPlayer"/> class.
-        /// </summary>
-        public WinPlayer()
+    /// <inheritdoc/>
+    public PlayerStatus PlayerStatus { get; set; } = PlayerStatus.Stopped;
+
+    /// <inheritdoc/>
+    public string LastFileOpened { get; set; }
+
+    /// <inheritdoc/>
+    public void Stop()
+    {
+        _outputDevice.Stop();
+        PlayerStatus = PlayerStatus.Stopped;
+    }
+
+    /// <summary>
+    /// Opens an audio file and then plays it.
+    /// </summary>
+    /// <param name="path">The filepath.</param>
+    public void OpenFile(string path)
+    {
+        bool isFileValid = File.Exists(path);
+        if (isFileValid)
         {
-            this.outputDevice = new WaveOutEvent();
-            this.outputDevice.PlaybackStopped += this.OnPlaybackStopped;
+            _audioFileReader = new AudioFileReader(path);
+            _outputDevice.Init(_audioFileReader);
+            _outputDevice.Play();
+            PlayerStatus = PlayerStatus.Playing;
         }
-
-        /// <inheritdoc/>
-        public PlayerStatus PlayerStatus { get; set; } = PlayerStatus.Stopped;
-
-        /// <inheritdoc/>
-        public string LastFileOpened { get; set; }
-
-        /// <inheritdoc/>
-        public void Stop()
+        else
         {
-            this.outputDevice.Stop();
-            this.PlayerStatus = PlayerStatus.Stopped;
+            // Space for error message, should one be wanted/needed
         }
+    }
 
-        /// <summary>
-        /// Opens an audio file and then plays it.
-        /// </summary>
-        /// <param name="path">The filepath.</param>
-        public void OpenFile(string path)
+    /// <summary>
+    /// Method to play and pause audio playback depending on PlaybackState.
+    /// </summary>
+    public void PlayPause()
+    {
+        if (_outputDevice.PlaybackState == PlaybackState.Stopped)
         {
-            bool isFileValid = File.Exists(path);
-            if (isFileValid)
-            {
-                this.audioFileReader = new AudioFileReader(path);
-                this.outputDevice.Init(this.audioFileReader);
-                this.outputDevice.Play();
-                this.PlayerStatus = PlayerStatus.Playing;
-            }
-            else
-            {
-                // Space for error message, should one be wanted/needed
-            }
+            _outputDevice.Play();
+            PlayerStatus = PlayerStatus.Playing;
+            return;
         }
-
-        /// <summary>
-        /// Method to play and pause audio playback depending on PlaybackState.
-        /// </summary>
-        public void PlayPause()
+        else if (_outputDevice.PlaybackState == PlaybackState.Paused)
         {
-            if (this.outputDevice.PlaybackState == PlaybackState.Stopped)
-            {
-                this.outputDevice.Play();
-                this.PlayerStatus = PlayerStatus.Playing;
-                return;
-            }
-            else if (this.outputDevice.PlaybackState == PlaybackState.Paused)
-            {
-                this.outputDevice.Play();
-                this.PlayerStatus = PlayerStatus.Playing;
-                return;
-            }
-            else if (this.outputDevice.PlaybackState == PlaybackState.Playing)
-            {
-                this.outputDevice.Pause();
-                this.PlayerStatus = PlayerStatus.Paused;
-            }
+            _outputDevice.Play();
+            PlayerStatus = PlayerStatus.Playing;
+            return;
         }
-
-        /// <inheritdoc/>
-        public void PlayFromPlaylist(string path)
+        else if (_outputDevice.PlaybackState == PlaybackState.Playing)
         {
-            if (this.outputDevice != null)
-            {
-                this.outputDevice.Dispose();
-
-                try
-                {
-                    this.audioFileReader = new AudioFileReader(path);
-                    this.outputDevice.Init(this.audioFileReader);
-                    this.outputDevice.Play();
-                    this.PlayerStatus = PlayerStatus.Playing;
-                }
-                catch (System.IO.FileNotFoundException)
-                {
-                }
-            }
+            _outputDevice.Pause();
+            PlayerStatus = PlayerStatus.Paused;
         }
+    }
 
-        /// <summary>
-        /// Dispose of our device once playback is stopped.
-        /// </summary>
-        /// <param name="sender">The object sender.</param>
-        /// <param name="args">The StoppedEventArgs.</param>
-        public void OnPlaybackStopped(object sender, StoppedEventArgs args)
+    /// <inheritdoc/>
+    public void PlayFromPlaylist(string path)
+    {
+        if (_outputDevice != null)
         {
-            if (this.audioFileReader != null)
-            {
-                this.audioFileReader.Dispose();
-            }
+            _outputDevice.Dispose();
 
-            this.outputDevice.Dispose();
-        }
-
-        /// <summary>
-        /// Method to increase audio playback volume.
-        /// </summary>
-        public void IncreaseVolume()
-        {
-            // Use this construct to prevent edge cases going over 1.0f
-            // This is caused by using floats in WaveOutEvent
-            if (this.outputDevice.Volume > 0.9f)
-            {
-                this.outputDevice.Volume = 1.0f;
-                return;
-            }
-
-            this.outputDevice.Volume += 0.1f;
-        }
-
-        /// <summary>
-        /// Method to decrease audio playback volume.
-        /// </summary>
-        public void DecreaseVolume()
-        {
-            // Use this construct to prevent edge cases going under 0.0f
-            // This is caused by using floats in WaveOutEvent
-            if (this.outputDevice.Volume < 0.1f)
-            {
-                this.outputDevice.Volume = 0.0f;
-                return;
-            }
-
-            this.outputDevice.Volume -= 0.1f;
-        }
-
-        /// <summary>
-        /// Method to open an audio stream.
-        /// </summary>
-        /// <param name="streamURL">The URL of the stream.</param>
-        public void OpenStream(string streamURL)
-        {
             try
             {
-                using (var mf = new MediaFoundationReader(streamURL))
-                {
-                    this.outputDevice.Init(mf);
-                    this.outputDevice.Play();
-                }
-            }
-            catch (System.ArgumentException)
-            {
+                _audioFileReader = new AudioFileReader(path);
+                _outputDevice.Init(_audioFileReader);
+                _outputDevice.Play();
+                PlayerStatus = PlayerStatus.Playing;
             }
             catch (System.IO.FileNotFoundException)
             {
             }
         }
+    }
 
-        /// <inheritdoc/>
-        public System.TimeSpan CurrentTime()
+    /// <summary>
+    /// Dispose of our device once playback is stopped.
+    /// </summary>
+    /// <param name="sender">The object sender.</param>
+    /// <param name="args">The StoppedEventArgs.</param>
+    public void OnPlaybackStopped(object sender, StoppedEventArgs args)
+    {
+        if (_audioFileReader != null)
         {
-            TimeSpan zeroTime = new TimeSpan(0);
-
-            if (this.outputDevice.PlaybackState != PlaybackState.Stopped)
-            {
-                return this.audioFileReader.CurrentTime;
-            }
-            else
-            {
-                return zeroTime;
-            }
+            _audioFileReader.Dispose();
         }
 
-        /// <inheritdoc/>
-        public System.TimeSpan TrackLength()
+        _outputDevice.Dispose();
+    }
+
+    /// <summary>
+    /// Method to increase audio playback volume.
+    /// </summary>
+    public void IncreaseVolume()
+    {
+        // Use this construct to prevent edge cases going over 1.0f
+        // This is caused by using floats in WaveOutEvent
+        if (_outputDevice.Volume > 0.9f)
         {
-            return this.audioFileReader.TotalTime;
+            _outputDevice.Volume = 1.0f;
+            return;
         }
 
-        /// <inheritdoc/>
-        public void SeekForward()
+        _outputDevice.Volume += 0.1f;
+    }
+
+    /// <summary>
+    /// Method to decrease audio playback volume.
+    /// </summary>
+    public void DecreaseVolume()
+    {
+        // Use this construct to prevent edge cases going under 0.0f
+        // This is caused by using floats in WaveOutEvent
+        if (_outputDevice.Volume < 0.1f)
         {
-            if (this.audioFileReader != null && this.audioFileReader.CurrentTime <= this.audioFileReader.TotalTime)
-            {
-                this.audioFileReader.CurrentTime = this.audioFileReader.CurrentTime.Add(TimeSpan.FromSeconds(5));
-            }
+            _outputDevice.Volume = 0.0f;
+            return;
         }
 
-        /// <inheritdoc/>
-        public void SeekBackwards()
+        _outputDevice.Volume -= 0.1f;
+    }
+
+    /// <summary>
+    /// Method to open an audio stream.
+    /// </summary>
+    /// <param name="streamURL">The URL of the stream.</param>
+    public void OpenStream(string streamURL)
+    {
+        try
         {
-            if (this.audioFileReader != null && this.audioFileReader.CurrentTime >= TimeSpan.FromSeconds(5))
+            using (var mf = new MediaFoundationReader(streamURL))
             {
-                this.audioFileReader.CurrentTime = this.audioFileReader.CurrentTime.Subtract(TimeSpan.FromSeconds(5));
+                _outputDevice.Init(mf);
+                _outputDevice.Play();
             }
+        }
+        catch (System.ArgumentException)
+        {
+        }
+        catch (System.IO.FileNotFoundException)
+        {
+        }
+    }
+
+    /// <inheritdoc/>
+    public System.TimeSpan CurrentTime()
+    {
+        TimeSpan zeroTime = new TimeSpan(0);
+
+        if (_outputDevice.PlaybackState != PlaybackState.Stopped)
+        {
+            return _audioFileReader.CurrentTime;
+        }
+        else
+        {
+            return zeroTime;
+        }
+    }
+
+    /// <inheritdoc/>
+    public System.TimeSpan TrackLength()
+    {
+        return _audioFileReader.TotalTime;
+    }
+
+    /// <inheritdoc/>
+    public void SeekForward()
+    {
+        if (_audioFileReader != null && _audioFileReader.CurrentTime <= _audioFileReader.TotalTime)
+        {
+            _audioFileReader.CurrentTime = _audioFileReader.CurrentTime.Add(TimeSpan.FromSeconds(5));
+        }
+    }
+
+    /// <inheritdoc/>
+    public void SeekBackwards()
+    {
+        if (_audioFileReader != null && _audioFileReader.CurrentTime >= TimeSpan.FromSeconds(5))
+        {
+            _audioFileReader.CurrentTime = _audioFileReader.CurrentTime.Subtract(TimeSpan.FromSeconds(5));
         }
     }
 }

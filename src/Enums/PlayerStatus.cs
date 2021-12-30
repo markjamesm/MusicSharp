@@ -1,12 +1,11 @@
-﻿namespace MusicSharp
+﻿namespace MusicSharp;
+
+/// <summary>
+/// The status of the audio player.
+/// </summary>
+public enum PlayerStatus
 {
-    /// <summary>
-    /// The status of the audio player.
-    /// </summary>
-    public enum PlayerStatus
-    {
-        Playing,
-        Paused,
-        Stopped
-    }
+    Playing,
+    Paused,
+    Stopped
 }

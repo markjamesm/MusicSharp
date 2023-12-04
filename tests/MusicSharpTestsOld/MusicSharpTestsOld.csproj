@@ -4,6 +4,8 @@
     <TargetFramework>net7.0</TargetFramework>
 
     <IsPackable>false</IsPackable>
+
+    <RootNamespace>MusicSharpTests</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>

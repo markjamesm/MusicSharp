@@ -49,10 +49,16 @@ public class WinPlayer : IPlayer
 
         if (isFileValid)
         {
-            _audioFileReader = new AudioFileReader(path);
-            _outputDevice.Init(_audioFileReader);
-            _outputDevice.Play();
-            PlayerStatus = ePlayerStatus.Playing;
+            try
+            {
+                _audioFileReader = new AudioFileReader(path);
+                _outputDevice.Init(_audioFileReader);
+                _outputDevice.Play();
+                PlayerStatus = ePlayerStatus.Playing;   
+            }
+            catch (FileNotFoundException)
+            {
+            }   
         }
 
         // Space for error message, should one be wanted/needed.
@@ -96,7 +102,7 @@ public class WinPlayer : IPlayer
                 _outputDevice.Play();
                 PlayerStatus = ePlayerStatus.Playing;
             }
-            catch (System.IO.FileNotFoundException)
+            catch (FileNotFoundException)
             {
             }
         }
@@ -162,10 +168,7 @@ public class WinPlayer : IPlayer
             _outputDevice.Init(mf);
             _outputDevice.Play();
         }
-        catch (ArgumentException)
-        {
-        }
-        catch (FileNotFoundException)
+        catch (NullReferenceException)
         {
         }
     }

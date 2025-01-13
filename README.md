@@ -19,11 +19,24 @@ Currently in beta, MusicSharp makes use of the [NAudio](https://github.com/naudi
 ## Planned
 
 - Save playlists.
-- Cross platform support.
+- Cross-platform support.
 
 ## Installation
 
 Download the [latest release of MusicSharp](https://github.com/markjamesm/MusicSharp/releases) and follow the installation instructions.
+
+### Additional step for Linux
+
+Install GStreamer:
+```bash
+# Ubuntu/Debian:
+sudo apt-get install gstreamer1.0-plugins-base gstreamer1.0-plugins-good gstreamer1.0-plugins-bad gstreamer1.0-plugins-ugly
+```
+
+```bash 
+# Fedora
+sudo dnf install gstreamer1-plugins-base gstreamer1-plugins-good gstreamer1-plugins-bad-free gstreamer1-plugins-ugly-free
+```
 
 ## Want to Contribute?
 

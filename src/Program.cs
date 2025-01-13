@@ -2,6 +2,8 @@
 // Licensed under the GNU GPL v3 License. See LICENSE in the project root for license information.
 // </copyright>
 
+using System;
+using System.Runtime.InteropServices;
 using MusicSharp.SoundEngines;
 using MusicSharp.View;
 
@@ -15,7 +17,21 @@ public static class Program
     /// </summary>
     public static void Main()
     {
-        var player = new WinPlayer();
+        IPlayer player;
+
+        if(RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        {
+            player = new WinPlayer();
+        }
+        else if(RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+        {
+            player = new LinuxPlayer();
+        }
+        else
+        {
+            throw new PlatformNotSupportedException();
+        }
+
         var gui = new Tui(player);
 
         gui.Start();

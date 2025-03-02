@@ -3,7 +3,8 @@
 // </copyright>
 
 using MusicSharp.SoundEngines;
-using MusicSharp.View;
+
+namespace MusicSharp;
 
 /// <summary>
 /// Entry Point class.
@@ -15,8 +16,8 @@ public static class Program
     /// </summary>
     public static void Main()
     {
-        var player = new WinPlayer();
-        var gui = new Tui(player);
+        using var player = new SoundEngine();
+        var gui = new Tui.Tui(player);
 
         gui.Start();
     }

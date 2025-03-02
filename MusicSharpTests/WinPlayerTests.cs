@@ -3,7 +3,7 @@ using MusicSharp.SoundEngines;
 namespace MusicSharpTests;
 
 public class WinPlayerTests
-{
+{ /*
     [Test]
     public void Play_NullFile()
     {
@@ -22,5 +22,5 @@ public class WinPlayerTests
 
         // act and assert
         Assert.Throws<NullReferenceException>(() => player.PlayFromPlaylist(null));
-    }
+    } */
 }

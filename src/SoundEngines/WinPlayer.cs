@@ -1,7 +1,7 @@
 ﻿// <copyright file="WinPlayer.cs" company="Mark-James McDougall">
 // Licensed under the GNU GPL v3 License. See LICENSE in the project root for license information.
 // </copyright>
-
+/*
 using MusicSharp.Enums;
 using System;
 using System.IO;
@@ -12,8 +12,9 @@ namespace MusicSharp.SoundEngines;
 /// <summary>
 /// The audio player implementation for Windows using NAudio.
 /// </summary>
-public class WinPlayer : IPlayer
+public class WinPlayer : ISoundEngine
 {
+    
     private readonly WaveOutEvent _outputDevice;
     private AudioFileReader _audioFileReader;
 
@@ -212,3 +213,4 @@ public class WinPlayer : IPlayer
         }
     }
 }
+*/

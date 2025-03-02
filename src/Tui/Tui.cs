@@ -2,15 +2,15 @@
 // Licensed under the GNU GPL v3 License. See LICENSE in the project root for license information.
 // </copyright>
 
-using MusicSharp.Enums;
-using MusicSharp.SoundEngines;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using MusicSharp.Enums;
 using MusicSharp.Models;
+using MusicSharp.SoundEngines;
 using Terminal.Gui;
 
-namespace MusicSharp.View;
+namespace MusicSharp.Tui;
 
 /// <summary>
 /// The Gui class houses the CLI elements of MusicSharp.
@@ -242,13 +242,13 @@ public class Tui
                 _player.LastFileOpened = d.FilePath.ToString();
                 _player.OpenFile(_player.LastFileOpened);
                 NowPlaying(_player.LastFileOpened);
-                AudioProgressBar.Fraction = 0F;
-                UpdateProgressBar();
-                TimePlayedLabel();
+            //    AudioProgressBar.Fraction = 0F;
+              //  UpdateProgressBar();
+              //  TimePlayedLabel();
             }
             else
             {
-                // This is a good spot for an error message, should one be wanted/needed
+                MessageBox.Query("Warning", "Invalid file path.", "Close");
             }
         }
     }

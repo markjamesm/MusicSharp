@@ -8,10 +8,15 @@ using SoundFlow.Providers;
 
 namespace MusicSharp.SoundEngines;
 
-public class SoundFlow: ISoundEngine
+
+// Cross-platform sound engine that works for all devices which
+//  the .NET platform runs on.
+public class SoundEngine: ISoundEngine
 {
     public ePlayerStatus PlayerStatus { get; set; }
     public string LastFileOpened { get; set; }
+    
+    
     public void OpenFile(string path)
     {
         throw new NotImplementedException();

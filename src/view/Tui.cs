@@ -28,7 +28,7 @@ public class Tui
     /// <summary>
     /// Create a new instance of the audio player engine.
     /// </summary>
-    private readonly IPlayer _player;
+    private readonly ISoundEngine _player;
 
     private object _mainLoopTimeout = null;
 
@@ -38,7 +38,7 @@ public class Tui
     /// Initializes a new instance of the <see cref="Tui"/> class.
     /// </summary>
     /// <param name="player">The player to be injected.</param>
-    public Tui(IPlayer player)
+    public Tui(ISoundEngine player)
     {
         _player = player;
     }

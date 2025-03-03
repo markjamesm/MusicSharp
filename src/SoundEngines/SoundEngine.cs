@@ -103,15 +103,15 @@ public class SoundEngine: ISoundEngine, IDisposable
     {
         throw new NotImplementedException();
     }
+    
+   public float CurrentTime()
+   {
+       return _player.Time;
+   }
 
-    public TimeSpan CurrentTime()
+    public float TrackLength()
     {
-        throw new NotImplementedException();
-    }
-
-    public TimeSpan TrackLength()
-    {
-        throw new NotImplementedException();
+        return _player.Duration;
     }
 
     public void SeekForward()

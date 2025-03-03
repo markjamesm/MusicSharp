@@ -232,7 +232,7 @@ public class Tui
         d.DirectoryPath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
 
         // This will filter the dialog on basis of the allowed file types in the array.
-        d.AllowedFileTypes = new string[] { ".mp3", ".wav", ".flac" };
+        d.AllowedFileTypes = [".mp3", ".wav", ".flac"];
         Application.Run(d);
 
         if (!d.Canceled)
@@ -242,9 +242,9 @@ public class Tui
                 _player.LastFileOpened = d.FilePath.ToString();
                 _player.OpenFile(_player.LastFileOpened);
                 NowPlaying(_player.LastFileOpened);
-            //    AudioProgressBar.Fraction = 0F;
-              //  UpdateProgressBar();
-              //  TimePlayedLabel();
+                AudioProgressBar.Fraction = 0F;
+                UpdateProgressBar();
+                TimePlayedLabel();
             }
             else
             {
@@ -265,7 +265,7 @@ public class Tui
             Width = Dim.Fill(),
         };
 
-        var streamURL = new TextField(string.Empty)
+        var streamUrl = new TextField(string.Empty)
         {
             X = 3,
             Y = 4,
@@ -275,7 +275,7 @@ public class Tui
         var loadStream = new Button(12, 7, "Load Stream");
         loadStream.Clicked += () =>
         {
-            _player.OpenStream(streamURL.Text.ToString());
+            _player.OpenStream(streamUrl.Text.ToString());
             Application.RequestStop();
         };
 
@@ -287,7 +287,7 @@ public class Tui
 
         d.AddButton(loadStream);
         d.AddButton(cancelStream);
-        d.Add(editLabel, streamURL);
+        d.Add(editLabel, streamUrl);
         Application.Run(d);
     }
 
@@ -297,7 +297,7 @@ public class Tui
         var d = new OpenDialog("Open", "Open a playlist") { AllowsMultipleSelection = false };
 
         // This will filter the dialog on basis of the allowed file types in the array.
-        d.AllowedFileTypes = new string[] { ".m3u" };
+        d.AllowedFileTypes = [".m3u"];
         Application.Run(d);
 
         if (!d.Canceled)
@@ -336,8 +336,9 @@ public class Tui
     {
         if (_player.PlayerStatus != ePlayerStatus.Stopped)
         {
-            var timePlayed = _player.CurrentTime().ToString(@"mm\:ss");
-            var trackLength = _player.TrackLength().ToString(@"mm\:ss");
+            var timePlayed = TimeSpan.FromSeconds((double)(new decimal(_player.CurrentTime()))).ToString(@"hh\:mm\:ss");
+            var trackLength = TimeSpan.FromSeconds((double)(new decimal(_player.TrackLength()))).ToString(@"hh\:mm\:ss");
+            
             _trackName = new Label($"{timePlayed} / {trackLength}")
             {
                 X = Pos.Right(AudioProgressBar),
@@ -360,9 +361,9 @@ public class Tui
     {
         _mainLoopTimeout = Application.MainLoop.AddTimeout(TimeSpan.FromSeconds(1), (updateTimer) =>
         {
-            while (_player.CurrentTime().Seconds < _player.TrackLength().TotalSeconds && _player.PlayerStatus is not ePlayerStatus.Stopped)
+            while (_player.CurrentTime() < _player.TrackLength() && _player.PlayerStatus is not ePlayerStatus.Stopped)
             {
-                AudioProgressBar.Fraction = (float)(_player.CurrentTime().Seconds / _player.TrackLength().TotalSeconds);
+                AudioProgressBar.Fraction = _player.CurrentTime() / _player.TrackLength();
                 TimePlayedLabel();
 
                 return true;

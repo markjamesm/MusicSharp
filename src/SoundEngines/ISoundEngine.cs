@@ -63,13 +63,13 @@ public interface ISoundEngine
     /// Returns the current playtime of the audioFileReader instance.
     /// </summary>
     /// <returns>The current time played as TimeSpan.</returns>
-    System.TimeSpan CurrentTime();
+    float CurrentTime();
 
     /// <summary>
     /// Returns the total track length in timespan format.
     /// </summary>
     /// <returns>The length of the track in timespan format.</returns>
-    System.TimeSpan TrackLength();
+    float TrackLength();
 
     /// <summary>
     /// Skip ahead in the audio file 5s.

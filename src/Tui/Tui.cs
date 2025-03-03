@@ -53,7 +53,7 @@ public class Tui
     /// </summary>
     public void Start()
     {
-        // Creates a instance of MainLoop to process input events, handle timers and other sources of data.
+        // Creates an instance of MainLoop to process input events, handle timers and other sources of data.
         Application.Init();
 
         var top = Application.Top;
@@ -77,7 +77,7 @@ public class Tui
             {
                 new MenuItem("_About MusicSharp", string.Empty, () =>
                 {
-                    MessageBox.Query("Music Sharp 0.7.5", "\nMusic Sharp is a lightweight CLI\n music player written in C#.\n\nDeveloped by Mark-James McDougall\nand licensed under the GPL v3.\n ", "Close");
+                    MessageBox.Query("Music Sharp 0.8.5", "\nMusic Sharp is a lightweight CLI\n music player written in C#.\n\nDeveloped by Mark-James McDougall\nand licensed under the GPL v3.\n ", "Close");
                 }),
             }),
         });

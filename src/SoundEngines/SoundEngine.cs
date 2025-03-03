@@ -8,7 +8,6 @@ using SoundFlow.Providers;
 
 namespace MusicSharp.SoundEngines;
 
-
 // Cross-platform sound engine that works for all devices which
 //  the .NET platform runs on.
 public class SoundEngine: ISoundEngine, IDisposable
@@ -101,7 +100,8 @@ public class SoundEngine: ISoundEngine, IDisposable
 
     public void PlayFromPlaylist(string path)
     {
-        throw new NotImplementedException();
+        _player.Play();
+        PlayerStatus = ePlayerStatus.Playing;
     }
     
    public float CurrentTime()
@@ -116,12 +116,18 @@ public class SoundEngine: ISoundEngine, IDisposable
 
     public void SeekForward()
     {
-        throw new NotImplementedException();
+        if (_player.Time < _player.Duration - 5f)
+        {
+            _player.Seek(_player.Time + 5f);
+        }
     }
 
     public void SeekBackwards()
     {
-        throw new NotImplementedException();
+        if (_player.Time > 5f)
+        {
+            _player.Seek(_player.Time - 5f);
+        }
     }
 
     public void Dispose()

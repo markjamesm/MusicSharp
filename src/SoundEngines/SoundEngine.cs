@@ -10,7 +10,7 @@ namespace MusicSharp.SoundEngines;
 
 // Cross-platform sound engine that works for all devices which
 //  the .NET platform runs on.
-public class SoundEngine: ISoundEngine, IDisposable
+public sealed class SoundEngine: ISoundEngine, IDisposable
 {
     private readonly MiniAudioEngine _soundEngine;
     private SoundPlayer _player;
@@ -28,8 +28,15 @@ public class SoundEngine: ISoundEngine, IDisposable
     {
         if (File.Exists(path))
         {
-            _player = new SoundPlayer(new StreamDataProvider(File.OpenRead(path)));
+            if (_player != null)
+            {
+                _player.Stop();
+                _player = new SoundPlayer(new StreamDataProvider(File.OpenRead(path)));
+                
+            }
             
+            _player = new SoundPlayer(new StreamDataProvider(File.OpenRead(path)));
+                
             // Add the player to the master mixer. This connects the player's output to the audio engine's output.
             Mixer.Master.AddComponent(_player);
             

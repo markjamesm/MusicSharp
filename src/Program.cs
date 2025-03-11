@@ -3,6 +3,8 @@
 // </copyright>
 
 using MusicSharp.SoundEngines;
+using SoundFlow.Backends.MiniAudio;
+using SoundFlow.Enums;
 
 namespace MusicSharp;
 
@@ -16,7 +18,8 @@ public static class Program
     /// </summary>
     public static void Main()
     {
-        using var player = new SoundEngine();
+        using var soundEngine = new MiniAudioEngine(44100, Capability.Playback);
+        var player = new SoundEngine(soundEngine);
         var gui = new Tui.Tui(player);
 
         gui.Start();

@@ -3,46 +3,40 @@ using System.IO;
 using MusicSharp.Enums;
 using SoundFlow.Backends.MiniAudio;
 using SoundFlow.Components;
-using SoundFlow.Enums;
 using SoundFlow.Providers;
 
 namespace MusicSharp.SoundEngines;
 
 // Cross-platform sound engine that works for all devices which
 //  the .NET platform runs on.
-public sealed class SoundEngine: ISoundEngine, IDisposable
+public sealed class SoundEngine : ISoundEngine, IDisposable
 {
     private readonly MiniAudioEngine _soundEngine;
     private SoundPlayer _player;
-    
+
     public ePlayerStatus PlayerStatus { get; set; }
     public string LastFileOpened { get; set; }
 
 
-    public SoundEngine()
+    public SoundEngine(MiniAudioEngine soundEngine)
     {
-     _soundEngine = new MiniAudioEngine(44100, Capability.Playback);
+        _soundEngine = soundEngine;
     }
-    
-    public void OpenFile(string path)
+
+    public void Play(string path)
     {
-        if (File.Exists(path))
+        if (_player != null)
         {
-            if (_player != null)
-            {
-                _player.Stop();
-                _player = new SoundPlayer(new StreamDataProvider(File.OpenRead(path)));
-                
-            }
-            
-            _player = new SoundPlayer(new StreamDataProvider(File.OpenRead(path)));
-                
-            // Add the player to the master mixer. This connects the player's output to the audio engine's output.
-            Mixer.Master.AddComponent(_player);
-            
-            _player.Play();
-            PlayerStatus = ePlayerStatus.Playing;
+            _player.Stop();
         }
+
+        _player = new SoundPlayer(new StreamDataProvider(File.OpenRead(path)));
+
+        // Add the player to the master mixer. This connects the player's output to the audio engine's output.
+        Mixer.Master.AddComponent(_player);
+
+        _player.Play();
+        PlayerStatus = ePlayerStatus.Playing;
     }
 
     public void OpenStream(string streamUrl)
@@ -104,23 +98,7 @@ public sealed class SoundEngine: ISoundEngine, IDisposable
             _player.Volume = 0f;
         }
     }
-
-    public void PlayFromPlaylist(string path)
-    {
-        _player.Play();
-        PlayerStatus = ePlayerStatus.Playing;
-    }
     
-   public float CurrentTime()
-   {
-       return _player.Time;
-   }
-
-    public float TrackLength()
-    {
-        return _player.Duration;
-    }
-
     public void SeekForward()
     {
         if (_player.Time < _player.Duration - 5f)
@@ -135,6 +113,16 @@ public sealed class SoundEngine: ISoundEngine, IDisposable
         {
             _player.Seek(_player.Time - 5f);
         }
+    }
+    
+    public float CurrentTime()
+    {
+        return _player.Time;
+    }
+
+    public float TrackLength()
+    {
+        return _player.Duration;
     }
 
     public void Dispose()

@@ -173,7 +173,7 @@ public class Tui
         _playlistView.OpenSelectedItem += (a) =>
         {
             _player.LastFileOpened = a.Value.ToString();
-            _player.PlayFromPlaylist(_player.LastFileOpened);
+            _player.Play(_player.LastFileOpened);
             NowPlaying(_player.LastFileOpened);
             UpdateProgressBar();
         };
@@ -239,16 +239,19 @@ public class Tui
         {
             if (File.Exists(d.FilePath.ToString()))
             {
-                _player.LastFileOpened = d.FilePath.ToString();
-                _player.OpenFile(_player.LastFileOpened);
-                NowPlaying(_player.LastFileOpened);
-                AudioProgressBar.Fraction = 0F;
-                UpdateProgressBar();
-                TimePlayedLabel();
-            }
-            else
-            {
-                MessageBox.Query("Warning", "Invalid file path.", "Close");
+                try
+                {
+                    _player.LastFileOpened = d.FilePath.ToString();
+                    _player.Play(_player.LastFileOpened);
+                    NowPlaying(_player.LastFileOpened);
+                    AudioProgressBar.Fraction = 0F;
+                    UpdateProgressBar();
+                    TimePlayedLabel();
+                }
+                catch (FileNotFoundException ex)
+                {
+                    MessageBox.Query("Warning", "Invalid file path.", "Close");
+                }
             }
         }
     }
@@ -320,7 +323,7 @@ public class Tui
         }
     }
 
-    private void NowPlaying(string track)
+    private static void NowPlaying(string track)
     {
         _trackName = new Label(track)
         {

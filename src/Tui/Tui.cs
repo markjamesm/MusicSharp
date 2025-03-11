@@ -259,6 +259,9 @@ public class Tui
     // Open and play an audio stream.
     private void OpenStream()
     {
+        MessageBox.Query("Notice", "Streaming support is not yet implemented.", "Close");
+        
+        /*
         var d = new Dialog("Open Stream", 50, 15);
 
         var editLabel = new Label("Enter the url of the audio stream to load:\n(.mp3 only)")
@@ -292,6 +295,7 @@ public class Tui
         d.AddButton(cancelStream);
         d.Add(editLabel, streamUrl);
         Application.Run(d);
+        */
     }
 
     // Load a playlist file. Currently, only M3U is supported.

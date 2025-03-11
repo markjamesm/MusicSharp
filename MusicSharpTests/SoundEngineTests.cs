@@ -1,9 +1,11 @@
 using MusicSharp.SoundEngines;
+using SoundFlow.Backends.MiniAudio;
+using SoundFlow.Enums;
 
 namespace MusicSharpTests;
 
-public class WinPlayerTests
-{ /*
+public class SoundEngineTests
+{
     [Test]
     public void Play_NullFile()
     {
@@ -18,9 +20,10 @@ public class WinPlayerTests
     public void PlayFromPlaylist_NullFile()
     {
         // arrange
-        var player = new WinPlayer();
+        using var soundEngine = new MiniAudioEngine(44100, Capability.Playback);
+        using var player = new SoundEngine(soundEngine);
 
         // act and assert
-        Assert.Throws<NullReferenceException>(() => player.PlayFromPlaylist(null));
-    } */
+        Assert.Throws<NullReferenceException>(() => player.Play(null));
+    }
 }

@@ -11,7 +11,7 @@ using MusicSharp.Models;
 using MusicSharp.SoundEngines;
 using Terminal.Gui;
 
-namespace MusicSharp.Tui;
+namespace MusicSharp.Interface;
 
 /// <summary>
 /// The Gui class houses the CLI elements of MusicSharp.
@@ -35,7 +35,7 @@ public class Tui
 
     private List<string> _playlist = new List<string>();
     
-    private HttpClient _httpClient;
+    private readonly HttpClient _httpClient;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="Tui"/> class.
@@ -265,7 +265,7 @@ public class Tui
     {
         var d = new Dialog("Open Stream", 50, 15);
 
-        var editLabel = new Label("Enter the url of the audio stream to load:")
+        var editLabel = new Label("Enter the url of the audio stream to load\n (.mp3 streams only):")
         {
             X = 0,
             Y = 0,
@@ -282,11 +282,11 @@ public class Tui
         var loadStream = new Button(12, 7, "Load Stream");
         loadStream.Clicked += async () =>
         {
-            var stream = await _httpClient.GetStreamAsync(streamUrl.ToString());
+            var stream = await _httpClient.GetStreamAsync(streamUrl.Text.ToString());
             _player.Play(stream, eFileType.Stream);
         };
 
-        var cancelStream = new Button(29, 7, "Cancel");
+        var cancelStream = new Button(29, 7, "Close");
         cancelStream.Clicked += () =>
         {
             Application.RequestStop();

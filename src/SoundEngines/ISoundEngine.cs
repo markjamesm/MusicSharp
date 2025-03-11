@@ -25,7 +25,8 @@ public interface ISoundEngine
     /// Method to play audio.
     /// </summary>
     /// <param name="path">The filepath of the audio file to play.</param>
-    void Play(string path);
+    /// /// <param name="fileType">The type of audio file (.</param>
+    void Play(object path, eFileType fileType);
     
     /// <summary>
     /// Method to play or pause depending on state.
@@ -36,12 +37,6 @@ public interface ISoundEngine
     /// Method to stop audio playback.
     /// </summary>
     void Stop();
-
-    /// <summary>
-    /// Method to play an audio stream from a URL.
-    /// </summary>
-    /// <param name="streamUrl">The stream URL of the audio file to play.</param>
-    void OpenStream(string streamUrl);
 
     /// <summary>
     /// Method to increase audio playback volume.

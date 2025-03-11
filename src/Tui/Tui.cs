@@ -5,6 +5,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Net.Http;
 using MusicSharp.Enums;
 using MusicSharp.Models;
 using MusicSharp.SoundEngines;
@@ -33,14 +34,17 @@ public class Tui
     private object _mainLoopTimeout = null;
 
     private List<string> _playlist = new List<string>();
+    
+    private HttpClient _httpClient;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="Tui"/> class.
     /// </summary>
     /// <param name="player">The player to be injected.</param>
-    public Tui(ISoundEngine player)
+    public Tui(ISoundEngine player, HttpClient httpClient)
     {
         _player = player;
+        _httpClient = httpClient;
     }
 
     /// <summary>
@@ -173,7 +177,7 @@ public class Tui
         _playlistView.OpenSelectedItem += (a) =>
         {
             _player.LastFileOpened = a.Value.ToString();
-            _player.Play(_player.LastFileOpened);
+            _player.Play(_player.LastFileOpened, eFileType.File);
             NowPlaying(_player.LastFileOpened);
             UpdateProgressBar();
         };
@@ -242,7 +246,7 @@ public class Tui
                 try
                 {
                     _player.LastFileOpened = d.FilePath.ToString();
-                    _player.Play(_player.LastFileOpened);
+                    _player.Play(_player.LastFileOpened, eFileType.File);
                     NowPlaying(_player.LastFileOpened);
                     AudioProgressBar.Fraction = 0F;
                     UpdateProgressBar();
@@ -259,12 +263,9 @@ public class Tui
     // Open and play an audio stream.
     private void OpenStream()
     {
-        MessageBox.Query("Notice", "Streaming support is not yet implemented.", "Close");
-        
-        /*
         var d = new Dialog("Open Stream", 50, 15);
 
-        var editLabel = new Label("Enter the url of the audio stream to load:\n(.mp3 only)")
+        var editLabel = new Label("Enter the url of the audio stream to load:")
         {
             X = 0,
             Y = 0,
@@ -279,10 +280,10 @@ public class Tui
         };
 
         var loadStream = new Button(12, 7, "Load Stream");
-        loadStream.Clicked += () =>
+        loadStream.Clicked += async () =>
         {
-            _player.OpenStream(streamUrl.Text.ToString());
-            Application.RequestStop();
+            var stream = await _httpClient.GetStreamAsync(streamUrl.ToString());
+            _player.Play(stream, eFileType.Stream);
         };
 
         var cancelStream = new Button(29, 7, "Cancel");
@@ -295,7 +296,6 @@ public class Tui
         d.AddButton(cancelStream);
         d.Add(editLabel, streamUrl);
         Application.Run(d);
-        */
     }
 
     // Load a playlist file. Currently, only M3U is supported.

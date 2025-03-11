@@ -23,25 +23,32 @@ public sealed class SoundEngine : ISoundEngine, IDisposable
         _soundEngine = soundEngine;
     }
 
-    public void Play(string path)
+    public void Play(object path, eFileType fileType)
     {
         if (_player != null)
         {
             _player.Stop();
         }
 
-        _player = new SoundPlayer(new StreamDataProvider(File.OpenRead(path)));
+        switch (fileType)
+        {
+            case eFileType.File:
+                _player = new SoundPlayer(new StreamDataProvider(File.OpenRead((string)path)));
+                break;
+            
+            case eFileType.Stream:
+                _player = new SoundPlayer(new StreamDataProvider((Stream)path));
+                break;
+            
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
 
         // Add the player to the master mixer. This connects the player's output to the audio engine's output.
         Mixer.Master.AddComponent(_player);
 
         _player.Play();
         PlayerStatus = ePlayerStatus.Playing;
-    }
-
-    public void OpenStream(string streamUrl)
-    {
-        throw new NotImplementedException();
     }
 
     public void PlayPause()

@@ -60,9 +60,6 @@ public sealed class SoundEngine : ISoundEngine, IDisposable
                 PlayerStatus = ePlayerStatus.Paused;
                 break;
             case ePlayerStatus.Paused:
-                _player.Play();
-                PlayerStatus = ePlayerStatus.Playing;
-                break;
             case ePlayerStatus.Stopped:
                 _player.Play();
                 PlayerStatus = ePlayerStatus.Playing;

@@ -5,6 +5,7 @@
 using System.Net.Http;
 using MusicSharp.UI;
 using MusicSharp.AudioPlayer;
+using MusicSharp.Helpers;
 using SoundFlow.Backends.MiniAudio;
 using SoundFlow.Enums;
 
@@ -20,11 +21,14 @@ public static class Program
     /// </summary>
     public static void Main()
     {
-        using var httpClient = new HttpClient();
         var soundEngine = new MiniAudioEngine(44100, Capability.Playback);
         using IPlayer player = new SoundFlowPlayer(soundEngine);
-        var gui = new Tui(player, httpClient);
+        
+        using var httpClient = new HttpClient();
+        var converters = new Converters(httpClient);
+        
+        var ui = new Tui(player, converters);
 
-        gui.Start();
+        ui.Start();
     }
 }

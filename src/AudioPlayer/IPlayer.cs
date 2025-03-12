@@ -3,6 +3,7 @@
 // </copyright>
 
 using System;
+using System.IO;
 using MusicSharp.Enums;
 
 namespace MusicSharp.AudioPlayer;
@@ -26,8 +27,8 @@ public interface IPlayer: IDisposable
     /// Method to play audio.
     /// </summary>
     /// <param name="path">The filepath of the audio file to play.</param>
-    /// /// <param name="fileType">The type of audio file (.</param>
-    void Play(object path, EFileType fileType);
+    /// /// <param name="stream">The audio stream.</param>
+    void Play(Stream stream);
     
     /// <summary>
     /// Method to play or pause depending on state.

@@ -9,7 +9,7 @@ namespace MusicSharp.AudioPlayer;
 
 // Cross-platform sound engine that works for all devices which
 //  the .NET platform runs on.
-public sealed class SoundFlowPlayer : IPlayer, IDisposable
+public sealed class SoundFlowPlayer : IPlayer
 {
     private readonly MiniAudioEngine _soundEngine;
     private SoundPlayer _player;
@@ -23,26 +23,14 @@ public sealed class SoundFlowPlayer : IPlayer, IDisposable
         _soundEngine = soundEngine;
     }
 
-    public void Play(object path, EFileType fileType)
+    public void Play(Stream stream)
     {
         if (_player != null)
         {
             _player.Stop();
         }
 
-        switch (fileType)
-        {
-            case EFileType.File:
-                _player = new SoundPlayer(new StreamDataProvider(File.OpenRead((string)path)));
-                break;
-            
-            case EFileType.Stream:
-                _player = new SoundPlayer(new StreamDataProvider((Stream)path));
-                break;
-            
-            default:
-                throw new ArgumentOutOfRangeException();
-        }
+        _player = new SoundPlayer(new StreamDataProvider(stream));
 
         // Add the player to the master mixer. This connects the player's output to the audio engine's output.
         Mixer.Master.AddComponent(_player);

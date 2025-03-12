@@ -9,6 +9,7 @@ using System.Net.Http;
 using MusicSharp.Enums;
 using MusicSharp.Models;
 using MusicSharp.AudioPlayer;
+using MusicSharp.Helpers;
 using Terminal.Gui;
 
 namespace MusicSharp.UI;
@@ -35,16 +36,17 @@ public class Tui
 
     private List<string> _playlist = new List<string>();
     
-    private readonly HttpClient _httpClient;
+    private readonly Converters _converters;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="Tui"/> class.
     /// </summary>
     /// <param name="player">The player to be injected.</param>
-    public Tui(IPlayer player, HttpClient httpClient)
+    /// <param name="converters">Helper class to convert files and urls to Stream type.</param>
+    public Tui(IPlayer player, Converters converters)
     {
         _player = player;
-        _httpClient = httpClient;
+        _converters = converters;
     }
 
     /// <summary>
@@ -176,10 +178,17 @@ public class Tui
         // Play the selection when a playlist path is clicked.
         _playlistView.OpenSelectedItem += (a) =>
         {
-            _player.LastFileOpened = a.Value.ToString();
-            _player.Play(_player.LastFileOpened, EFileType.File);
-            NowPlaying(_player.LastFileOpened);
-            UpdateProgressBar();
+            try
+            {
+                _player.LastFileOpened = a.Value.ToString();
+                _player.Play(Converters.ConvertFileToStream(_player.LastFileOpened));
+                NowPlaying(_player.LastFileOpened);
+                UpdateProgressBar();
+            }
+            catch (FileNotFoundException ex)
+            {
+                MessageBox.Query("Warning", "Invalid file path.", "Close");
+            }
         };
 
         _playlistPane.Add(_playlistView);
@@ -246,7 +255,8 @@ public class Tui
                 try
                 {
                     _player.LastFileOpened = d.FilePath.ToString();
-                    _player.Play(_player.LastFileOpened, EFileType.File);
+                    var stream = Converters.ConvertFileToStream(d.FilePath.ToString());
+                    _player.Play(stream);
                     NowPlaying(_player.LastFileOpened);
                     AudioProgressBar.Fraction = 0F;
                     UpdateProgressBar();
@@ -282,8 +292,15 @@ public class Tui
         var loadStream = new Button(12, 7, "Load Stream");
         loadStream.Clicked += async () =>
         {
-            var stream = await _httpClient.GetStreamAsync(streamUrl.Text.ToString());
-            _player.Play(stream, EFileType.Stream);
+            try
+            {
+                var stream = await _converters.ConvertUrlToStream(streamUrl.Text.ToString());
+                _player.Play(stream);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Query("Warning", "Invalid URL.", "Close");
+            }
         };
 
         var cancelStream = new Button(29, 7, "Close");

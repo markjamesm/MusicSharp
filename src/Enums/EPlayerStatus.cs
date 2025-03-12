@@ -3,7 +3,7 @@
 /// <summary>
 /// The status of the audio player.
 /// </summary>
-public enum ePlayerStatus
+public enum EPlayerStatus
 {
     Playing,
     Paused,

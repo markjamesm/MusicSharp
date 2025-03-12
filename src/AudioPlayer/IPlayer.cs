@@ -2,19 +2,21 @@
 // Licensed under the GNU GPL v3 License. See LICENSE in the project root for license information.
 // </copyright>
 
+using System;
+using System.IO;
 using MusicSharp.Enums;
 
-namespace MusicSharp.SoundEngines;
+namespace MusicSharp.AudioPlayer;
 
 /// <summary>
 /// Defines the methods an audio player class should implement.
 /// </summary>
-public interface IPlayer
+public interface IPlayer: IDisposable
 {
     /// <summary>
     /// Gets or sets a value indicating whether the audio player is playing.
     /// </summary>
-    ePlayerStatus PlayerStatus { get; set; }
+    EPlayerStatus PlayerStatus { get; set; }
 
     /// <summary>
     /// Gets or sets the last file opened by the player.
@@ -25,19 +27,14 @@ public interface IPlayer
     /// Method to play audio.
     /// </summary>
     /// <param name="path">The filepath of the audio file to play.</param>
-    void OpenFile(string path);
-
+    /// /// <param name="stream">The audio stream.</param>
+    void Play(Stream stream);
+    
     /// <summary>
-    /// Method to play an audio stream from a URL.
-    /// </summary>
-    /// <param name="streamUrl">The stream URL of the audio file to play.</param>
-    void OpenStream(string streamUrl);
-
-    /// <summary>
-    /// Method to pause audio playback.
+    /// Method to play or pause depending on state.
     /// </summary>
     void PlayPause();
-
+    
     /// <summary>
     /// Method to stop audio playback.
     /// </summary>
@@ -54,22 +51,16 @@ public interface IPlayer
     void DecreaseVolume();
 
     /// <summary>
-    /// Play an audio file contained in a playlist.
-    /// </summary>
-    /// <param name="path">The path to the audio file.</param>
-    void PlayFromPlaylist(string path);
-
-    /// <summary>
     /// Returns the current playtime of the audioFileReader instance.
     /// </summary>
     /// <returns>The current time played as TimeSpan.</returns>
-    System.TimeSpan CurrentTime();
+    float CurrentTime();
 
     /// <summary>
     /// Returns the total track length in timespan format.
     /// </summary>
     /// <returns>The length of the track in timespan format.</returns>
-    System.TimeSpan TrackLength();
+    float TrackLength();
 
     /// <summary>
     /// Skip ahead in the audio file 5s.

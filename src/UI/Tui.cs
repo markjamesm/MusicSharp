@@ -2,15 +2,16 @@
 // Licensed under the GNU GPL v3 License. See LICENSE in the project root for license information.
 // </copyright>
 
-using MusicSharp.Enums;
-using MusicSharp.SoundEngines;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using MusicSharp.Enums;
 using MusicSharp.Models;
+using MusicSharp.AudioPlayer;
+using MusicSharp.Helpers;
 using Terminal.Gui;
 
-namespace MusicSharp.View;
+namespace MusicSharp.UI;
 
 /// <summary>
 /// The Gui class houses the CLI elements of MusicSharp.
@@ -33,14 +34,18 @@ public class Tui
     private object _mainLoopTimeout = null;
 
     private List<string> _playlist = new List<string>();
+    
+    private readonly Converters _converters;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="Tui"/> class.
     /// </summary>
     /// <param name="player">The player to be injected.</param>
-    public Tui(IPlayer player)
+    /// <param name="converters">Helper class to convert files and urls to Stream type.</param>
+    public Tui(IPlayer player, Converters converters)
     {
         _player = player;
+        _converters = converters;
     }
 
     /// <summary>
@@ -53,7 +58,7 @@ public class Tui
     /// </summary>
     public void Start()
     {
-        // Creates a instance of MainLoop to process input events, handle timers and other sources of data.
+        // Creates an instance of MainLoop to process input events, handle timers and other sources of data.
         Application.Init();
 
         var top = Application.Top;
@@ -77,7 +82,7 @@ public class Tui
             {
                 new MenuItem("_About MusicSharp", string.Empty, () =>
                 {
-                    MessageBox.Query("Music Sharp 0.7.5", "\nMusic Sharp is a lightweight CLI\n music player written in C#.\n\nDeveloped by Mark-James McDougall\nand licensed under the GPL v3.\n ", "Close");
+                    MessageBox.Query("Music Sharp 1.0.0", "\nMusic Sharp is a lightweight CLI\n music player written in C#.\n\nDeveloped by Mark-James McDougall\nand licensed under the GPL v3.\n ", "Close");
                 }),
             }),
         });
@@ -106,7 +111,7 @@ public class Tui
         {
             PlayPause();
 
-            if (_player.PlayerStatus != ePlayerStatus.Stopped)
+            if (_player.PlayerStatus != EPlayerStatus.Stopped)
             {
                 UpdateProgressBar();
             }
@@ -172,10 +177,17 @@ public class Tui
         // Play the selection when a playlist path is clicked.
         _playlistView.OpenSelectedItem += (a) =>
         {
-            _player.LastFileOpened = a.Value.ToString();
-            _player.PlayFromPlaylist(_player.LastFileOpened);
-            NowPlaying(_player.LastFileOpened);
-            UpdateProgressBar();
+            try
+            {
+                _player.LastFileOpened = a.Value.ToString();
+                _player.Play(Converters.ConvertFileToStream(_player.LastFileOpened));
+                NowPlaying(_player.LastFileOpened);
+                UpdateProgressBar();
+            }
+            catch (FileNotFoundException ex)
+            {
+                MessageBox.Query("Warning", "Invalid file path.", "Close");
+            }
         };
 
         _playlistPane.Add(_playlistView);
@@ -213,7 +225,7 @@ public class Tui
         {
             _player.PlayPause();
 
-            if (_player.PlayerStatus == ePlayerStatus.Playing)
+            if (_player.PlayerStatus == EPlayerStatus.Playing)
             {
                 UpdateProgressBar();
             }
@@ -232,23 +244,27 @@ public class Tui
         d.DirectoryPath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
 
         // This will filter the dialog on basis of the allowed file types in the array.
-        d.AllowedFileTypes = new string[] { ".mp3", ".wav", ".flac" };
+        d.AllowedFileTypes = [".mp3", ".wav", ".flac"];
         Application.Run(d);
 
         if (!d.Canceled)
         {
             if (File.Exists(d.FilePath.ToString()))
             {
-                _player.LastFileOpened = d.FilePath.ToString();
-                _player.OpenFile(_player.LastFileOpened);
-                NowPlaying(_player.LastFileOpened);
-                AudioProgressBar.Fraction = 0F;
-                UpdateProgressBar();
-                TimePlayedLabel();
-            }
-            else
-            {
-                // This is a good spot for an error message, should one be wanted/needed
+                try
+                {
+                    _player.LastFileOpened = d.FilePath.ToString();
+                    var stream = Converters.ConvertFileToStream(d.FilePath.ToString());
+                    _player.Play(stream);
+                    NowPlaying(_player.LastFileOpened);
+                    AudioProgressBar.Fraction = 0F;
+                    UpdateProgressBar();
+                    TimePlayedLabel();
+                }
+                catch (FileNotFoundException ex)
+                {
+                    MessageBox.Query("Warning", "Invalid file path.", "Close");
+                }
             }
         }
     }
@@ -258,14 +274,14 @@ public class Tui
     {
         var d = new Dialog("Open Stream", 50, 15);
 
-        var editLabel = new Label("Enter the url of the audio stream to load:\n(.mp3 only)")
+        var editLabel = new Label("Enter the url of the audio stream to load\n (.mp3 streams only):")
         {
             X = 0,
             Y = 0,
             Width = Dim.Fill(),
         };
 
-        var streamURL = new TextField(string.Empty)
+        var streamUrl = new TextField(string.Empty)
         {
             X = 3,
             Y = 4,
@@ -273,13 +289,20 @@ public class Tui
         };
 
         var loadStream = new Button(12, 7, "Load Stream");
-        loadStream.Clicked += () =>
+        loadStream.Clicked += async () =>
         {
-            _player.OpenStream(streamURL.Text.ToString());
-            Application.RequestStop();
+            try
+            {
+                var stream = await _converters.ConvertUrlToStream(streamUrl.Text.ToString());
+                _player.Play(stream);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Query("Warning", "Invalid URL.", "Close");
+            }
         };
 
-        var cancelStream = new Button(29, 7, "Cancel");
+        var cancelStream = new Button(29, 7, "Close");
         cancelStream.Clicked += () =>
         {
             Application.RequestStop();
@@ -287,7 +310,7 @@ public class Tui
 
         d.AddButton(loadStream);
         d.AddButton(cancelStream);
-        d.Add(editLabel, streamURL);
+        d.Add(editLabel, streamUrl);
         Application.Run(d);
     }
 
@@ -297,7 +320,7 @@ public class Tui
         var d = new OpenDialog("Open", "Open a playlist") { AllowsMultipleSelection = false };
 
         // This will filter the dialog on basis of the allowed file types in the array.
-        d.AllowedFileTypes = new string[] { ".m3u" };
+        d.AllowedFileTypes = [".m3u"];
         Application.Run(d);
 
         if (!d.Canceled)
@@ -320,7 +343,7 @@ public class Tui
         }
     }
 
-    private void NowPlaying(string track)
+    private static void NowPlaying(string track)
     {
         _trackName = new Label(track)
         {
@@ -334,10 +357,11 @@ public class Tui
 
     private void TimePlayedLabel()
     {
-        if (_player.PlayerStatus != ePlayerStatus.Stopped)
+        if (_player.PlayerStatus != EPlayerStatus.Stopped)
         {
-            var timePlayed = _player.CurrentTime().ToString(@"mm\:ss");
-            var trackLength = _player.TrackLength().ToString(@"mm\:ss");
+            var timePlayed = TimeSpan.FromSeconds((double)(new decimal(_player.CurrentTime()))).ToString(@"hh\:mm\:ss");
+            var trackLength = TimeSpan.FromSeconds((double)(new decimal(_player.TrackLength()))).ToString(@"hh\:mm\:ss");
+            
             _trackName = new Label($"{timePlayed} / {trackLength}")
             {
                 X = Pos.Right(AudioProgressBar),
@@ -360,9 +384,9 @@ public class Tui
     {
         _mainLoopTimeout = Application.MainLoop.AddTimeout(TimeSpan.FromSeconds(1), (updateTimer) =>
         {
-            while (_player.CurrentTime().Seconds < _player.TrackLength().TotalSeconds && _player.PlayerStatus is not ePlayerStatus.Stopped)
+            while (_player.CurrentTime() < _player.TrackLength() && _player.PlayerStatus is not EPlayerStatus.Stopped)
             {
-                AudioProgressBar.Fraction = (float)(_player.CurrentTime().Seconds / _player.TrackLength().TotalSeconds);
+                AudioProgressBar.Fraction = _player.CurrentTime() / _player.TrackLength();
                 TimePlayedLabel();
 
                 return true;

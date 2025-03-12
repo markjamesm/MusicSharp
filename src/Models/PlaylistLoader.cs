@@ -3,6 +3,7 @@
 // </copyright>
 
 using System.Collections.Generic;
+using System.Linq;
 using ATL.Playlist;
 
 namespace MusicSharp.Models;
@@ -22,14 +23,9 @@ public static class PlaylistLoader
     /// <param name="userPlaylist">The user specified playlist path.</param>
     public static List<string> LoadPlaylist(string userPlaylist)
     {
-        var filePaths = new List<string>();
         var theReader = PlaylistIOFactory.GetInstance().GetPlaylistIO(userPlaylist);
 
-        foreach (var s in theReader.FilePaths)
-        {
-            filePaths.Add(s);
-        }
-
-        return filePaths;
+        // Fix space formatting as SoundFlow doesn't support encoded spaces
+        return theReader.FilePaths.Select(s => s.Replace("%20", " ")).ToList();
     }
 }

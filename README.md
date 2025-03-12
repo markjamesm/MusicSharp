@@ -1,9 +1,9 @@
 # MusicSharp
 [![.NET](https://github.com/markjamesm/Baseball-Sharp/actions/workflows/dotnet.yml/badge.svg?branch=master)](https://github.com/markjamesm/MusicSharp/actions) [![C#](https://img.shields.io/badge/Language-CSharp-darkgreen.svg)](https://en.wikipedia.org/wiki/C_Sharp_(programming_language)) [![License](https://img.shields.io/badge/License-GPL-orange.svg)](https://www.gnu.org/licenses/gpl-3.0.en.html)
 
-MusicSharp is a cross-platform Terminal User Interface (TUI) music player written in C# (.NET 8) with the goal of being minimalistic and light on resources.
+A cross-platform Terminal User Interface (TUI) music player written in C# (.NET 8) with the goal of being minimalistic and light on resources.
 
-Currently in beta, MusicSharp makes use of the [SoundFlow](https://github.com/LSXPrime/SoundFlow) and [Terminal.Gui](https://github.com/migueldeicaza/gui.cs) libraries. A project build log can be [found here](https://markjames.dev/blog/developing-a-cli-music-player-csharp/)
+MusicSharp makes use of the [SoundFlow](https://github.com/LSXPrime/SoundFlow) and [Terminal.Gui](https://github.com/migueldeicaza/gui.cs) libraries.
 
 ## Screenshot
 
@@ -11,10 +11,10 @@ Currently in beta, MusicSharp makes use of the [SoundFlow](https://github.com/LS
 
 ## Features
 
-- Cross-platform (Windows, Mac, Linux)
+- Cross-platform support (Windows, Mac, Linux).
 - Play audio files.
-- Load music playlists (M3U)
-- Audio streaming.
+- Load and play from music playlists (M3U).
+- Streaming support.
 
 ## Installation
 

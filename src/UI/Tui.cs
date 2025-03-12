@@ -8,10 +8,10 @@ using System.IO;
 using System.Net.Http;
 using MusicSharp.Enums;
 using MusicSharp.Models;
-using MusicSharp.SoundEngines;
+using MusicSharp.AudioPlayer;
 using Terminal.Gui;
 
-namespace MusicSharp.Interface;
+namespace MusicSharp.UI;
 
 /// <summary>
 /// The Gui class houses the CLI elements of MusicSharp.
@@ -29,7 +29,7 @@ public class Tui
     /// <summary>
     /// Create a new instance of the audio player engine.
     /// </summary>
-    private readonly ISoundEngine _player;
+    private readonly IPlayer _player;
 
     private object _mainLoopTimeout = null;
 
@@ -41,7 +41,7 @@ public class Tui
     /// Initializes a new instance of the <see cref="Tui"/> class.
     /// </summary>
     /// <param name="player">The player to be injected.</param>
-    public Tui(ISoundEngine player, HttpClient httpClient)
+    public Tui(IPlayer player, HttpClient httpClient)
     {
         _player = player;
         _httpClient = httpClient;
@@ -81,7 +81,7 @@ public class Tui
             {
                 new MenuItem("_About MusicSharp", string.Empty, () =>
                 {
-                    MessageBox.Query("Music Sharp 0.8.5", "\nMusic Sharp is a lightweight CLI\n music player written in C#.\n\nDeveloped by Mark-James McDougall\nand licensed under the GPL v3.\n ", "Close");
+                    MessageBox.Query("Music Sharp 1.0.0", "\nMusic Sharp is a lightweight CLI\n music player written in C#.\n\nDeveloped by Mark-James McDougall\nand licensed under the GPL v3.\n ", "Close");
                 }),
             }),
         });

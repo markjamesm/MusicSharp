@@ -3,8 +3,8 @@
 // </copyright>
 
 using System.Net.Http;
-using MusicSharp.SoundEngines;
-using MusicSharp.Interface;
+using MusicSharp.UI;
+using MusicSharp.AudioPlayer;
 using SoundFlow.Backends.MiniAudio;
 using SoundFlow.Enums;
 
@@ -22,7 +22,7 @@ public static class Program
     {
         using var httpClient = new HttpClient();
         var soundEngine = new MiniAudioEngine(44100, Capability.Playback);
-        using var player = new SoundEngine(soundEngine);
+        using IPlayer player = new SoundFlowPlayer(soundEngine);
         var gui = new Tui(player, httpClient);
 
         gui.Start();

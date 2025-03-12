@@ -1,15 +1,16 @@
-﻿// <copyright file="ISoundEngine.cs" company="Mark-James McDougall">
+﻿// <copyright file="IPlayer.cs" company="Mark-James McDougall">
 // Licensed under the GNU GPL v3 License. See LICENSE in the project root for license information.
 // </copyright>
 
+using System;
 using MusicSharp.Enums;
 
-namespace MusicSharp.SoundEngines;
+namespace MusicSharp.AudioPlayer;
 
 /// <summary>
 /// Defines the methods an audio player class should implement.
 /// </summary>
-public interface ISoundEngine
+public interface IPlayer: IDisposable
 {
     /// <summary>
     /// Gets or sets a value indicating whether the audio player is playing.

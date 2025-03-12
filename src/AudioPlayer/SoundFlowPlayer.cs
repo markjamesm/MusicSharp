@@ -5,11 +5,11 @@ using SoundFlow.Backends.MiniAudio;
 using SoundFlow.Components;
 using SoundFlow.Providers;
 
-namespace MusicSharp.SoundEngines;
+namespace MusicSharp.AudioPlayer;
 
 // Cross-platform sound engine that works for all devices which
 //  the .NET platform runs on.
-public sealed class SoundEngine : ISoundEngine, IDisposable
+public sealed class SoundFlowPlayer : IPlayer, IDisposable
 {
     private readonly MiniAudioEngine _soundEngine;
     private SoundPlayer _player;
@@ -18,7 +18,7 @@ public sealed class SoundEngine : ISoundEngine, IDisposable
     public string LastFileOpened { get; set; }
 
 
-    public SoundEngine(MiniAudioEngine soundEngine)
+    public SoundFlowPlayer(MiniAudioEngine soundEngine)
     {
         _soundEngine = soundEngine;
     }

@@ -1,6 +1,6 @@
 namespace MusicSharpTests;
 
-public class SoundEngineTests
+public class SoundFlowPlayerTests
 {
     [Test]
     public void Play_NullFile()

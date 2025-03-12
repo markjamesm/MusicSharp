@@ -3,9 +3,10 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net8.0</TargetFramework>
-    <Version>0.4.9</Version>
+    <Version>0.8.9</Version>
     <Authors>Mark-James McDougall</Authors>
     <Company>Mark-James McDougall</Company>
+    <Nullable>enable</Nullable>
     <PackageIcon></PackageIcon>
     <ApplicationIcon>MusicSharp.ico</ApplicationIcon>
   </PropertyGroup>

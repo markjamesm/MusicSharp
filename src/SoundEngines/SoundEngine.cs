@@ -14,7 +14,7 @@ public sealed class SoundEngine : ISoundEngine, IDisposable
     private readonly MiniAudioEngine _soundEngine;
     private SoundPlayer _player;
 
-    public ePlayerStatus PlayerStatus { get; set; }
+    public EPlayerStatus PlayerStatus { get; set; }
     public string LastFileOpened { get; set; }
 
 
@@ -23,7 +23,7 @@ public sealed class SoundEngine : ISoundEngine, IDisposable
         _soundEngine = soundEngine;
     }
 
-    public void Play(object path, eFileType fileType)
+    public void Play(object path, EFileType fileType)
     {
         if (_player != null)
         {
@@ -32,11 +32,11 @@ public sealed class SoundEngine : ISoundEngine, IDisposable
 
         switch (fileType)
         {
-            case eFileType.File:
+            case EFileType.File:
                 _player = new SoundPlayer(new StreamDataProvider(File.OpenRead((string)path)));
                 break;
             
-            case eFileType.Stream:
+            case EFileType.Stream:
                 _player = new SoundPlayer(new StreamDataProvider((Stream)path));
                 break;
             
@@ -48,21 +48,21 @@ public sealed class SoundEngine : ISoundEngine, IDisposable
         Mixer.Master.AddComponent(_player);
 
         _player.Play();
-        PlayerStatus = ePlayerStatus.Playing;
+        PlayerStatus = EPlayerStatus.Playing;
     }
 
     public void PlayPause()
     {
         switch (PlayerStatus)
         {
-            case ePlayerStatus.Playing:
+            case EPlayerStatus.Playing:
                 _player.Pause();
-                PlayerStatus = ePlayerStatus.Paused;
+                PlayerStatus = EPlayerStatus.Paused;
                 break;
-            case ePlayerStatus.Paused:
-            case ePlayerStatus.Stopped:
+            case EPlayerStatus.Paused:
+            case EPlayerStatus.Stopped:
                 _player.Play();
-                PlayerStatus = ePlayerStatus.Playing;
+                PlayerStatus = EPlayerStatus.Playing;
                 break;
             default:
                 throw new ArgumentOutOfRangeException();
@@ -71,10 +71,10 @@ public sealed class SoundEngine : ISoundEngine, IDisposable
 
     public void Stop()
     {
-        if (PlayerStatus != ePlayerStatus.Stopped)
+        if (PlayerStatus != EPlayerStatus.Stopped)
         {
             _player.Stop();
-            PlayerStatus = ePlayerStatus.Stopped;
+            PlayerStatus = EPlayerStatus.Stopped;
         }
     }
 

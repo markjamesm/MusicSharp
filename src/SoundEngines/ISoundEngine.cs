@@ -14,7 +14,7 @@ public interface ISoundEngine
     /// <summary>
     /// Gets or sets a value indicating whether the audio player is playing.
     /// </summary>
-    ePlayerStatus PlayerStatus { get; set; }
+    EPlayerStatus PlayerStatus { get; set; }
 
     /// <summary>
     /// Gets or sets the last file opened by the player.
@@ -26,7 +26,7 @@ public interface ISoundEngine
     /// </summary>
     /// <param name="path">The filepath of the audio file to play.</param>
     /// /// <param name="fileType">The type of audio file (.</param>
-    void Play(object path, eFileType fileType);
+    void Play(object path, EFileType fileType);
     
     /// <summary>
     /// Method to play or pause depending on state.

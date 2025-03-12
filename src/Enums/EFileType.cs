@@ -1,6 +1,6 @@
 namespace MusicSharp.Enums;
 
-public enum eFileType
+public enum EFileType
 {
     File,
     Stream

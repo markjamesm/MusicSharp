@@ -110,7 +110,7 @@ public class Tui
         {
             PlayPause();
 
-            if (_player.PlayerStatus != ePlayerStatus.Stopped)
+            if (_player.PlayerStatus != EPlayerStatus.Stopped)
             {
                 UpdateProgressBar();
             }
@@ -177,7 +177,7 @@ public class Tui
         _playlistView.OpenSelectedItem += (a) =>
         {
             _player.LastFileOpened = a.Value.ToString();
-            _player.Play(_player.LastFileOpened, eFileType.File);
+            _player.Play(_player.LastFileOpened, EFileType.File);
             NowPlaying(_player.LastFileOpened);
             UpdateProgressBar();
         };
@@ -217,7 +217,7 @@ public class Tui
         {
             _player.PlayPause();
 
-            if (_player.PlayerStatus == ePlayerStatus.Playing)
+            if (_player.PlayerStatus == EPlayerStatus.Playing)
             {
                 UpdateProgressBar();
             }
@@ -246,7 +246,7 @@ public class Tui
                 try
                 {
                     _player.LastFileOpened = d.FilePath.ToString();
-                    _player.Play(_player.LastFileOpened, eFileType.File);
+                    _player.Play(_player.LastFileOpened, EFileType.File);
                     NowPlaying(_player.LastFileOpened);
                     AudioProgressBar.Fraction = 0F;
                     UpdateProgressBar();
@@ -283,7 +283,7 @@ public class Tui
         loadStream.Clicked += async () =>
         {
             var stream = await _httpClient.GetStreamAsync(streamUrl.Text.ToString());
-            _player.Play(stream, eFileType.Stream);
+            _player.Play(stream, EFileType.Stream);
         };
 
         var cancelStream = new Button(29, 7, "Close");
@@ -341,7 +341,7 @@ public class Tui
 
     private void TimePlayedLabel()
     {
-        if (_player.PlayerStatus != ePlayerStatus.Stopped)
+        if (_player.PlayerStatus != EPlayerStatus.Stopped)
         {
             var timePlayed = TimeSpan.FromSeconds((double)(new decimal(_player.CurrentTime()))).ToString(@"hh\:mm\:ss");
             var trackLength = TimeSpan.FromSeconds((double)(new decimal(_player.TrackLength()))).ToString(@"hh\:mm\:ss");
@@ -368,7 +368,7 @@ public class Tui
     {
         _mainLoopTimeout = Application.MainLoop.AddTimeout(TimeSpan.FromSeconds(1), (updateTimer) =>
         {
-            while (_player.CurrentTime() < _player.TrackLength() && _player.PlayerStatus is not ePlayerStatus.Stopped)
+            while (_player.CurrentTime() < _player.TrackLength() && _player.PlayerStatus is not EPlayerStatus.Stopped)
             {
                 AudioProgressBar.Fraction = _player.CurrentTime() / _player.TrackLength();
                 TimePlayedLabel();

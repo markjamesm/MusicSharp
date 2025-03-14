@@ -6,7 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using MusicSharp.Enums;
-using MusicSharp.Models;
+using MusicSharp.PlaylistHandlers;
 using MusicSharp.AudioPlayer;
 using MusicSharp.Helpers;
 using Terminal.Gui;

@@ -1,4 +1,4 @@
-using MusicSharp.Models;
+using MusicSharp.PlaylistHandlers;
 
 namespace MusicSharpTests;
 

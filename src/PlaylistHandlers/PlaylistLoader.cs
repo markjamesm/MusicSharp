@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using ATL.Playlist;
 
-namespace MusicSharp.Models;
+namespace MusicSharp.PlaylistHandlers;
 
 /// <summary>
 /// The PlaylistLoader class loads a playlist of a given type.

@@ -3,12 +3,6 @@
 
 A cross-platform Terminal User Interface (TUI) music player written in C# (.NET 8) with the goal of being minimalistic and light on resources.
 
-MusicSharp makes use of the [SoundFlow](https://github.com/LSXPrime/SoundFlow) and [Terminal.Gui](https://github.com/migueldeicaza/gui.cs) libraries.
-
-## Screenshot
-
-<img src="https://user-images.githubusercontent.com/20845425/99861949-06763200-2b66-11eb-9d5a-9bf2ea5151ee.png" alt="Screenshot of MusicSharp">
-
 ## Features
 
 - Cross-platform support (Windows, Mac, Linux).
@@ -19,6 +13,12 @@ MusicSharp makes use of the [SoundFlow](https://github.com/LSXPrime/SoundFlow) a
 ## Installation
 
 Download the [latest release of MusicSharp](https://github.com/markjamesm/MusicSharp/releases) and follow the installation instructions.
+
+## Screenshot
+
+<img src="https://user-images.githubusercontent.com/20845425/99861949-06763200-2b66-11eb-9d5a-9bf2ea5151ee.png" alt="Screenshot of MusicSharp">
+
+MusicSharp makes use of the [SoundFlow](https://github.com/LSXPrime/SoundFlow) and [Terminal.Gui](https://github.com/migueldeicaza/gui.cs) libraries.
 
 ## Want to Contribute?
 

@@ -31,11 +31,9 @@ public sealed class SoundFlowPlayer : IPlayer
         }
 
         _player = new SoundPlayer(new StreamDataProvider(stream));
-
-        // Add the player to the master mixer. This connects the player's output to the audio engine's output.
         Mixer.Master.AddComponent(_player);
-
         _player.Play();
+        
         PlayerStatus = EPlayerStatus.Playing;
     }
 
@@ -70,41 +68,22 @@ public sealed class SoundFlowPlayer : IPlayer
     {
         // Need to verify what SoundFlow's max volume level is
         // For now this should be enough based on testing
-        if (_player.Volume < 2.0f)
-        {
-            _player.Volume += .1f;
-        }
+        _player.Volume = Math.Clamp(_player.Volume + .1f, 0f, 2f);
     }
 
     public void DecreaseVolume()
     {
-        // Ensure that the volume isn't negative
-        // otherwise the player will crash
-        if (_player.Volume > .1f)
-        {
-            _player.Volume -= .1f;
-        }
-
-        if (_player.Volume <= .1f)
-        {
-            _player.Volume = 0f;
-        }
+        _player.Volume = Math.Clamp(_player.Volume - .1f, 0f, 2f);
     }
     
     public void SeekForward()
     {
-        if (_player.Time < _player.Duration - 5f)
-        {
-            _player.Seek(_player.Time + 5f);
-        }
+        _player.Seek(Math.Clamp(_player.Time + 5f, 0f, _player.Duration - 1));
     }
 
     public void SeekBackwards()
     {
-        if (_player.Time > 5f)
-        {
-            _player.Seek(_player.Time - 5f);
-        }
+        _player.Seek(Math.Clamp(_player.Time - 5f, 0f, _player.Duration));
     }
     
     public float CurrentTime()

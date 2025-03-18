@@ -24,8 +24,8 @@ public static class Program
         using IPlayer player = new SoundFlowPlayer(soundEngine);
         using var httpClient = new HttpClient();
         IStreamConverter streamConverter = new SoundFlowPlayerStreamConverter(httpClient);
+        
         var ui = new Tui(player, streamConverter);
-
         ui.Start();
     }
 }

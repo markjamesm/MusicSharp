@@ -12,11 +12,9 @@ using Terminal.Gui;
 
 namespace MusicSharp.UI;
 
-/// <summary>
-/// The Gui class houses the CLI elements of MusicSharp.
-/// </summary>
 public class Tui
 {
+    // TUI Components
     private static List<string> _playlistTracks;
     private static ListView _playlistView;
     private static FrameView _playlistPane;
@@ -24,76 +22,53 @@ public class Tui
     private static FrameView _nowPlaying;
     private static StatusBar _statusBar;
     private static Label _trackName;
-
-    /// <summary>
-    /// Create a new instance of the audio player engine.
-    /// </summary>
-    private readonly IPlayer _player;
-
-    private object _mainLoopTimeout = null;
-
+    private ProgressBar _audioProgressBar;
+    private object? _mainLoopTimeout = null;
     private List<string> _playlist = new List<string>();
     
+    private readonly IPlayer _player;
     private readonly IStreamConverter _streamConverter;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="Tui"/> class.
-    /// </summary>
-    /// <param name="player">The player to be injected.</param>
-    /// <param name="streamConverter">Helper class to convert files and urls to Stream type.</param>
+    
     public Tui(IPlayer player, IStreamConverter streamConverter)
     {
         _player = player;
         _streamConverter = streamConverter;
     }
-
-    /// <summary>
-    ///  Gets and sets the current audio file play progress.
-    /// </summary>
-    internal ProgressBar AudioProgressBar { get; private set; }
-
-    /// <summary>
-    /// Start the UI.
-    /// </summary>
+    
     public void Start()
     {
         // Creates an instance of MainLoop to process input events, handle timers and other sources of data.
         Application.Init();
 
         var top = Application.Top;
-        var tframe = top.Frame;
 
         // Create the menubar.
-        var menu = new MenuBar(new MenuBarItem[]
-        {
-            new MenuBarItem("_File", new MenuItem[]
-            {
+        var menu = new MenuBar([
+            new MenuBarItem("_File", [
                 new MenuItem("_Open", "Open a music file", () => OpenFile()),
 
-                new MenuItem("Open S_tream", "Open a music stream", () => OpenStream()),
+                new MenuItem("Open _Stream", "Open a music stream", () => OpenStream()),
 
-                new MenuItem("Open Pla_ylist", "Load a playlist", () => LoadPlaylist()),
+                new MenuItem("Open _Playlist", "Load a playlist", () => LoadPlaylist()),
 
-                new MenuItem("_Quit", "Exit MusicSharp", () => Application.RequestStop()),
-            }),
+                new MenuItem("_Quit", "Exit MusicSharp", () => Application.RequestStop())
+            ]),
 
-            new MenuBarItem("_Help", new MenuItem[]
-            {
+            new MenuBarItem("_Help", [
                 new MenuItem("_About MusicSharp", string.Empty, () =>
                 {
                     MessageBox.Query("Music Sharp 1.0.0", "\nMusic Sharp is a lightweight CLI\n music player written in C#.\n\nDeveloped by Mark-James McDougall\nand licensed under the GPL v3.\n ", "Close");
-                }),
-            }),
-        });
+                })
+            ])
+        ]);
 
-        _statusBar = new StatusBar(new StatusItem[]
-        {
-                new StatusItem(Key.F1, "~F1~ Open file", () => OpenFile()),
+        _statusBar = new StatusBar([
+            new StatusItem(Key.F1, "~F1~ Open file", () => OpenFile()),
                 new StatusItem(Key.F2, "~F2~ Open stream", () => OpenStream()),
                 new StatusItem(Key.F3, "~F3~ Load playlist", () => LoadPlaylist()),
                 new StatusItem(Key.F4, "~F4~ Quit", () => Application.RequestStop()),
-                new StatusItem(Key.Space, "~Space~ Play/Pause", () => PlayPause()),
-        });
+                new StatusItem(Key.Space, "~Space~ Play/Pause", () => PlayPause())
+        ]);
 
         // Create the playback controls frame.
         _playbackControls = new FrameView("Playback")
@@ -120,7 +95,7 @@ public class Tui
         stopButton.Clicked += () =>
         {
             _player.Stop();
-            AudioProgressBar.Fraction = 0F;
+            _audioProgressBar.Fraction = 0F;
             TimePlayedLabel();
         };
 
@@ -201,7 +176,7 @@ public class Tui
             CanFocus = false,
         };
 
-        AudioProgressBar = new ProgressBar()
+        _audioProgressBar = new ProgressBar()
         {
             X = 0,
             Y = 2,
@@ -210,7 +185,7 @@ public class Tui
             ColorScheme = Colors.Base,
         };
 
-        _nowPlaying.Add(AudioProgressBar);
+        _nowPlaying.Add(_audioProgressBar);
 
         // Add the layout elements and run the app.
         top.Add(menu, _playlistPane, _playbackControls, _nowPlaying, _statusBar);
@@ -234,15 +209,11 @@ public class Tui
             MessageBox.Query("Warning", "Select a file or stream first.", "Close");
         }
     }
-
-    // Display a file open dialog and return the path of the user selected file.
+    
     private void OpenFile()
     {
         var d = new OpenDialog("Open", "Open an audio file") { AllowsMultipleSelection = false };
-
         d.DirectoryPath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-
-        // This will filter the dialog on basis of the allowed file types in the array.
         d.AllowedFileTypes = [".mp3", ".wav", ".flac"];
         Application.Run(d);
 
@@ -256,7 +227,7 @@ public class Tui
                     var stream = _streamConverter.ConvertFileToStream(d.FilePath.ToString());
                     _player.Play(stream);
                     NowPlaying(_player.LastFileOpened);
-                    AudioProgressBar.Fraction = 0F;
+                    _audioProgressBar.Fraction = 0F;
                     UpdateProgressBar();
                     TimePlayedLabel();
                 }
@@ -312,8 +283,7 @@ public class Tui
         d.Add(editLabel, streamUrl);
         Application.Run(d);
     }
-
-    // Load a playlist file. Currently, only M3U is supported.
+    
     private void LoadPlaylist()
     {
         var d = new OpenDialog("Open", "Open a playlist") { AllowsMultipleSelection = false };
@@ -363,7 +333,7 @@ public class Tui
             
             _trackName = new Label($"{timePlayed} / {trackLength}")
             {
-                X = Pos.Right(AudioProgressBar),
+                X = Pos.Right(_audioProgressBar),
                 Y = 2,
             };
         }
@@ -371,7 +341,7 @@ public class Tui
         {
             _trackName = new Label($"00:00 / 00:00")
             {
-                X = Pos.Right(AudioProgressBar),
+                X = Pos.Right(_audioProgressBar),
                 Y = 2,
             };
         }
@@ -385,7 +355,7 @@ public class Tui
         {
             while (_player.CurrentTime() < _player.TrackLength() && _player.PlayerStatus is not EPlayerStatus.Stopped)
             {
-                AudioProgressBar.Fraction = _player.CurrentTime() / _player.TrackLength();
+                _audioProgressBar.Fraction = _player.CurrentTime() / _player.TrackLength();
                 TimePlayedLabel();
 
                 return true;

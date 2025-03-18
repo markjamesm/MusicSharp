@@ -78,7 +78,7 @@ public sealed class SoundFlowPlayer : IPlayer
     
     public void SeekForward()
     {
-        _player.Seek(Math.Clamp(_player.Time + 5f, 0f, _player.Duration - 1));
+        _player.Seek(Math.Clamp(_player.Time + 5f, 0f, _player.Duration - 0.1f));
     }
 
     public void SeekBackwards()

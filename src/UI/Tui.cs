@@ -8,7 +8,6 @@ using System.IO;
 using MusicSharp.Enums;
 using MusicSharp.PlaylistHandlers;
 using MusicSharp.AudioPlayer;
-using MusicSharp.Helpers;
 using Terminal.Gui;
 
 namespace MusicSharp.UI;
@@ -35,17 +34,17 @@ public class Tui
 
     private List<string> _playlist = new List<string>();
     
-    private readonly Converters _converters;
+    private readonly IStreamConverter _streamConverter;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="Tui"/> class.
     /// </summary>
     /// <param name="player">The player to be injected.</param>
-    /// <param name="converters">Helper class to convert files and urls to Stream type.</param>
-    public Tui(IPlayer player, Converters converters)
+    /// <param name="streamConverter">Helper class to convert files and urls to Stream type.</param>
+    public Tui(IPlayer player, IStreamConverter streamConverter)
     {
         _player = player;
-        _converters = converters;
+        _streamConverter = streamConverter;
     }
 
     /// <summary>
@@ -180,7 +179,7 @@ public class Tui
             try
             {
                 _player.LastFileOpened = a.Value.ToString();
-                _player.Play(Converters.ConvertFileToStream(_player.LastFileOpened));
+                _player.Play(_streamConverter.ConvertFileToStream(a.Value.ToString()));
                 NowPlaying(_player.LastFileOpened);
                 UpdateProgressBar();
             }
@@ -254,7 +253,7 @@ public class Tui
                 try
                 {
                     _player.LastFileOpened = d.FilePath.ToString();
-                    var stream = Converters.ConvertFileToStream(d.FilePath.ToString());
+                    var stream = _streamConverter.ConvertFileToStream(d.FilePath.ToString());
                     _player.Play(stream);
                     NowPlaying(_player.LastFileOpened);
                     AudioProgressBar.Fraction = 0F;
@@ -293,7 +292,7 @@ public class Tui
         {
             try
             {
-                var stream = await _converters.ConvertUrlToStream(streamUrl.Text.ToString());
+                var stream = await _streamConverter.ConvertUrlToStream(streamUrl.Text.ToString());
                 _player.Play(stream);
             }
             catch (Exception ex)

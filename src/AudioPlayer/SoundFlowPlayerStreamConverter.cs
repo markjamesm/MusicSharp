@@ -2,18 +2,18 @@ using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
 
-namespace MusicSharp.Helpers;
+namespace MusicSharp.AudioPlayer;
 
-public class Converters
+public class SoundFlowPlayerStreamConverter : IStreamConverter
 {
     private readonly HttpClient _httpClient;
 
-    public Converters(HttpClient httpClient)
+    public SoundFlowPlayerStreamConverter(HttpClient httpClient)
     {
         _httpClient = httpClient;
     }
     
-    public static Stream ConvertFileToStream(string path)
+    public Stream ConvertFileToStream(string path)
     {
         return File.OpenRead(path);
     }

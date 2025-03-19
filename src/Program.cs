@@ -7,6 +7,7 @@ using MusicSharp.UI;
 using MusicSharp.AudioPlayer;
 using SoundFlow.Backends.MiniAudio;
 using SoundFlow.Enums;
+using Terminal.Gui;
 
 namespace MusicSharp;
 
@@ -24,8 +25,12 @@ public static class Program
         using IPlayer player = new SoundFlowPlayer(soundEngine);
         using var httpClient = new HttpClient();
         IStreamConverter streamConverter = new SoundFlowPlayerStreamConverter(httpClient);
-        
         var ui = new Tui(player, streamConverter);
-        ui.Start();
+        
+        ConfigurationManager.RuntimeConfig = """{ "Theme": "Dark" }""";
+        Application.Init();
+        Application.Run(ui);
+        ui.Dispose();
+        Application.Shutdown ();
     }
 }

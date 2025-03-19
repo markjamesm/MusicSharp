@@ -50,15 +50,48 @@ public class Tui : Toplevel
         
         var libraryWindow = new View()
         {
+            Title = "Library",
             Y = Pos.Bottom(menuBar),
             Width = Dim.Fill(),
-            Height = Dim.Fill(),
+            Height = Dim.Auto(),
+            CanFocus = true,
+            BorderStyle = LineStyle.Rounded
+        };
+        
+        // Create the audio progress bar frame.
+        var playbackControls = new FrameView()
+        {
+            Title = "Playback",
+            X = 0,
+            Y = Pos.Bottom(libraryWindow),
+            Width = Dim.Auto(),
+            Height = Dim.Auto(),
+            CanFocus = true,
+            BorderStyle = LineStyle.Rounded
+        };
+
+        var playPauseButton = new Button { X = 0, Y = 0, IsDefault = true, Text = "Play/Pause" };
+        var stopButton = new Button { X = 0, Y = Pos.Bottom(playPauseButton), IsDefault = false, Text = "Stop" };
+        var volumeIncreaseButton = new Button { X = Pos.Right(playPauseButton), Y = 0, IsDefault = false, Text = "Volume +" };
+        var volumeDecreaseButton = new Button { X = Pos.Right(playPauseButton), Y = Pos.Bottom(volumeIncreaseButton), IsDefault = false, Text = "Volume -" };
+        var seekForwardButton = new Button { X = Pos.Right(volumeIncreaseButton), Y = 0, IsDefault = false, Text = "Seek 5s" };
+        var seekBackwardButton = new Button { X = Pos.Right(volumeDecreaseButton), Y = Pos.Bottom(seekForwardButton), IsDefault = false, Text = "Seek -5s" };
+        
+        playbackControls.Add (playPauseButton, stopButton, volumeIncreaseButton, volumeDecreaseButton, seekForwardButton, seekBackwardButton);
+
+        var progressBar = new ProgressBar()
+        {
+            X = Pos.Right(playbackControls),
+            Y = Pos.Bottom(libraryWindow),
+            Width = Dim.Auto(),
+            Height = Dim.Auto(),
+            CanFocus = false,
             BorderStyle = LineStyle.Rounded
         };
         
         // Add the views to the Window
-        Add(menuBar);
-        Add(libraryWindow);
+        Add(menuBar, libraryWindow, playbackControls, progressBar);
+        //Add(libraryWindow);
     }
     
     // Action Methods

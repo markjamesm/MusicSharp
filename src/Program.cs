@@ -1,8 +1,4 @@
-﻿// <copyright file="Program.cs" company="Mark-James McDougall">
-// Licensed under the GNU GPL v3 License. See LICENSE in the project root for license information.
-// </copyright>
-
-using System.Net.Http;
+﻿using System.Net.Http;
 using MusicSharp.UI;
 using MusicSharp.AudioPlayer;
 using SoundFlow.Backends.MiniAudio;

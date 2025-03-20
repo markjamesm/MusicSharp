@@ -1,7 +1,4 @@
-﻿// <copyright file="TuiTwo.cs" company="Mark-James McDougall">
-// Licensed under the GNU GPL v3 License. See LICENSE in the project root for license information.
-// </copyright>
-/*
+﻿/*
 using System;
 using System.Collections.Generic;
 using System.IO;

@@ -1,5 +1,4 @@
 using System;
-using System.IO;
 using MusicSharp.Enums;
 using SoundFlow.Backends.MiniAudio;
 using SoundFlow.Components;
@@ -8,7 +7,7 @@ using SoundFlow.Providers;
 
 namespace MusicSharp.AudioPlayer;
 
-// Cross-platform sound engine that works for all devices which
+// Cross-platform sound engine that works for all devices that
 //  the .NET platform runs on.
 public sealed class SoundFlowPlayer : IPlayer
 {

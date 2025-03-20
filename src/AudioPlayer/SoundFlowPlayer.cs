@@ -16,7 +16,6 @@ public sealed class SoundFlowPlayer : IPlayer
     private readonly IStreamConverter _streamConverter;
 
     public EPlayerStatus PlayerState => GetPlayerStateMapper();
-
     public string LastFileOpened { get; set; }
     public float TrackLength => _player?.Duration ?? 0;
     public float CurrentTime => _player?.Time ?? 0;

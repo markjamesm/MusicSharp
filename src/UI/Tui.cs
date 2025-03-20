@@ -77,11 +77,41 @@ public class Tui : Toplevel
                 _player.PlayPause();
             }
         };
-        stopButton.Accepting += (s, args) => _player.Stop();
-        volumeIncreaseButton.Accepting += (s, args) => _player.IncreaseVolume(); 
-        volumeDecreaseButton.Accepting += (s, args) => _player.DecreaseVolume();
-        seekForwardButton.Accepting += (s, args) => _player.SeekForward();
-        seekBackwardButton.Accepting += (s, a) => _player.SeekBackward();
+        stopButton.Accepting += (s, args)  =>
+        {
+            if (_player.IsStreamLoaded)
+            {
+                _player.Stop();
+            }
+        };
+        volumeIncreaseButton.Accepting += (s, args) =>
+        {
+            if (_player.IsStreamLoaded)
+            {
+                _player.IncreaseVolume();
+            }
+        }; 
+        volumeDecreaseButton.Accepting += (s, args) =>
+        {
+            if (_player.IsStreamLoaded)
+            {
+                _player.DecreaseVolume();
+            }
+        };
+        seekForwardButton.Accepting += (s, args) =>
+        {
+            if (_player.IsStreamLoaded)
+            {
+                _player.SeekForward();
+            }
+        };
+        seekBackwardButton.Accepting += (s, a) =>
+        {
+            if (_player.IsStreamLoaded)
+            {
+                _player.SeekBackward();
+            }
+        };
         
         playbackControls.Add (playPauseButton, stopButton, volumeIncreaseButton, volumeDecreaseButton, seekForwardButton, seekBackwardButton);
 
@@ -95,9 +125,8 @@ public class Tui : Toplevel
             BorderStyle = LineStyle.Rounded,
         };
         
-        // Add the views to the Window
+        // Add the views to the main window
         Add(menuBar, libraryWindow, playbackControls, progressBar);
-        //Add(libraryWindow);
     }
     
     // Action Methods

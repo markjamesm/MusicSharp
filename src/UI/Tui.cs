@@ -50,8 +50,9 @@ public class Tui : Toplevel
             CanFocus = true,
             BorderStyle = LineStyle.Rounded
         };
+
+        #region PlayBackControls
         
-        // Create the audio progress bar frame.
         var playbackControls = new Window()
         {
             Title = "Playback",
@@ -161,6 +162,8 @@ public class Tui : Toplevel
         };
         
         playbackControls.Add (playPauseButton, stopButton, volumeIncreaseButton, volumeDecreaseButton, seekForwardButton, seekBackwardButton);
+        
+        #endregion
 
         var progressBar = new ProgressBar()
         {
@@ -244,5 +247,10 @@ public class Tui : Toplevel
         streamDialog.Add(uriLabel, streamUrl, loadStreamButton, cancelButton);
         
         Application.Run(streamDialog);
+    }
+
+    private void UpdateProgressBar()
+    {
+        
     }
 }

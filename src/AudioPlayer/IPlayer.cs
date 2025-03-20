@@ -28,6 +28,8 @@ public interface IPlayer: IDisposable
     /// Gets or sets the last file opened by the player.
     /// </summary>
     string LastFileOpened { get; set; }
+    
+    bool IsStreamLoaded { get; }
 
     /// <summary>
     /// Method to play audio.

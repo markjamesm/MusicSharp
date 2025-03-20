@@ -20,6 +20,7 @@ public sealed class SoundFlowPlayer : IPlayer
     public string LastFileOpened { get; set; }
     public float TrackLength => _player?.Duration ?? 0;
     public float CurrentTime => _player?.Time ?? 0;
+    public bool IsStreamLoaded => _player != null;
 
 
     public SoundFlowPlayer(MiniAudioEngine soundEngine, IStreamConverter streamConverter)

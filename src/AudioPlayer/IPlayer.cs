@@ -17,6 +17,16 @@ public interface IPlayer: IDisposable
     /// Gets or sets a value indicating whether the audio player is playing.
     /// </summary>
     EPlayerStatus PlayerStatus { get; set; }
+    
+    /// <summary>
+    /// Returns the total length of the audio file.
+    /// </summary>
+    float TrackLength { get; }
+    
+    /// <summary>
+    /// Returns the current time played.
+    /// </summary>
+    float CurrentTime { get; }
 
     /// <summary>
     /// Gets or sets the last file opened by the player.
@@ -26,11 +36,11 @@ public interface IPlayer: IDisposable
     /// <summary>
     /// Method to play audio.
     /// </summary>
-    /// <param name="stream">The audio stream.</param>
-    void Play(Stream stream);
+    /// <param name="path">The path to the file or stream.</param>
+    void Play(string path);
     
     /// <summary>
-    /// Method to play or pause depending on state.
+    /// Method to pause audio playback.
     /// </summary>
     void PlayPause();
     
@@ -50,18 +60,6 @@ public interface IPlayer: IDisposable
     void DecreaseVolume();
 
     /// <summary>
-    /// Returns the current playtime of the audioFileReader instance.
-    /// </summary>
-    /// <returns>The current time played as TimeSpan.</returns>
-    float CurrentTime();
-
-    /// <summary>
-    /// Returns the total track length in timespan format.
-    /// </summary>
-    /// <returns>The length of the track in timespan format.</returns>
-    float TrackLength();
-
-    /// <summary>
     /// Skip ahead in the audio file 5s.
     /// </summary>
     public void SeekForward();
@@ -69,5 +67,5 @@ public interface IPlayer: IDisposable
     /// <summary>
     /// Skip back in the audio file 5s.
     /// </summary>
-    public void SeekBackwards();
+    public void SeekBackward();
 }

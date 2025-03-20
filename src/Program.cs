@@ -22,13 +22,13 @@ public static class Program
     public static void Main()
     {
         var soundEngine = new MiniAudioEngine(44100, Capability.Playback);
-        using IPlayer player = new SoundFlowPlayer(soundEngine);
         using var httpClient = new HttpClient();
         IStreamConverter streamConverter = new SoundFlowPlayerStreamConverter(httpClient);
+        using IPlayer player = new SoundFlowPlayer(soundEngine, streamConverter);
         
         ConfigurationManager.RuntimeConfig = """{ "Theme": "Dark" }""";
         Application.Init();
-        using var ui = new Tui(player, streamConverter);
+        using var ui = new Tui(player);
         Application.Run(ui);
         Application.Shutdown ();
     }

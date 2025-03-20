@@ -3,6 +3,7 @@ using System.IO;
 using MusicSharp.Enums;
 using SoundFlow.Backends.MiniAudio;
 using SoundFlow.Components;
+using SoundFlow.Enums;
 using SoundFlow.Providers;
 
 namespace MusicSharp.AudioPlayer;
@@ -12,25 +13,33 @@ namespace MusicSharp.AudioPlayer;
 public sealed class SoundFlowPlayer : IPlayer
 {
     private readonly MiniAudioEngine _soundEngine;
-    private SoundPlayer _player;
+    private SoundPlayer? _player;
+    private readonly IStreamConverter _streamConverter;
 
     public EPlayerStatus PlayerStatus { get; set; }
+    
     public string LastFileOpened { get; set; }
+    public float TrackLength => _player?.Duration ?? 0;
+    public float CurrentTime => _player?.Time ?? 0;
 
 
-    public SoundFlowPlayer(MiniAudioEngine soundEngine)
+    public SoundFlowPlayer(MiniAudioEngine soundEngine, IStreamConverter streamConverter)
     {
         _soundEngine = soundEngine;
+        _streamConverter = streamConverter;
     }
 
-    public void Play(Stream stream)
+    public void Play(string path)
     {
-        if (_player != null)
+        var stream = _streamConverter.ConvertFileToStream(path);
+        
+        if (_player == null)
         {
-            _player.Stop();
+            _player = new SoundPlayer(new StreamDataProvider(stream));
         }
-
+        
         _player = new SoundPlayer(new StreamDataProvider(stream));
+        
         Mixer.Master.AddComponent(_player);
         _player.Play();
         
@@ -42,12 +51,12 @@ public sealed class SoundFlowPlayer : IPlayer
         switch (PlayerStatus)
         {
             case EPlayerStatus.Playing:
-                _player.Pause();
+                _player?.Pause();
                 PlayerStatus = EPlayerStatus.Paused;
                 break;
             case EPlayerStatus.Paused:
             case EPlayerStatus.Stopped:
-                _player.Play();
+                _player?.Play();
                 PlayerStatus = EPlayerStatus.Playing;
                 break;
             default:
@@ -59,7 +68,7 @@ public sealed class SoundFlowPlayer : IPlayer
     {
         if (PlayerStatus != EPlayerStatus.Stopped)
         {
-            _player.Stop();
+            _player?.Stop();
             PlayerStatus = EPlayerStatus.Stopped;
         }
     }
@@ -81,19 +90,9 @@ public sealed class SoundFlowPlayer : IPlayer
         _player.Seek(Math.Clamp(_player.Time + 5f, 0f, _player.Duration - 0.1f));
     }
 
-    public void SeekBackwards()
+    public void SeekBackward()
     {
         _player.Seek(Math.Clamp(_player.Time - 5f, 0f, _player.Duration));
-    }
-    
-    public float CurrentTime()
-    {
-        return _player.Time;
-    }
-
-    public float TrackLength()
-    {
-        return _player.Duration;
     }
 
     public void Dispose()

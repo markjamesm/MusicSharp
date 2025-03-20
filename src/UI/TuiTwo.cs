@@ -67,7 +67,7 @@ public class TuiTwo
                 new StatusItem(Key.F2, "~F2~ Open stream", () => OpenStream()),
                 new StatusItem(Key.F3, "~F3~ Load playlist", () => LoadPlaylist()),
                 new StatusItem(Key.F4, "~F4~ Quit", () => Application.RequestStop()),
-                new StatusItem(Key.Space, "~Space~ Play/Pause", () => PlayPause())
+                new StatusItem(Key.Space, "~Space~ Play/PlayPause", () => PlayPause())
         ]);
 
         // Create the playback controls frame.
@@ -80,7 +80,7 @@ public class TuiTwo
             CanFocus = true,
         };
 
-        var playPauseButton = new Button(1, 1, "Play/Pause");
+        var playPauseButton = new Button(1, 1, "Play/PlayPause");
         playPauseButton.Clicked += () =>
         {
             PlayPause();
@@ -108,7 +108,7 @@ public class TuiTwo
         var seekBackward = new Button(26, 2, "Seek -5s");
         seekBackward.Clicked += () =>
         {
-            _player.SeekBackwards();
+            _player.SeekBackward();
         };
 
         var increaseVolumeButton = new Button(39, 0, "+ Volume");

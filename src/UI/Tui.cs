@@ -1,46 +1,33 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
 using MusicSharp.AudioPlayer;
 using Terminal.Gui;
-using MenuBarItem = Terminal.Gui.MenuBarItem;
 
 namespace MusicSharp.UI;
 
-public class Tui : Toplevel
+public class Tui : Window
 {
     private readonly IPlayer _player;
-    private readonly IStreamConverter _streamConverter;
-    
-    private readonly StatusBar? _statusBar;
 
-    public Tui(IPlayer player, IStreamConverter streamConverter)
+    public Tui(IPlayer player)
     {
         _player = player;
-        _streamConverter = streamConverter;
-
-        HighlightStyle = HighlightStyle.Hover;
-
-        // Title = $"Example App ({Application.QuitKey} to quit)";
         
         var menuBar = new MenuBar()
         {
-            HighlightStyle = HighlightStyle.Hover,
             MenusBorderStyle = LineStyle.Rounded,
             Menus =
             [
-                new(
+                new MenuBarItem(
                     "_File",
                     new MenuItem[]
                     {
                         new(
                             "_Open file",
                             "Open a local audio file",
-                            OpenFile // Open a file dialog
+                            OpenFile
                         ),
                         new(
                             "_Quit",
-                            "Quit UI Catalog",
+                            "Quit MusicSharp",
                             RequestStop
                         )
                     }
@@ -48,7 +35,7 @@ public class Tui : Toplevel
             ]
         };
         
-        var libraryWindow = new View()
+        var libraryWindow = new Window()
         {
             Title = "Library",
             Y = Pos.Bottom(menuBar),
@@ -59,7 +46,7 @@ public class Tui : Toplevel
         };
         
         // Create the audio progress bar frame.
-        var playbackControls = new FrameView()
+        var playbackControls = new Window()
         {
             Title = "Playback",
             X = 0,
@@ -70,12 +57,19 @@ public class Tui : Toplevel
             BorderStyle = LineStyle.Rounded
         };
 
-        var playPauseButton = new Button { X = 0, Y = 0, IsDefault = true, Text = "Play/Pause" };
+        var playPauseButton = new Button { X = 0, Y = 0, IsDefault = false, Text = "Play/Pause" };
         var stopButton = new Button { X = 0, Y = Pos.Bottom(playPauseButton), IsDefault = false, Text = "Stop" };
         var volumeIncreaseButton = new Button { X = Pos.Right(playPauseButton), Y = 0, IsDefault = false, Text = "Volume +" };
         var volumeDecreaseButton = new Button { X = Pos.Right(playPauseButton), Y = Pos.Bottom(volumeIncreaseButton), IsDefault = false, Text = "Volume -" };
         var seekForwardButton = new Button { X = Pos.Right(volumeIncreaseButton), Y = 0, IsDefault = false, Text = "Seek 5s" };
         var seekBackwardButton = new Button { X = Pos.Right(volumeDecreaseButton), Y = Pos.Bottom(seekForwardButton), IsDefault = false, Text = "Seek -5s" };
+        
+        playPauseButton.Accepting += (s, args) => _player.PlayPause();
+        stopButton.Accepting += (s, args) => _player.Stop();
+        volumeIncreaseButton.Accepting += (s, args) => _player.IncreaseVolume(); 
+        volumeDecreaseButton.Accepting += (s, args) => _player.DecreaseVolume();
+        seekForwardButton.Accepting += (s, args) => _player.SeekForward();
+        seekBackwardButton.Accepting += (s, a) => _player.SeekBackward();
         
         playbackControls.Add (playPauseButton, stopButton, volumeIncreaseButton, volumeDecreaseButton, seekForwardButton, seekBackwardButton);
 
@@ -86,7 +80,7 @@ public class Tui : Toplevel
             Width = Dim.Auto(),
             Height = Dim.Auto(),
             CanFocus = false,
-            BorderStyle = LineStyle.Rounded
+            BorderStyle = LineStyle.Rounded,
         };
         
         // Add the views to the Window
@@ -108,8 +102,16 @@ public class Tui : Toplevel
 
         if (!d.Canceled)
         {
-            var stream = _streamConverter.ConvertFileToStream(d.FilePaths[0].ToString());
-            _player.Play(stream);   
+            _player.Play(d.FilePaths[0]);
         }
     }
+
+    // private void PlayHandler(Stream stream)
+    // {
+    //     switch (_player.PlayerStatus)
+    //     {
+    //         case EPlayerStatus.Playing:
+    //             _player.Stop();
+    //     }
+    // }
 }

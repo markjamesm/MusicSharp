@@ -85,7 +85,7 @@ public class TuiTwo
         {
             PlayPause();
 
-            if (_player.PlayerStatus != EPlayerStatus.Stopped)
+            if (_player.PlayerState != EPlayerStatus.Stopped)
             {
                 UpdateProgressBar();
             }
@@ -199,7 +199,7 @@ public class TuiTwo
         {
             _player.PlayPause();
 
-            if (_player.PlayerStatus == EPlayerStatus.Playing)
+            if (_player.PlayerState == EPlayerStatus.Playing)
             {
                 UpdateProgressBar();
             }
@@ -326,7 +326,7 @@ public class TuiTwo
 
     private void TimePlayedLabel()
     {
-        if (_player.PlayerStatus != EPlayerStatus.Stopped)
+        if (_player.PlayerState != EPlayerStatus.Stopped)
         {
             var timePlayed = TimeSpan.FromSeconds((double)(new decimal(_player.CurrentTime()))).ToString(@"hh\:mm\:ss");
             var trackLength = TimeSpan.FromSeconds((double)(new decimal(_player.TrackLength()))).ToString(@"hh\:mm\:ss");
@@ -353,7 +353,7 @@ public class TuiTwo
     {
         _mainLoopTimeout = Application.MainLoop.AddTimeout(TimeSpan.FromSeconds(1), (updateTimer) =>
         {
-            while (_player.CurrentTime() < _player.TrackLength() && _player.PlayerStatus is not EPlayerStatus.Stopped)
+            while (_player.CurrentTime() < _player.TrackLength() && _player.PlayerState is not EPlayerStatus.Stopped)
             {
                 _audioProgressBar.Fraction = _player.CurrentTime() / _player.TrackLength();
                 TimePlayedLabel();

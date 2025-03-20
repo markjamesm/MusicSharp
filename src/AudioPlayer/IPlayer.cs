@@ -16,7 +16,7 @@ public interface IPlayer: IDisposable
     /// <summary>
     /// Gets or sets a value indicating whether the audio player is playing.
     /// </summary>
-    EPlayerStatus PlayerStatus { get; set; }
+    EPlayerStatus PlayerState { get; }
     
     /// <summary>
     /// Returns the total length of the audio file.

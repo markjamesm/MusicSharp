@@ -16,8 +16,8 @@ public sealed class SoundFlowPlayer : IPlayer
     private SoundPlayer? _player;
     private readonly IStreamConverter _streamConverter;
 
-    public EPlayerStatus PlayerStatus { get; set; }
-    
+    public EPlayerStatus PlayerState => GetPlayerStateMapper();
+
     public string LastFileOpened { get; set; }
     public float TrackLength => _player?.Duration ?? 0;
     public float CurrentTime => _player?.Time ?? 0;
@@ -42,22 +42,18 @@ public sealed class SoundFlowPlayer : IPlayer
         
         Mixer.Master.AddComponent(_player);
         _player.Play();
-        
-        PlayerStatus = EPlayerStatus.Playing;
     }
 
     public void PlayPause()
     {
-        switch (PlayerStatus)
+        switch (PlayerState)
         {
             case EPlayerStatus.Playing:
                 _player?.Pause();
-                PlayerStatus = EPlayerStatus.Paused;
                 break;
             case EPlayerStatus.Paused:
             case EPlayerStatus.Stopped:
                 _player?.Play();
-                PlayerStatus = EPlayerStatus.Playing;
                 break;
             default:
                 throw new ArgumentOutOfRangeException();
@@ -66,10 +62,9 @@ public sealed class SoundFlowPlayer : IPlayer
 
     public void Stop()
     {
-        if (PlayerStatus != EPlayerStatus.Stopped)
+        if (PlayerState != EPlayerStatus.Stopped)
         {
             _player?.Stop();
-            PlayerStatus = EPlayerStatus.Stopped;
         }
     }
 
@@ -98,5 +93,16 @@ public sealed class SoundFlowPlayer : IPlayer
     public void Dispose()
     {
         _soundEngine.Dispose();
+    }
+
+    private EPlayerStatus GetPlayerStateMapper()
+    {
+        return _player?.State switch
+        {
+            PlaybackState.Playing => EPlayerStatus.Playing,
+            PlaybackState.Paused => EPlayerStatus.Paused,
+            PlaybackState.Stopped => EPlayerStatus.Stopped,
+            _ => throw new ArgumentOutOfRangeException()
+        };
     }
 }

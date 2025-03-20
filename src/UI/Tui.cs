@@ -3,7 +3,7 @@ using Terminal.Gui;
 
 namespace MusicSharp.UI;
 
-public class Tui : Window
+public class Tui : Toplevel
 {
     private readonly IPlayer _player;
 
@@ -13,6 +13,7 @@ public class Tui : Window
         
         var menuBar = new MenuBar()
         {
+            Title = "MusicSharp",
             MenusBorderStyle = LineStyle.Rounded,
             Menus =
             [
@@ -108,7 +109,7 @@ public class Tui : Window
 
     // private void PlayHandler(Stream stream)
     // {
-    //     switch (_player.PlayerStatus)
+    //     switch (_player.PlayerState)
     //     {
     //         case EPlayerStatus.Playing:
     //             _player.Stop();

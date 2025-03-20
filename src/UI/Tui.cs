@@ -63,12 +63,59 @@ public class Tui : Toplevel
             BorderStyle = LineStyle.Rounded
         };
 
-        var playPauseButton = new Button { X = 0, Y = 0, IsDefault = false, Text = "Play/Pause" };
-        var stopButton = new Button { X = 0, Y = Pos.Bottom(playPauseButton), IsDefault = false, Text = "Stop" };
-        var volumeIncreaseButton = new Button { X = Pos.Right(playPauseButton), Y = 0, IsDefault = false, Text = "Volume +" };
-        var volumeDecreaseButton = new Button { X = Pos.Right(playPauseButton), Y = Pos.Bottom(volumeIncreaseButton), IsDefault = false, Text = "Volume -" };
-        var seekForwardButton = new Button { X = Pos.Right(volumeIncreaseButton), Y = 0, IsDefault = false, Text = "Seek 5s" };
-        var seekBackwardButton = new Button { X = Pos.Right(volumeDecreaseButton), Y = Pos.Bottom(seekForwardButton), IsDefault = false, Text = "Seek -5s" };
+        var playPauseButton = new Button
+        {
+            X = 0, 
+            Y = 0, 
+            IsDefault = false, 
+            CanFocus = true, 
+            Text = "Play/Pause"
+        };
+        
+        var stopButton = new Button
+        {
+            X = 0, 
+            Y = Pos.Bottom(playPauseButton), 
+            IsDefault = false, 
+            CanFocus = true, 
+            Text = "Stop"
+        };
+        
+        var volumeIncreaseButton = new Button
+        {
+            X = Pos.Right(playPauseButton), 
+            Y = 0, 
+            IsDefault = false, 
+            CanFocus = true, 
+            Text = "Volume +"
+        };
+        
+        var volumeDecreaseButton = new Button
+        {
+            X = Pos.Right(playPauseButton), 
+            Y = Pos.Bottom(volumeIncreaseButton), 
+            CanFocus = true, 
+            IsDefault = false, 
+            Text = "Volume -"
+        };
+        
+        var seekForwardButton = new Button
+        {
+            X = Pos.Right(volumeIncreaseButton), 
+            Y = 0, 
+            IsDefault = false, 
+            CanFocus = true, 
+            Text = "Seek 5s"
+        };
+        
+        var seekBackwardButton = new Button
+        {
+            X = Pos.Right(volumeDecreaseButton), 
+            Y = Pos.Bottom(seekForwardButton), 
+            IsDefault = false, 
+            CanFocus = true, 
+            Text = "Seek -5s"
+        };
         
         playPauseButton.Accepting += (s, args) =>
         {

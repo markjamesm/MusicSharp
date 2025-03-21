@@ -1,6 +1,9 @@
 using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using MusicSharp.AudioPlayer;
 using MusicSharp.Enums;
+using MusicSharp.PlaylistHandlers;
 using Terminal.Gui;
 
 namespace MusicSharp.UI;
@@ -12,6 +15,7 @@ public class Tui : Toplevel
     private object? _mainLoopTimeout;
     private readonly uint _mainLoopTimeoutTick = 100; // ms
     private Window? _nowPlayingWindow;
+    private ObservableCollection<string> _playlistTracks = ["Testing"];
 
     public Tui(IPlayer player)
     {
@@ -33,6 +37,11 @@ public class Tui : Toplevel
                             OpenFile
                         ),
                         new(
+                            "Open _playlist",
+                            "Open a playlist",
+                            OpenPlaylist
+                        ),
+                        new(
                             "Open _stream",
                             "Open a web stream",
                             OpenStream
@@ -47,21 +56,24 @@ public class Tui : Toplevel
             ]
         };
         
-        var libraryWindow = new Window()
+        var libraryList = new ListView
         {
             Title = "Library",
+            X = 0,
             Y = Pos.Bottom(menuBar),
             Width = Dim.Fill(),
-            Height = Dim.Auto(),
-            CanFocus = true,
-            BorderStyle = LineStyle.Rounded
+            Height = 12,
+            CanFocus = false,
+            BorderStyle = LineStyle.Rounded,
         };
+        
+        libraryList.SetSource(_playlistTracks);
         
         _progressBar = new ProgressBar()
         {
             Title = "Progress",
             X = 0,
-            Y = Pos.Bottom(libraryWindow),
+            Y = Pos.Bottom(libraryList),
             Width = Dim.Fill(),
             Height = 3,
             CanFocus = false,
@@ -197,7 +209,7 @@ public class Tui : Toplevel
         };
         
         // Add the views to the main window
-        Add(menuBar, libraryWindow, _progressBar, playbackControls, _nowPlayingWindow);
+        Add(menuBar, libraryList, _progressBar, playbackControls, _nowPlayingWindow);
     }
     
     #endregion
@@ -304,5 +316,36 @@ public class Tui : Toplevel
         };
 
         _nowPlayingWindow?.Add(nowPlayingLabel);
+    }
+
+    private void OpenPlaylist()
+    {
+        var d = new OpenDialog()
+        {
+            AllowsMultipleSelection = false,
+            Title = "Open a playlist",
+            AllowedTypes = [new AllowedType("Allowed filetypes", ".m3u")]
+        };
+        
+        Application.Run(d);
+
+        if (!d.Canceled)
+        {  
+            var playlist = PlaylistLoader.LoadPlaylist(d.FilePaths[0]);
+            
+            if (playlist == null)
+            {
+                Application.RequestStop();
+            }
+            else
+            {
+                foreach (var track in playlist)
+                {
+                    _playlistTracks.Add(track);
+                }
+
+                Application.Run();
+            }
+        }
     }
 }

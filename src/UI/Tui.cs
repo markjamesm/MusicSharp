@@ -1,4 +1,6 @@
+using System;
 using MusicSharp.AudioPlayer;
+using MusicSharp.Enums;
 using Terminal.Gui;
 
 namespace MusicSharp.UI;
@@ -6,6 +8,10 @@ namespace MusicSharp.UI;
 public class Tui : Toplevel
 {
     private readonly IPlayer _player;
+    private ProgressBar _progressBar;
+    private object? _mainLoopTimeout;
+    private readonly uint _mainLoopTimeoutTick = 100; // ms
+    private Window? _nowPlayingWindow;
 
     public Tui(IPlayer player)
     {
@@ -164,20 +170,48 @@ public class Tui : Toplevel
         playbackControls.Add (playPauseButton, stopButton, volumeIncreaseButton, volumeDecreaseButton, seekForwardButton, seekBackwardButton);
         
         #endregion
-
-        var progressBar = new ProgressBar()
+        
+        #region PlaybackInfo
+        
+        var playbackInfo = new Window()
         {
             X = Pos.Right(playbackControls),
             Y = Pos.Bottom(libraryWindow),
-            Width = Dim.Auto(),
+            Width = Dim.Fill(),
             Height = Dim.Auto(),
-            CanFocus = false,
-            BorderStyle = LineStyle.Rounded,
+            CanFocus = true,
+            BorderStyle = LineStyle.Rounded
         };
         
+        _nowPlayingWindow = new Window
+        {
+            Title = "Status",
+            X = 0,
+            Y = 0,
+            Width = Dim.Fill(),
+            Height = 4,
+            BorderStyle = LineStyle.Rounded,
+        };
+
+        _progressBar = new ProgressBar()
+        {
+            X = 0,
+            Y = Pos.Bottom(_nowPlayingWindow),
+            Width = Dim.Fill(),
+            Height = 3,
+            CanFocus = false,
+            BorderStyle = LineStyle.Rounded,
+            Fraction = 0f,
+            ColorScheme = Colors.ColorSchemes ["Error"]
+        };
+        
+        playbackInfo.Add (_progressBar, _nowPlayingWindow);
+        
         // Add the views to the main window
-        Add(menuBar, libraryWindow, playbackControls, progressBar);
+        Add(menuBar, libraryWindow, playbackControls, playbackInfo);
     }
+    
+    #endregion
     
     // Action Methods
     private void OpenFile()
@@ -194,6 +228,8 @@ public class Tui : Toplevel
         if (!d.Canceled)
         {
             _player.Play(d.FilePaths[0]);
+            UpdateProgressBar();
+            NowPlaying("Test Track");
         }
     }
     
@@ -251,6 +287,33 @@ public class Tui : Toplevel
 
     private void UpdateProgressBar()
     {
-        
+        _mainLoopTimeout = Application.AddTimeout (
+            TimeSpan.FromMilliseconds (_mainLoopTimeoutTick),
+            () =>
+            {
+                while (_player.CurrentTime < _player.TrackLength && _player.PlayerState != EPlayerStatus.Stopped)
+                {
+                    _progressBar.Fraction = _player.CurrentTime / _player.TrackLength;
+                  //  TimePlayedLabel();
+
+                    return true;
+                }
+
+                return true;
+            }
+        );
+    }
+    
+    private void NowPlaying(string trackName)
+    {
+        var nowPlayingLabel = new Label
+        {
+            Text = trackName,
+            X = 0,
+            Y = 0,
+            Width = Dim.Fill(),
+        };
+
+        _nowPlayingWindow?.Add(nowPlayingLabel);
     }
 }

@@ -56,6 +56,19 @@ public class Tui : Toplevel
             CanFocus = true,
             BorderStyle = LineStyle.Rounded
         };
+        
+        _progressBar = new ProgressBar()
+        {
+            Title = "Progress",
+            X = 0,
+            Y = Pos.Bottom(libraryWindow),
+            Width = Dim.Fill(),
+            Height = 3,
+            CanFocus = false,
+            BorderStyle = LineStyle.Rounded,
+            Fraction = 0f,
+            ColorScheme = Colors.ColorSchemes ["Error"]
+        };
 
         #region PlayBackControls
         
@@ -63,7 +76,7 @@ public class Tui : Toplevel
         {
             Title = "Playback",
             X = 0,
-            Y = Pos.Bottom(libraryWindow),
+            Y = Pos.Bottom(_progressBar),
             Width = Dim.Auto(),
             Height = Dim.Auto(),
             CanFocus = true,
@@ -173,42 +186,18 @@ public class Tui : Toplevel
         
         #region PlaybackInfo
         
-        var playbackInfo = new Window()
-        {
-            X = Pos.Right(playbackControls),
-            Y = Pos.Bottom(libraryWindow),
-            Width = Dim.Fill(),
-            Height = Dim.Auto(),
-            CanFocus = true,
-            BorderStyle = LineStyle.Rounded
-        };
-        
         _nowPlayingWindow = new Window
         {
-            Title = "Status",
-            X = 0,
-            Y = 0,
+            Title = "Now playing",
+            X = Pos.Right(playbackControls),
+            Y = Pos.Bottom(_progressBar),
             Width = Dim.Fill(),
-            Height = 4,
+            Height = Dim.Height(playbackControls),
             BorderStyle = LineStyle.Rounded,
         };
-
-        _progressBar = new ProgressBar()
-        {
-            X = 0,
-            Y = Pos.Bottom(_nowPlayingWindow),
-            Width = Dim.Fill(),
-            Height = 3,
-            CanFocus = false,
-            BorderStyle = LineStyle.Rounded,
-            Fraction = 0f,
-            ColorScheme = Colors.ColorSchemes ["Error"]
-        };
-        
-        playbackInfo.Add (_progressBar, _nowPlayingWindow);
         
         // Add the views to the main window
-        Add(menuBar, libraryWindow, playbackControls, playbackInfo);
+        Add(menuBar, libraryWindow, _progressBar, playbackControls, _nowPlayingWindow);
     }
     
     #endregion

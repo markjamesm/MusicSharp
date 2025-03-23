@@ -5,6 +5,7 @@ using MusicSharp.AudioPlayer;
 using MusicSharp.Enums;
 using MusicSharp.PlaylistHandlers;
 using Terminal.Gui;
+using Attribute = Terminal.Gui.Attribute;
 
 namespace MusicSharp.UI;
 
@@ -15,7 +16,8 @@ public class Tui : Toplevel
     private object? _mainLoopTimeout;
     private readonly uint _mainLoopTimeoutTick = 100; // ms
     private Window? _nowPlayingWindow;
-    private ObservableCollection<string> _playlistTracks = ["Testing"];
+    private ListView? _libraryListView;
+    private ObservableCollection<string> _playlistTracks = new();
 
     public Tui(IPlayer player)
     {
@@ -56,7 +58,7 @@ public class Tui : Toplevel
             ]
         };
         
-        var libraryList = new ListView
+        _libraryListView = new ListView
         {
             Title = "Library",
             X = 0,
@@ -65,15 +67,14 @@ public class Tui : Toplevel
             Height = 12,
             CanFocus = false,
             BorderStyle = LineStyle.Rounded,
+            Source = new ListWrapper<string> (_playlistTracks)
         };
-        
-        libraryList.SetSource(_playlistTracks);
         
         _progressBar = new ProgressBar()
         {
             Title = "Progress",
             X = 0,
-            Y = Pos.Bottom(libraryList),
+            Y = Pos.Bottom(_libraryListView),
             Width = Dim.Fill(),
             Height = 3,
             CanFocus = false,
@@ -209,9 +210,9 @@ public class Tui : Toplevel
         };
         
         // Add the views to the main window
-        Add(menuBar, libraryList, _progressBar, playbackControls, _nowPlayingWindow);
+        Add(menuBar, _libraryListView, _progressBar, playbackControls, _nowPlayingWindow);
     }
-    
+
     #endregion
     
     // Action Methods
@@ -342,9 +343,7 @@ public class Tui : Toplevel
                 foreach (var track in playlist)
                 {
                     _playlistTracks.Add(track);
-                }
-
-                Application.Run();
+                } 
             }
         }
     }

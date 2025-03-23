@@ -1,11 +1,9 @@
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using MusicSharp.AudioPlayer;
 using MusicSharp.Enums;
 using MusicSharp.PlaylistHandlers;
 using Terminal.Gui;
-using Attribute = Terminal.Gui.Attribute;
 
 namespace MusicSharp.UI;
 
@@ -69,6 +67,8 @@ public class Tui : Toplevel
             BorderStyle = LineStyle.Rounded,
             Source = new ListWrapper<string> (_playlistTracks)
         };
+        
+        _libraryListView.OpenSelectedItem += (sender, args) => _player.Play(args.Value.ToString()); 
         
         _progressBar = new ProgressBar()
         {

@@ -36,6 +36,11 @@ public sealed class SoundFlowPlayer : IPlayer
         {
             _player = new SoundPlayer(new StreamDataProvider(stream));
         }
+
+        if (_player.State == PlaybackState.Playing )
+        {
+            _player.Stop();
+        }
         
         _player = new SoundPlayer(new StreamDataProvider(stream));
         

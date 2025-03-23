@@ -21,7 +21,7 @@
 
   <ItemGroup>
     <PackageReference Include="SoundFlow" Version="1.0.3" />
-    <PackageReference Include="Terminal.Gui" Version="2.0.0-prealpha.1834" />
+    <PackageReference Include="Terminal.Gui" Version="2.0.0-prealpha.1895" />
     <PackageReference Include="z440.atl.core" Version="6.19.0" />
   </ItemGroup>
 

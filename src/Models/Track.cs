@@ -11,5 +11,5 @@ public class Track
     public string Genre { get; set; }
     public string DateAdded { get; set; }
     public string Plays { get; set; }
-    public string  Codec { get; set; }
+    public string Codec { get; set; }
 }

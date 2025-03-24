@@ -1,7 +1,6 @@
 using System;
 using System.Collections.ObjectModel;
 using System.Text;
-using Microsoft.Extensions.Primitives;
 using MusicSharp.AudioPlayer;
 using MusicSharp.Enums;
 using MusicSharp.PlaylistHandlers;

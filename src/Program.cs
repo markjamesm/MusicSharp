@@ -22,7 +22,6 @@ public static class Program
         IStreamConverter streamConverter = new SoundFlowPlayerStreamConverter(httpClient);
         using IPlayer player = new SoundFlowPlayer(soundEngine, streamConverter);
         
-       // ConfigurationManager.RuntimeConfig = """{ "Theme": "Dark" }""";
         Application.Init();
         using var ui = new Tui(player);
         Application.Run(ui);

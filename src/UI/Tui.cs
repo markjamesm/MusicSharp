@@ -1,5 +1,7 @@
 using System;
 using System.Collections.ObjectModel;
+using System.Text;
+using Microsoft.Extensions.Primitives;
 using MusicSharp.AudioPlayer;
 using MusicSharp.Enums;
 using MusicSharp.PlaylistHandlers;
@@ -52,7 +54,16 @@ public class Tui : Toplevel
                             RequestStop
                         )
                     }
-                )
+                ),
+                new MenuBarItem(
+                    "About",
+                    new MenuItem[]
+                    {
+                        new("About",
+                            "About MusicSharp",
+                            AboutDialog)
+                    }
+                    )
             ]
         };
         
@@ -68,7 +79,11 @@ public class Tui : Toplevel
             Source = new ListWrapper<string> (_playlistTracks)
         };
         
-        _libraryListView.OpenSelectedItem += (sender, args) => _player.Play(args.Value.ToString()); 
+        _libraryListView.OpenSelectedItem += (sender, args) =>
+        {
+            _player.Play(args.Value.ToString());
+            UpdateProgressBar();
+        }; 
         
         _progressBar = new ProgressBar()
         {
@@ -346,5 +361,56 @@ public class Tui : Toplevel
                 } 
             }
         }
+    }
+
+    private void AboutDialog()
+    {
+        var aboutDialog = new Dialog
+        {
+            X = Pos.Center(),
+            Y = Pos.Center(),
+        };
+        
+        var sb = new StringBuilder();
+        sb.Append("""
+                      __  ___           _      _____ __                   
+                     /  |/  /_  _______(_)____/ ___// /_  ____ __________ 
+                    / /|_/ / / / / ___/ / ___/\__ \/ __ \/ __ `/ ___/ __ \
+                   / /  / / /_/ (__  ) / /__ ___/ / / / / /_/ / /  / /_/ /
+                  /_/  /_/\__,_/____/_/\___//____/_/ /_/\__,_/_/  / .___/ 
+                                                                 /_/      
+                  """);
+
+        var asciiLabel = new Label
+        {
+            Text = sb.ToString(),
+            X = 0,
+            Y = 0,
+        };
+
+        var infoLabel = new Label
+        {
+            Text = "MusicSharp v2.0.0\nCreated by Mark-James M.",
+            X = Pos.Center(),
+            Y = Pos.Bottom(asciiLabel),
+            Width = Dim.Auto(),
+            Height = Dim.Auto()
+        };
+
+        var closeButton = new Button
+        {
+            Text = "Close",
+            X = Pos.Center(),
+        };
+        
+        closeButton.Accepting += (s, args) =>
+        {
+            RequestStop();
+        };
+        
+        aboutDialog.Add(asciiLabel, infoLabel);
+        aboutDialog.AddButton(closeButton);
+        
+        Application.Run(aboutDialog);
     }
 }

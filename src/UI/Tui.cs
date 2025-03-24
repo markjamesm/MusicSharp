@@ -4,6 +4,7 @@ using System.Text;
 using MusicSharp.AudioPlayer;
 using MusicSharp.Enums;
 using MusicSharp.PlaylistHandlers;
+using MusicSharp.TrackInfo;
 using Terminal.Gui;
 
 namespace MusicSharp.UI;
@@ -21,7 +22,7 @@ public class Tui : Toplevel
     public Tui(IPlayer player)
     {
         _player = player;
-        
+
         var menuBar = new MenuBar()
         {
             Title = "MusicSharp",
@@ -62,10 +63,10 @@ public class Tui : Toplevel
                             "About MusicSharp",
                             AboutDialog)
                     }
-                    )
+                )
             ]
         };
-        
+
         var statusBar = new StatusBar([
             new Shortcut
             {
@@ -86,7 +87,7 @@ public class Tui : Toplevel
                 Action = OpenPlaylist
             }
         ]);
-        
+
         _libraryListView = new ListView
         {
             Title = "Library",
@@ -96,15 +97,11 @@ public class Tui : Toplevel
             Height = 12,
             CanFocus = false,
             BorderStyle = LineStyle.Rounded,
-            Source = new ListWrapper<string> (_playlistTracks)
+            Source = new ListWrapper<string>(_playlistTracks)
         };
-        
-        _libraryListView.OpenSelectedItem += (sender, args) =>
-        {
-            _player.Play(args.Value.ToString());
-            UpdateProgressBar();
-        }; 
-        
+
+        _libraryListView.OpenSelectedItem += (sender, args) => { PlayHandler(args.Value.ToString()); };
+
         _progressBar = new ProgressBar()
         {
             Title = "Progress",
@@ -115,11 +112,11 @@ public class Tui : Toplevel
             CanFocus = false,
             BorderStyle = LineStyle.Rounded,
             Fraction = 0f,
-            ColorScheme = Colors.ColorSchemes ["Error"]
+            ColorScheme = Colors.ColorSchemes["Error"]
         };
 
         #region PlayBackControls
-        
+
         var playbackControls = new Window()
         {
             Title = "Playback",
@@ -133,58 +130,58 @@ public class Tui : Toplevel
 
         var playPauseButton = new Button
         {
-            X = 0, 
-            Y = 0, 
-            IsDefault = false, 
-            CanFocus = true, 
+            X = 0,
+            Y = 0,
+            IsDefault = false,
+            CanFocus = true,
             Text = "Play/Pause"
         };
-        
+
         var stopButton = new Button
         {
-            X = 0, 
-            Y = Pos.Bottom(playPauseButton), 
-            IsDefault = false, 
-            CanFocus = true, 
+            X = 0,
+            Y = Pos.Bottom(playPauseButton),
+            IsDefault = false,
+            CanFocus = true,
             Text = "Stop"
         };
-        
+
         var volumeIncreaseButton = new Button
         {
-            X = Pos.Right(playPauseButton), 
-            Y = 0, 
-            IsDefault = false, 
-            CanFocus = true, 
+            X = Pos.Right(playPauseButton),
+            Y = 0,
+            IsDefault = false,
+            CanFocus = true,
             Text = "Volume +"
         };
-        
+
         var volumeDecreaseButton = new Button
         {
-            X = Pos.Right(playPauseButton), 
-            Y = Pos.Bottom(volumeIncreaseButton), 
-            CanFocus = true, 
-            IsDefault = false, 
+            X = Pos.Right(playPauseButton),
+            Y = Pos.Bottom(volumeIncreaseButton),
+            CanFocus = true,
+            IsDefault = false,
             Text = "Volume -"
         };
-        
+
         var seekForwardButton = new Button
         {
-            X = Pos.Right(volumeIncreaseButton), 
-            Y = 0, 
-            IsDefault = false, 
-            CanFocus = true, 
+            X = Pos.Right(volumeIncreaseButton),
+            Y = 0,
+            IsDefault = false,
+            CanFocus = true,
             Text = "Seek 5s"
         };
-        
+
         var seekBackwardButton = new Button
         {
-            X = Pos.Right(volumeDecreaseButton), 
-            Y = Pos.Bottom(seekForwardButton), 
-            IsDefault = false, 
-            CanFocus = true, 
+            X = Pos.Right(volumeDecreaseButton),
+            Y = Pos.Bottom(seekForwardButton),
+            IsDefault = false,
+            CanFocus = true,
             Text = "Seek -5s"
         };
-        
+
         playPauseButton.Accepting += (s, args) =>
         {
             if (_player.IsStreamLoaded)
@@ -192,7 +189,7 @@ public class Tui : Toplevel
                 _player.PlayPause();
             }
         };
-        stopButton.Accepting += (s, args)  =>
+        stopButton.Accepting += (s, args) =>
         {
             if (_player.IsStreamLoaded)
             {
@@ -205,7 +202,7 @@ public class Tui : Toplevel
             {
                 _player.IncreaseVolume();
             }
-        }; 
+        };
         volumeDecreaseButton.Accepting += (s, args) =>
         {
             if (_player.IsStreamLoaded)
@@ -227,13 +224,14 @@ public class Tui : Toplevel
                 _player.SeekBackward();
             }
         };
-        
-        playbackControls.Add (playPauseButton, stopButton, volumeIncreaseButton, volumeDecreaseButton, seekForwardButton, seekBackwardButton);
-        
+
+        playbackControls.Add(playPauseButton, stopButton, volumeIncreaseButton, volumeDecreaseButton, seekForwardButton,
+            seekBackwardButton);
+
         #endregion
-        
+
         #region PlaybackInfo
-        
+
         _nowPlayingWindow = new Window
         {
             Title = "Now playing",
@@ -243,14 +241,22 @@ public class Tui : Toplevel
             Height = Dim.Height(playbackControls),
             BorderStyle = LineStyle.Rounded,
         };
-        
+
         // Add the views to the main window
         Add(menuBar, _libraryListView, _progressBar, playbackControls, _nowPlayingWindow, statusBar);
     }
 
     #endregion
-    
-    // Action Methods
+
+    #region ActionMethods
+
+    private void PlayHandler(string filePath)
+    {
+        _player.Play(filePath);
+        UpdateProgressBar();
+        NowPlaying(TrackHelpers.GetTrackAndArtistName(filePath));
+    }
+
     private void OpenFile()
     {
         var d = new OpenDialog()
@@ -259,17 +265,17 @@ public class Tui : Toplevel
             Title = "Open an audio file",
             AllowedTypes = [new AllowedType("Allowed filetypes", ".mp3")]
         };
-        
+
         Application.Run(d);
 
         if (!d.Canceled)
         {
             _player.Play(d.FilePaths[0]);
             UpdateProgressBar();
-            NowPlaying("Test Track");
+            NowPlaying(TrackHelpers.GetTrackAndArtistName(d.FilePaths[0]));
         }
     }
-    
+
     private void OpenStream()
     {
         var streamDialog = new Dialog
@@ -307,31 +313,25 @@ public class Tui : Toplevel
             Y = Pos.Bottom(streamUrl)
         };
 
-        loadStreamButton.Accepting += (s, args) =>
-        {
-            _player.Play(streamUrl.Text);
-        };
+        loadStreamButton.Accepting += (s, args) => { _player.Play(streamUrl.Text); };
 
-        cancelButton.Accepting += (s, args) =>
-        {
-            RequestStop();
-        };
-        
+        cancelButton.Accepting += (s, args) => { RequestStop(); };
+
         streamDialog.Add(uriLabel, streamUrl, loadStreamButton, cancelButton);
-        
+
         Application.Run(streamDialog);
     }
 
     private void UpdateProgressBar()
     {
-        _mainLoopTimeout = Application.AddTimeout (
-            TimeSpan.FromMilliseconds (_mainLoopTimeoutTick),
+        _mainLoopTimeout = Application.AddTimeout(
+            TimeSpan.FromMilliseconds(_mainLoopTimeoutTick),
             () =>
             {
                 while (_player.CurrentTime < _player.TrackLength && _player.PlayerState != EPlayerStatus.Stopped)
                 {
                     _progressBar.Fraction = _player.CurrentTime / _player.TrackLength;
-                  //  TimePlayedLabel();
+                    //  TimePlayedLabel();
 
                     return true;
                 }
@@ -340,7 +340,7 @@ public class Tui : Toplevel
             }
         );
     }
-    
+
     private void NowPlaying(string trackName)
     {
         var nowPlayingLabel = new Label
@@ -362,13 +362,13 @@ public class Tui : Toplevel
             Title = "Open a playlist",
             AllowedTypes = [new AllowedType("Allowed filetypes", ".m3u")]
         };
-        
+
         Application.Run(d);
 
         if (!d.Canceled)
-        {  
+        {
             var playlist = PlaylistLoader.LoadPlaylist(d.FilePaths[0]);
-            
+
             if (playlist == null)
             {
                 Application.RequestStop();
@@ -378,7 +378,7 @@ public class Tui : Toplevel
                 foreach (var track in playlist)
                 {
                     _playlistTracks.Add(track);
-                } 
+                }
             }
         }
     }
@@ -390,7 +390,7 @@ public class Tui : Toplevel
             X = Pos.Center(),
             Y = Pos.Center(),
         };
-        
+
         var sb = new StringBuilder();
         sb.Append("""
                       __  ___           _      _____ __                   
@@ -422,15 +422,14 @@ public class Tui : Toplevel
             Text = "Close",
             X = Pos.Center(),
         };
-        
-        closeButton.Accepting += (s, args) =>
-        {
-            RequestStop();
-        };
-        
+
+        closeButton.Accepting += (s, args) => { RequestStop(); };
+
         aboutDialog.Add(asciiLabel, infoLabel);
         aboutDialog.AddButton(closeButton);
-        
+
         Application.Run(aboutDialog);
     }
+
+    #endregion
 }

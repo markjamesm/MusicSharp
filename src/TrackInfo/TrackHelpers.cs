@@ -8,7 +8,7 @@ public static class TrackHelpers
     {
         var trackData = new Track(filePath);
 
-        if (trackData.Title == null)
+        if (trackData.Title == string.Empty)
         {
             return "Unknown - Unknown";
         }

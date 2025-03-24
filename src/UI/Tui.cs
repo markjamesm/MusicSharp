@@ -66,6 +66,27 @@ public class Tui : Toplevel
             ]
         };
         
+        var statusBar = new StatusBar([
+            new Shortcut
+            {
+                Text = "Open file",
+                Key = Key.F1,
+                Action = OpenFile
+            },
+            new Shortcut
+            {
+                Text = "Open stream",
+                Key = Key.F2,
+                Action = OpenStream
+            },
+            new Shortcut
+            {
+                Text = "Open playlist",
+                Key = Key.F3,
+                Action = OpenPlaylist
+            }
+        ]);
+        
         _libraryListView = new ListView
         {
             Title = "Library",
@@ -224,7 +245,7 @@ public class Tui : Toplevel
         };
         
         // Add the views to the main window
-        Add(menuBar, _libraryListView, _progressBar, playbackControls, _nowPlayingWindow);
+        Add(menuBar, _libraryListView, _progressBar, playbackControls, _nowPlayingWindow, statusBar);
     }
 
     #endregion

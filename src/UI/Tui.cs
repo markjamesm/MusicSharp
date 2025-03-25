@@ -16,6 +16,8 @@ public class Tui : Toplevel
     private object? _mainLoopTimeout;
     private readonly uint _mainLoopTimeoutTick = 100; // ms
     private Window? _nowPlayingWindow;
+    private Label _nowPlayingLabel;
+    private Label _timePlayedLabel;
     private ListView? _libraryListView;
     private ObservableCollection<string> _playlistTracks = new();
 
@@ -241,6 +243,25 @@ public class Tui : Toplevel
             Height = Dim.Height(playbackControls),
             BorderStyle = LineStyle.Rounded,
         };
+        
+        _nowPlayingLabel = new Label
+        {
+            Text = string.Empty,
+            X = 0,
+            Y = 0,
+            Width = Dim.Fill(),
+        };
+
+        _nowPlayingWindow?.Add(_nowPlayingLabel);
+        
+        _timePlayedLabel = new Label
+        {
+            Text = $"00:00 / 00:00",
+            X = 0,
+            Y = Pos.Bottom(_nowPlayingLabel) + 1,
+        };
+        
+        _nowPlayingWindow.Add(_nowPlayingLabel, _timePlayedLabel);
 
         // Add the views to the main window
         Add(menuBar, _libraryListView, _progressBar, playbackControls, _nowPlayingWindow, statusBar);
@@ -253,7 +274,7 @@ public class Tui : Toplevel
     private void PlayHandler(string filePath)
     {
         _player.Play(filePath);
-        UpdateProgressBar();
+        RunMainLoop();
         NowPlaying(TrackHelpers.GetTrackAndArtistName(filePath));
     }
 
@@ -271,8 +292,7 @@ public class Tui : Toplevel
         if (!d.Canceled)
         {
             _player.Play(d.FilePaths[0]);
-            UpdateProgressBar();
-            NowPlaying(TrackHelpers.GetTrackAndArtistName(d.FilePaths[0]));
+            PlayHandler(d.FilePaths[0]);
         }
     }
 
@@ -322,7 +342,7 @@ public class Tui : Toplevel
         Application.Run(streamDialog);
     }
 
-    private void UpdateProgressBar()
+    private void RunMainLoop()
     {
         _mainLoopTimeout = Application.AddTimeout(
             TimeSpan.FromMilliseconds(_mainLoopTimeoutTick),
@@ -331,7 +351,7 @@ public class Tui : Toplevel
                 while (_player.CurrentTime < _player.TrackLength && _player.PlayerState != EPlayerStatus.Stopped)
                 {
                     _progressBar.Fraction = _player.CurrentTime / _player.TrackLength;
-                    //  TimePlayedLabel();
+                    TimePlayedLabel();
 
                     return true;
                 }
@@ -343,15 +363,7 @@ public class Tui : Toplevel
 
     private void NowPlaying(string trackName)
     {
-        var nowPlayingLabel = new Label
-        {
-            Text = trackName,
-            X = 0,
-            Y = 0,
-            Width = Dim.Fill(),
-        };
-
-        _nowPlayingWindow?.Add(nowPlayingLabel);
+        _nowPlayingLabel.Text = trackName;
     }
 
     private void OpenPlaylist()
@@ -380,6 +392,32 @@ public class Tui : Toplevel
                     _playlistTracks.Add(track);
                 }
             }
+        }
+    }
+    
+    private void TimePlayedLabel()
+    {
+        if (_player.PlayerState != EPlayerStatus.Stopped)
+        {
+            if (_player.TrackLength > 3599)
+            {
+                var timePlayed = TimeSpan.FromSeconds((double)new decimal(_player.CurrentTime)).ToString(@"hh\:mm\:ss");
+                var trackLength = TimeSpan.FromSeconds((double)new decimal(_player.TrackLength)).ToString(@"hh\:mm\:ss");
+                
+                _timePlayedLabel.Text = $"{timePlayed} / {trackLength}";
+            }
+
+            else
+            {
+                var timePlayed = TimeSpan.FromSeconds((double)new decimal(_player.CurrentTime)).ToString(@"mm\:ss");
+                var trackLength = TimeSpan.FromSeconds((double)new decimal(_player.TrackLength)).ToString(@"mm\:ss");
+                
+                _timePlayedLabel.Text = $"{timePlayed} / {trackLength}";
+            }
+        }
+        else
+        {
+            _timePlayedLabel.Text = $"00:00 / 00:00";
         }
     }
 

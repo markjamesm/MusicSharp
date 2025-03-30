@@ -1,15 +1,31 @@
+using System;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
 namespace MusicSharp.Models;
 
 public class Track
 {
-    public string Name { get; set; }
-    public string Artist  { get; set; }
-    public string Album { get; set; }
-    public string Path { get; set; }
-    public string Duration { get; set; }
-    public string Date { get; set; }
-    public string Genre { get; set; }
-    public string DateAdded { get; set; }
-    public string Plays { get; set; }
-    public string Codec { get; set; }
+    [Key]
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+    public int Id { get; set; }
+    
+    [Required, MaxLength(500)]
+    public string Title { get; set; }
+    
+    public int AlbumId { get; set; }
+    public Album Album { get; set; } = null!;
+
+    [Required]
+    public TimeOnly Duration { get; set; }
+    
+    [Required, MaxLength(1200)] 
+    public string FilePath { get; set; }
+    
+    [Required]
+    public DateTime DateAdded { get; set; } = DateTime.Now;
+
+    public int PlayCount { get; set; } = 0;
+
+    [MaxLength(500)] public string Codec { get; set; }
 }

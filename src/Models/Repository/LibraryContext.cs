@@ -1,23 +1,23 @@
 using System;
 using Microsoft.EntityFrameworkCore;
-using MusicSharp.Models;
 
-namespace MusicSharp.Library;
+namespace MusicSharp.Models.Repository;
 
 public class LibraryContext : DbContext
 {
+    public DbSet<Artist> Artists { get; set; }
+    public DbSet<Album> Albums { get; set; }
     public DbSet<Track> Tracks { get; set; }
     public string DbPath { get; }
 
     public LibraryContext()
     {
-        var folder = Environment.SpecialFolder.LocalApplicationData;
+        const Environment.SpecialFolder folder = Environment.SpecialFolder.LocalApplicationData;
         var path = Environment.GetFolderPath(folder);
         DbPath = System.IO.Path.Join(path, "musicsharp-library.db");
     }
     
-    // The following configures EF to create a Sqlite database file in the
-    // platform-specific local folder.
+    // Create the db in the OS-specific app data directory.
     protected override void OnConfiguring(DbContextOptionsBuilder options)
         => options.UseSqlite($"Data Source={DbPath}");
 }

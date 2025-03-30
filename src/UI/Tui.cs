@@ -61,9 +61,9 @@ public class Tui : Toplevel
                     "Library",
                     new MenuItem[]
                     {
-                        new("_Add to library",
-                            "Add music to library",
-                            AddToLibrary)
+                        new("_Save playlist",
+                            "Save files to playlist",
+                            AboutDialog)
                     }
                 ),
                 new MenuBarItem(
@@ -427,23 +427,6 @@ public class Tui : Toplevel
         else
         {
             _timePlayedLabel.Text = $"00:00 / 00:00";
-        }
-    }
-
-    private void AddToLibrary()
-    {
-        var d = new OpenDialog()
-        {
-            AllowsMultipleSelection = true,
-            Title = "Open an audio file",
-            AllowedTypes = [new AllowedType("Allowed filetypes", ".mp3", ".flac", ".wav")]
-        };
-
-        Application.Run(d);
-
-        if (!d.Canceled)
-        {
-            MusicLibrary.MusicLibrary.AddMusicToLibrary(d.FilePaths);
         }
     }
 

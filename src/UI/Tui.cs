@@ -293,7 +293,7 @@ public class Tui : Toplevel
         {
             AllowsMultipleSelection = false,
             Title = "Open an audio file",
-            AllowedTypes = [new AllowedType("Allowed filetypes", ".mp3")]
+            AllowedTypes = [new AllowedType("Allowed filetypes", ".mp3", ".flac", ".wav")]
         };
 
         Application.Run(d);
@@ -436,7 +436,7 @@ public class Tui : Toplevel
         {
             AllowsMultipleSelection = true,
             Title = "Open an audio file",
-            AllowedTypes = [new AllowedType("Allowed filetypes", ".mp3 .flac .wav")]
+            AllowedTypes = [new AllowedType("Allowed filetypes", ".mp3", ".flac", ".wav")]
         };
 
         Application.Run(d);

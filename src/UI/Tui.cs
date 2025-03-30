@@ -258,7 +258,7 @@ public class Tui : Toplevel
             Height = Dim.Height(playbackControls),
             BorderStyle = LineStyle.Rounded,
         };
-        
+
         _nowPlayingLabel = new Label
         {
             Text = string.Empty,
@@ -268,14 +268,14 @@ public class Tui : Toplevel
         };
 
         _nowPlayingWindow?.Add(_nowPlayingLabel);
-        
+
         _timePlayedLabel = new Label
         {
             Text = $"00:00 / 00:00",
             X = 0,
             Y = Pos.Bottom(_nowPlayingLabel) + 1,
         };
-        
+
         _nowPlayingWindow.Add(_nowPlayingLabel, _timePlayedLabel);
 
         // Add the views to the main window
@@ -402,7 +402,7 @@ public class Tui : Toplevel
             }
         }
     }
-    
+
     private void SavePlaylist()
     {
         var d = new SaveDialog
@@ -413,14 +413,14 @@ public class Tui : Toplevel
         };
 
         Application.Run(d);
-        
+
         if (!d.Canceled)
         {
-            var currentTracks =  _playlistTracks.ToList();
+            var currentTracks = _playlistTracks.ToList();
             Playlist.SavePlaylistToFile(d.FileName, currentTracks);
         }
     }
-    
+
     private void TimePlayedLabel()
     {
         if (_player.PlayerState != EPlayerStatus.Stopped)
@@ -428,8 +428,9 @@ public class Tui : Toplevel
             if (_player.TrackLength > 3599)
             {
                 var timePlayed = TimeSpan.FromSeconds((double)new decimal(_player.CurrentTime)).ToString(@"hh\:mm\:ss");
-                var trackLength = TimeSpan.FromSeconds((double)new decimal(_player.TrackLength)).ToString(@"hh\:mm\:ss");
-                
+                var trackLength = TimeSpan.FromSeconds((double)new decimal(_player.TrackLength))
+                    .ToString(@"hh\:mm\:ss");
+
                 _timePlayedLabel.Text = $"{timePlayed} / {trackLength}";
             }
 
@@ -437,7 +438,7 @@ public class Tui : Toplevel
             {
                 var timePlayed = TimeSpan.FromSeconds((double)new decimal(_player.CurrentTime)).ToString(@"mm\:ss");
                 var trackLength = TimeSpan.FromSeconds((double)new decimal(_player.TrackLength)).ToString(@"mm\:ss");
-                
+
                 _timePlayedLabel.Text = $"{timePlayed} / {trackLength}";
             }
         }

@@ -1,10 +1,9 @@
 using System;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Text;
 using MusicSharp.AudioPlayer;
 using MusicSharp.Enums;
-using MusicSharp.PlaylistHandlers;
-using MusicSharp.Mappers;
 using Terminal.Gui;
 
 namespace MusicSharp.UI;
@@ -19,7 +18,7 @@ public class Tui : Toplevel
     private Label _nowPlayingLabel;
     private Label _timePlayedLabel;
     private ListView? _libraryListView;
-    private ObservableCollection<string> _playlistTracks = new();
+    private ObservableCollection<string> _playlistTracks = [];
 
     public Tui(IPlayer player)
     {
@@ -37,17 +36,12 @@ public class Tui : Toplevel
                     {
                         new(
                             "_Open file",
-                            "Open a local audio file",
+                            "Open audio file",
                             OpenFile
                         ),
                         new(
-                            "Open _playlist",
-                            "Open a playlist",
-                            OpenPlaylist
-                        ),
-                        new(
                             "Open _stream",
-                            "Open a web stream",
+                            "Open web stream",
                             OpenStream
                         ),
                         new(
@@ -58,19 +52,25 @@ public class Tui : Toplevel
                     }
                 ),
                 new MenuBarItem(
-                    "Library",
+                    "Playlist",
                     new MenuItem[]
                     {
+                        new(
+                            "Open _playlist",
+                            "Open a playlist",
+                            OpenPlaylist
+                        ),
                         new("_Save playlist",
                             "Save files to playlist",
-                            AboutDialog)
+                            SavePlaylist
+                        )
                     }
                 ),
                 new MenuBarItem(
                     "About",
                     new MenuItem[]
                     {
-                        new("About",
+                        new("_About",
                             "About MusicSharp",
                             AboutDialog)
                     }
@@ -79,6 +79,12 @@ public class Tui : Toplevel
         };
 
         var statusBar = new StatusBar([
+            new Shortcut
+            {
+                Text = "Quit",
+                Key = Key.Esc,
+                Action = RequestStop
+            },
             new Shortcut
             {
                 Text = "Open file",
@@ -284,7 +290,7 @@ public class Tui : Toplevel
     {
         _player.Play(filePath);
         RunMainLoop();
-        NowPlaying(Mappers.Mappers.GetTrackAndArtistName(filePath));
+        NowPlaying(FileData.TrackData.GetTrackAndArtistName(filePath));
     }
 
     private void OpenFile()
@@ -388,19 +394,30 @@ public class Tui : Toplevel
 
         if (!d.Canceled)
         {
-            var playlist = PlaylistLoader.LoadPlaylist(d.FilePaths[0]);
+            var playlist = Playlist.LoadPlaylist(d.FilePaths[0]);
 
-            if (playlist == null)
+            foreach (var track in playlist)
             {
-                Application.RequestStop();
+                _playlistTracks.Add(track);
             }
-            else
-            {
-                foreach (var track in playlist)
-                {
-                    _playlistTracks.Add(track);
-                }
-            }
+        }
+    }
+    
+    private void SavePlaylist()
+    {
+        var d = new SaveDialog
+        {
+            AllowsMultipleSelection = false,
+            AllowedTypes = [new AllowedType("Allowed filetypes", ".m3u")],
+            Title = "Save playlist in M3U format"
+        };
+
+        Application.Run(d);
+        
+        if (!d.Canceled)
+        {
+            var currentTracks =  _playlistTracks.ToList();
+            Playlist.SavePlaylistToFile(d.FileName, currentTracks);
         }
     }
     

@@ -1,8 +1,8 @@
 using ATL;
 
-namespace MusicSharp.Mappers;
+namespace MusicSharp.FileData;
 
-public static class Mappers
+public static class TrackData
 {
     public static Track GetTrackData(string filePath)
     {

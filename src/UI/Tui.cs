@@ -4,7 +4,7 @@ using System.Text;
 using MusicSharp.AudioPlayer;
 using MusicSharp.Enums;
 using MusicSharp.PlaylistHandlers;
-using MusicSharp.TrackInfo;
+using MusicSharp.Mappers;
 using Terminal.Gui;
 
 namespace MusicSharp.UI;
@@ -55,6 +55,15 @@ public class Tui : Toplevel
                             "Quit MusicSharp",
                             RequestStop
                         )
+                    }
+                ),
+                new MenuBarItem(
+                    "Library",
+                    new MenuItem[]
+                    {
+                        new("_Add to library",
+                            "Add music to library",
+                            AddToLibrary)
                     }
                 ),
                 new MenuBarItem(
@@ -275,7 +284,7 @@ public class Tui : Toplevel
     {
         _player.Play(filePath);
         RunMainLoop();
-        NowPlaying(TrackHelpers.GetTrackAndArtistName(filePath));
+        NowPlaying(Mappers.Mappers.GetTrackAndArtistName(filePath));
     }
 
     private void OpenFile()
@@ -418,6 +427,23 @@ public class Tui : Toplevel
         else
         {
             _timePlayedLabel.Text = $"00:00 / 00:00";
+        }
+    }
+
+    private void AddToLibrary()
+    {
+        var d = new OpenDialog()
+        {
+            AllowsMultipleSelection = true,
+            Title = "Open an audio file",
+            AllowedTypes = [new AllowedType("Allowed filetypes", ".mp3 .flac .wav")]
+        };
+
+        Application.Run(d);
+
+        if (!d.Canceled)
+        {
+            MusicLibrary.MusicLibrary.AddMusicToLibrary(d.FilePaths);
         }
     }
 

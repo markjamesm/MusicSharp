@@ -1,9 +1,15 @@
 using ATL;
 
-namespace MusicSharp.TrackInfo;
+namespace MusicSharp.Mappers;
 
-public static class TrackHelpers
+public static class Mappers
 {
+    public static Track GetTrackData(string filePath)
+    {
+        var track = new Track(filePath);
+        return track;
+    }
+    
     public static string GetTrackAndArtistName(string filePath)
     {
         var trackData = new Track(filePath);

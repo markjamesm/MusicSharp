@@ -15,14 +15,15 @@ namespace MusicSharp.UI;
 public class Tui : Toplevel
 {
     private readonly IPlayer _player;
-    private ProgressBar _progressBar;
+    private readonly ProgressBar _progressBar;
     private object? _mainLoopTimeout;
-    private readonly uint _mainLoopTimeoutTick = 100; // ms
-    private Window? _nowPlayingWindow;
-    private Label _nowPlayingLabel;
-    private Label _timePlayedLabel;
-    private ListView? _libraryListView;
-    private ObservableCollection<string> _playlistTracks = [];
+    private readonly Window? _nowPlayingWindow;
+    private readonly Label _nowPlayingLabel;
+    private readonly Label _timePlayedLabel;
+    private readonly ListView? _libraryListView;
+    private readonly ObservableCollection<string> _playlistTracks = [];
+    
+    private const uint MainLoopTimeoutTick = 100; // ms
 
     public Tui(IPlayer player)
     {
@@ -383,7 +384,7 @@ public class Tui : Toplevel
     private void RunMainLoop()
     {
         _mainLoopTimeout = Application.AddTimeout(
-            TimeSpan.FromMilliseconds(_mainLoopTimeoutTick),
+            TimeSpan.FromMilliseconds(MainLoopTimeoutTick),
             () =>
             {
                 while (_player.CurrentTime < _player.TrackLength && _player.PlayerState != EPlayerStatus.Stopped)

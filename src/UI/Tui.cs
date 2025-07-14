@@ -202,47 +202,59 @@ public class Tui : Toplevel
             Text = "Seek -5s"
         };
 
-        playPauseButton.Accepting += (s, args) =>
+        playPauseButton.Accepting += (s, e) =>
         {
             if (_player.IsStreamLoaded)
             {
                 _player.PlayPause();
             }
+            
+            e.Handled = true;
         };
-        stopButton.Accepting += (s, args) =>
+        stopButton.Accepting += (s, e) =>
         {
             if (_player.IsStreamLoaded)
             {
                 _player.Stop();
             }
+            
+            e.Handled = true;
         };
-        volumeIncreaseButton.Accepting += (s, args) =>
+        volumeIncreaseButton.Accepting += (s, e) =>
         {
             if (_player.IsStreamLoaded)
             {
                 _player.IncreaseVolume();
             }
+            
+            e.Handled = true;
         };
-        volumeDecreaseButton.Accepting += (s, args) =>
+        volumeDecreaseButton.Accepting += (s, e) =>
         {
             if (_player.IsStreamLoaded)
             {
                 _player.DecreaseVolume();
             }
+            
+            e.Handled = true;
         };
-        seekForwardButton.Accepting += (s, args) =>
+        seekForwardButton.Accepting += (s, e) =>
         {
             if (_player.IsStreamLoaded)
             {
                 _player.SeekForward();
             }
+            
+            e.Handled = true;
         };
-        seekBackwardButton.Accepting += (s, a) =>
+        seekBackwardButton.Accepting += (s, e) =>
         {
             if (_player.IsStreamLoaded)
             {
                 _player.SeekBackward();
             }
+            
+            e.Handled = true;
         };
 
         playbackControls.Add(playPauseButton, stopButton, volumeIncreaseButton, volumeDecreaseButton, seekForwardButton,
@@ -351,9 +363,17 @@ public class Tui : Toplevel
             Y = Pos.Bottom(streamUrl)
         };
 
-        loadStreamButton.Accepting += (s, args) => { _player.Play(streamUrl.Text); };
+        loadStreamButton.Accepting += (s, e) =>
+        {
+            _player.Play(streamUrl.Text); 
+            e.Handled = true;
+        };
 
-        cancelButton.Accepting += (s, args) => { RequestStop(); };
+        cancelButton.Accepting += (s, e) =>
+        {
+            RequestStop();
+            e.Handled = true;
+        };
 
         streamDialog.Add(uriLabel, streamUrl, loadStreamButton, cancelButton);
 
@@ -491,7 +511,11 @@ public class Tui : Toplevel
             X = Pos.Center(),
         };
 
-        closeButton.Accepting += (s, args) => { RequestStop(); };
+        closeButton.Accepting += (s, e) =>
+        {
+            RequestStop();
+            e.Handled = true;
+        };
 
         aboutDialog.Add(asciiLabel, infoLabel);
         aboutDialog.AddButton(closeButton);

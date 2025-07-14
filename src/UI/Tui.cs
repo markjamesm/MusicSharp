@@ -4,7 +4,11 @@ using System.Linq;
 using System.Text;
 using MusicSharp.AudioPlayer;
 using MusicSharp.Enums;
-using Terminal.Gui;
+using Terminal.Gui.App;
+using Terminal.Gui.Drawing;
+using Terminal.Gui.Input;
+using Terminal.Gui.ViewBase;
+using Terminal.Gui.Views;
 
 namespace MusicSharp.UI;
 
@@ -129,7 +133,6 @@ public class Tui : Toplevel
             CanFocus = false,
             BorderStyle = LineStyle.Rounded,
             Fraction = 0f,
-            ColorScheme = Colors.ColorSchemes["Error"]
         };
 
         #region PlayBackControls

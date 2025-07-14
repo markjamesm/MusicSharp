@@ -3,7 +3,7 @@ using MusicSharp.UI;
 using MusicSharp.AudioPlayer;
 using SoundFlow.Backends.MiniAudio;
 using SoundFlow.Enums;
-using Terminal.Gui;
+using Terminal.Gui.App;
 
 namespace MusicSharp;
 

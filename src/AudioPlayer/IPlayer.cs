@@ -10,7 +10,7 @@ namespace MusicSharp.AudioPlayer;
 public interface IPlayer: IDisposable
 {
     /// <summary>
-    /// Gets or sets a value indicating whether the audio player is playing.
+    /// Gets a value indicating whether the audio player is playing.
     /// </summary>
     EPlayerStatus PlayerState { get; }
     
@@ -29,6 +29,9 @@ public interface IPlayer: IDisposable
     /// </summary>
     string LastFileOpened { get; set; }
     
+    /// <summary>
+    /// Indicates whether an audio stream is loaded.
+    /// </summary>
     bool IsStreamLoaded { get; }
 
     /// <summary>

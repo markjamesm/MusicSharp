@@ -1,6 +1,5 @@
 ﻿using System;
-using System.IO;
-using MusicSharp.Enums;
+using SoundFlow.Enums;
 
 namespace MusicSharp.AudioPlayer;
 
@@ -12,7 +11,7 @@ public interface IPlayer: IDisposable
     /// <summary>
     /// Gets a value indicating whether the audio player is playing.
     /// </summary>
-    EPlayerStatus PlayerState { get; }
+    PlaybackState State { get; }
     
     /// <summary>
     /// Returns the total length of the audio file.

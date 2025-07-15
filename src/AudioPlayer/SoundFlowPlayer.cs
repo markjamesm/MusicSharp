@@ -1,5 +1,4 @@
 using System;
-using MusicSharp.Enums;
 using SoundFlow.Backends.MiniAudio;
 using SoundFlow.Components;
 using SoundFlow.Enums;
@@ -15,7 +14,9 @@ public sealed class SoundFlowPlayer : IPlayer
     private SoundPlayer? _player;
     private readonly IStreamConverter _streamConverter;
 
-    public EPlayerStatus PlayerState => GetPlayerStateMapper();
+    // If we don't know the state of the player, default to stopped?
+    public PlaybackState State => _player?.State ?? PlaybackState.Stopped;
+    
     public string LastFileOpened { get; set; }
     public float TrackLength => _player?.Duration ?? 0;
     public float CurrentTime => _player?.Time ?? 0;
@@ -27,11 +28,12 @@ public sealed class SoundFlowPlayer : IPlayer
         _soundEngine = soundEngine;
         _streamConverter = streamConverter;
     }
-
+    
     public void Play(string path)
     {
         var stream = _streamConverter.ConvertFileToStream(path);
         
+        // Test if this check is really necessary
         if (_player == null)
         {
             _player = new SoundPlayer(new StreamDataProvider(stream));
@@ -50,13 +52,13 @@ public sealed class SoundFlowPlayer : IPlayer
 
     public void PlayPause()
     {
-        switch (PlayerState)
+        switch (_player?.State)
         {
-            case EPlayerStatus.Playing:
+            case PlaybackState.Playing:
                 _player?.Pause();
                 break;
-            case EPlayerStatus.Paused:
-            case EPlayerStatus.Stopped:
+            case PlaybackState.Paused:
+            case PlaybackState.Stopped:
                 _player?.Play();
                 break;
             default:
@@ -66,7 +68,7 @@ public sealed class SoundFlowPlayer : IPlayer
 
     public void Stop()
     {
-        if (PlayerState != EPlayerStatus.Stopped)
+        if (State != PlaybackState.Stopped)
         {
             _player?.Stop();
         }
@@ -97,16 +99,5 @@ public sealed class SoundFlowPlayer : IPlayer
     public void Dispose()
     {
         _soundEngine.Dispose();
-    }
-
-    private EPlayerStatus GetPlayerStateMapper()
-    {
-        return _player?.State switch
-        {
-            PlaybackState.Playing => EPlayerStatus.Playing,
-            PlaybackState.Paused => EPlayerStatus.Paused,
-            PlaybackState.Stopped => EPlayerStatus.Stopped,
-            _ => throw new ArgumentOutOfRangeException()
-        };
     }
 }

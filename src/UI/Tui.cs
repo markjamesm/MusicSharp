@@ -3,7 +3,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using MusicSharp.AudioPlayer;
-using MusicSharp.Enums;
+using SoundFlow.Enums;
 using Terminal.Gui.App;
 using Terminal.Gui.Drawing;
 using Terminal.Gui.Input;
@@ -386,7 +386,7 @@ public class Tui : Toplevel
             TimeSpan.FromMilliseconds(MainLoopTimeoutTick),
             () =>
             {
-                while (_player.CurrentTime < _player.TrackLength && _player.PlayerState != EPlayerStatus.Stopped)
+                while (_player.CurrentTime < _player.TrackLength && _player.State != PlaybackState.Stopped)
                 {
                     _progressBar.Fraction = _player.CurrentTime / _player.TrackLength;
                     TimePlayedLabel();
@@ -446,7 +446,7 @@ public class Tui : Toplevel
 
     private void TimePlayedLabel()
     {
-        if (_player.PlayerState != EPlayerStatus.Stopped)
+        if (_player.State != PlaybackState.Stopped)
         {
             if (_player.TrackLength > 3599)
             {
@@ -492,7 +492,7 @@ public class Tui : Toplevel
         var asciiLabel = new Label
         {
             Text = sb.ToString(),
-            X = 0,
+            X = Pos.Center(),
             Y = 0,
         };
 

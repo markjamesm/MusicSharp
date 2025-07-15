@@ -17,7 +17,6 @@ public class Tui : Toplevel
     private readonly IPlayer _player;
     private readonly ProgressBar _progressBar;
     private object? _mainLoopTimeout;
-    private readonly Window? _nowPlayingWindow;
     private readonly Label _nowPlayingLabel;
     private readonly Label _timePlayedLabel;
     private readonly ListView? _libraryListView;
@@ -138,7 +137,7 @@ public class Tui : Toplevel
 
         #region PlayBackControls
 
-        var playbackControls = new Window()
+        var playbackControls = new View()
         {
             Title = "Playback",
             X = 0,
@@ -265,7 +264,7 @@ public class Tui : Toplevel
 
         #region PlaybackInfo
 
-        _nowPlayingWindow = new Window
+        var nowPlayingView = new View
         {
             Title = "Now playing",
             X = Pos.Right(playbackControls),
@@ -283,7 +282,7 @@ public class Tui : Toplevel
             Width = Dim.Fill(),
         };
 
-        _nowPlayingWindow?.Add(_nowPlayingLabel);
+        nowPlayingView?.Add(_nowPlayingLabel);
 
         _timePlayedLabel = new Label
         {
@@ -292,10 +291,10 @@ public class Tui : Toplevel
             Y = Pos.Bottom(_nowPlayingLabel) + 1,
         };
 
-        _nowPlayingWindow.Add(_nowPlayingLabel, _timePlayedLabel);
+        nowPlayingView?.Add(_nowPlayingLabel, _timePlayedLabel);
 
         // Add the views to the main window
-        Add(menuBar, _libraryListView, _progressBar, playbackControls, _nowPlayingWindow, statusBar);
+        Add(menuBar, _libraryListView, _progressBar, playbackControls, nowPlayingView, statusBar);
     }
 
     #endregion

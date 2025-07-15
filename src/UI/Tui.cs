@@ -19,7 +19,7 @@ public class Tui : Toplevel
     private readonly Label _nowPlayingLabel;
     private readonly Label _timePlayedLabel;
     private readonly ListView? _libraryListView;
-    private readonly ObservableCollection<string> _playlistTracks = [];
+    private readonly ObservableCollection<string> _musicLibrary = [];
     private object? _mainLoopTimeout;
     
     private const uint MainLoopTimeoutTick = 100; // ms
@@ -97,7 +97,7 @@ public class Tui : Toplevel
             Height = 12,
             CanFocus = false,
             BorderStyle = LineStyle.Rounded,
-            Source = new ListWrapper<string>(_playlistTracks)
+            Source = new ListWrapper<string>(_musicLibrary)
         };
 
         _libraryListView.OpenSelectedItem += (sender, args) =>
@@ -410,7 +410,7 @@ public class Tui : Toplevel
 
             foreach (var track in playlist)
             {
-                _playlistTracks.Add(track);
+                _musicLibrary.Add(track);
             }
         }
     }
@@ -428,7 +428,7 @@ public class Tui : Toplevel
 
         if (!d.Canceled)
         {
-            var currentTracks = _playlistTracks.ToList();
+            var currentTracks = _musicLibrary.ToList();
             Playlist.SavePlaylistToFile(d.FileName, currentTracks);
         }
     }

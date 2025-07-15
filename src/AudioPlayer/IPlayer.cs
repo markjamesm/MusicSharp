@@ -22,11 +22,6 @@ public interface IPlayer: IDisposable
     /// Returns the current time played.
     /// </summary>
     float CurrentTime { get; }
-
-    /// <summary>
-    /// Gets or sets the last file opened by the player.
-    /// </summary>
-    string LastFileOpened { get; set; }
     
     /// <summary>
     /// Indicates whether an audio stream is loaded.

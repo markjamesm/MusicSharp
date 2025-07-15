@@ -16,8 +16,6 @@ public sealed class SoundFlowPlayer : IPlayer
 
     // If we don't know the state of the player, default to stopped?
     public PlaybackState State => _player?.State ?? PlaybackState.Stopped;
-    
-    public string LastFileOpened { get; set; }
     public float TrackLength => _player?.Duration ?? 0;
     public float CurrentTime => _player?.Time ?? 0;
     public bool IsStreamLoaded => _player != null;

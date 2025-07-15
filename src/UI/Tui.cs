@@ -52,11 +52,11 @@ public class Tui : Toplevel
                                         }
                     ),
                     new MenuBarItemv2(
-                        Title = "About",
-                        new MenuItemv2[]
-                        {
-                            new("_About", "About MusicSharp", AboutDialog)
-                        }
+                                        Title = "About", 
+                                        new MenuItemv2[]
+                                        {
+                                            new("_About", "About MusicSharp", AboutDialog)
+                                        }
                     ),
                 ]
         };

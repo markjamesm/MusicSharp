@@ -18,8 +18,8 @@ public class Tui : Toplevel
     private readonly ProgressBar _progressBar;
     private readonly Label _nowPlayingLabel;
     private readonly Label _timePlayedLabel;
-    private readonly ListView? _libraryListView;
-    private readonly ObservableCollection<string> _musicLibrary = [];
+    private readonly ListView? _playlistView;
+    private readonly ObservableCollection<string> _loadedPlaylist = [];
     private object? _mainLoopTimeout;
     
     private const uint MainLoopTimeoutTick = 100; // ms
@@ -88,19 +88,19 @@ public class Tui : Toplevel
             }
         ]);
 
-        _libraryListView = new ListView
+        _playlistView = new ListView
         {
-            Title = "Library",
+            Title = "Playlist",
             X = 0,
             Y = Pos.Bottom(menuBar),
             Width = Dim.Fill(),
             Height = 12,
             CanFocus = false,
             BorderStyle = LineStyle.Rounded,
-            Source = new ListWrapper<string>(_musicLibrary)
+            Source = new ListWrapper<string>(_loadedPlaylist)
         };
 
-        _libraryListView.OpenSelectedItem += (sender, args) =>
+        _playlistView.OpenSelectedItem += (sender, args) =>
         {
             if (args.Value != null)
             {
@@ -112,7 +112,7 @@ public class Tui : Toplevel
         {
             Title = "Progress",
             X = 0,
-            Y = Pos.Bottom(_libraryListView),
+            Y = Pos.Bottom(_playlistView),
             Width = Dim.Fill(),
             Height = 3,
             CanFocus = false,
@@ -279,7 +279,7 @@ public class Tui : Toplevel
         nowPlayingView?.Add(_nowPlayingLabel, _timePlayedLabel);
 
         // Add the views to the main window
-        Add(menuBar, _libraryListView, _progressBar, playbackControls, nowPlayingView, statusBar);
+        Add(menuBar, _playlistView, _progressBar, playbackControls, nowPlayingView, statusBar);
     }
 
     #endregion
@@ -410,7 +410,7 @@ public class Tui : Toplevel
 
             foreach (var track in playlist)
             {
-                _musicLibrary.Add(track);
+                _loadedPlaylist.Add(track);
             }
         }
     }
@@ -428,7 +428,7 @@ public class Tui : Toplevel
 
         if (!d.Canceled)
         {
-            var currentTracks = _musicLibrary.ToList();
+            var currentTracks = _loadedPlaylist.ToList();
             Playlist.SavePlaylistToFile(d.FileName, currentTracks);
         }
     }

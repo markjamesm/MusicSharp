@@ -350,7 +350,11 @@ public class Tui : Toplevel
 
         loadStreamButton.Accepting += (s, e) =>
         {
-            _player.Play(streamUrl.Text); 
+            if (streamUrl.Text != string.Empty)
+            {
+                _player.Play(streamUrl.Text); 
+            }
+            
             e.Handled = true;
         };
 

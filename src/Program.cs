@@ -4,7 +4,6 @@ using MusicSharp.AudioPlayer;
 using SoundFlow.Backends.MiniAudio;
 using SoundFlow.Enums;
 using Terminal.Gui.App;
-using Terminal.Gui.Configuration;
 
 namespace MusicSharp;
 

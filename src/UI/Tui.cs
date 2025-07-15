@@ -100,7 +100,13 @@ public class Tui : Toplevel
             Source = new ListWrapper<string>(_playlistTracks)
         };
 
-        _libraryListView.OpenSelectedItem += (sender, args) => { PlayHandler(args.Value.ToString()); };
+        _libraryListView.OpenSelectedItem += (sender, args) =>
+        {
+            if (args.Value != null)
+            {
+                PlayHandler(args.Value.ToString()!);
+            }
+        };
 
         _progressBar = new ProgressBar()
         {

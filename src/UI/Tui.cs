@@ -28,58 +28,37 @@ public class Tui : Toplevel
     {
         _player = player;
 
-        var menuBar = new MenuBar()
+        var menuBar = new MenuBarv2()
         {
             Title = "MusicSharp",
-            MenusBorderStyle = LineStyle.Rounded,
-            Menus =
-            [
-                new MenuBarItem(
-                    "_File",
-                    new MenuItem[]
-                    {
-                        new(
-                            "_Open file",
-                            "Open audio file",
-                            OpenFile
-                        ),
-                        new(
-                            "Open _stream",
-                            "Open web stream",
-                            OpenStream
-                        ),
-                        new(
-                            "_Quit",
-                            "Quit MusicSharp",
-                            RequestStop
-                        )
-                    }
-                ),
-                new MenuBarItem(
-                    "Playlist",
-                    new MenuItem[]
-                    {
-                        new(
-                            "Open _playlist",
-                            "Open a playlist",
-                            OpenPlaylist
-                        ),
-                        new("_Save playlist",
-                            "Save files to playlist",
-                            SavePlaylist
-                        )
-                    }
-                ),
-                new MenuBarItem(
-                    "About",
-                    new MenuItem[]
-                    {
-                        new("_About",
-                            "About MusicSharp",
-                            AboutDialog)
-                    }
-                )
-            ]
+            BorderStyle = LineStyle.Rounded,
+            Menus = 
+                [ 
+                    new MenuBarItemv2(
+                                        Title = "_File",
+                                        new MenuItemv2[]
+                                        {
+                                            new("_Open file", "Open audio file", OpenFile),
+                                            new("Open _stream", "Open stream", OpenStream),
+                                            new("_Quit", "Quit MusicSharp", RequestStop)
+                                        }
+                    ),
+                    new MenuBarItemv2(
+                                        Title = "Playlist",
+                                        new MenuItemv2[]
+                                        {
+                                            new("Open _playlist", "Open a playlist", OpenPlaylist),
+                                            new("_Save playlist", "Save files to playlist", SavePlaylist)
+                                        }
+                    ),
+                    new MenuBarItemv2(
+                        Title = "About",
+                        new MenuItemv2[]
+                        {
+                            new("_About", "About MusicSharp", AboutDialog)
+                        }
+                    ),
+                ]
         };
 
         var statusBar = new StatusBar([

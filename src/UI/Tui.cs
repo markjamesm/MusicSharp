@@ -16,11 +16,11 @@ public class Tui : Toplevel
 {
     private readonly IPlayer _player;
     private readonly ProgressBar _progressBar;
-    private object? _mainLoopTimeout;
     private readonly Label _nowPlayingLabel;
     private readonly Label _timePlayedLabel;
     private readonly ListView? _libraryListView;
     private readonly ObservableCollection<string> _playlistTracks = [];
+    private object? _mainLoopTimeout;
     
     private const uint MainLoopTimeoutTick = 100; // ms
 

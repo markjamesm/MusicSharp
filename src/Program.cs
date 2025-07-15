@@ -4,6 +4,7 @@ using MusicSharp.AudioPlayer;
 using SoundFlow.Backends.MiniAudio;
 using SoundFlow.Enums;
 using Terminal.Gui.App;
+using Terminal.Gui.Configuration;
 
 namespace MusicSharp;
 
@@ -17,14 +18,14 @@ public static class Program
     /// </summary>
     public static void Main()
     {
-        var soundEngine = new MiniAudioEngine(44100, Capability.Playback);
         using var httpClient = new HttpClient();
         IStreamConverter streamConverter = new SoundFlowPlayerStreamConverter(httpClient);
+        var soundEngine = new MiniAudioEngine(44100, Capability.Playback);
         using IPlayer player = new SoundFlowPlayer(soundEngine, streamConverter);
+        using var ui = new Tui(player);
         
         Application.Init();
-        using var ui = new Tui(player);
         Application.Run(ui);
-        Application.Shutdown ();
+        Application.Shutdown();
     }
 }

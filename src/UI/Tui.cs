@@ -28,6 +28,8 @@ public class Tui : Toplevel
     {
         _player = player;
 
+        #region Menus
+        
         var menuBar = new MenuBarv2()
         {
             Title = "MusicSharp",
@@ -83,11 +85,13 @@ public class Tui : Toplevel
             },
             new Shortcut
             {
-                Text = "Open playlist",
+                Text = "Load playlist",
                 Key = Key.F3,
                 Action = OpenPlaylist
             }
         ]);
+        
+        #endregion Menus
 
         _playlistView = new ListView
         {
@@ -96,9 +100,10 @@ public class Tui : Toplevel
             Y = Pos.Bottom(menuBar),
             Width = Dim.Fill(),
             Height = 12,
-            CanFocus = false,
+            CanFocus = true,
             BorderStyle = LineStyle.Rounded,
-            Source = new ListWrapper<string>(_loadedPlaylist)
+            Source = new ListWrapper<string>(_loadedPlaylist),
+            AllowsMarking = true,
         };
 
         _playlistView.OpenSelectedItem += (sender, args) =>
@@ -149,7 +154,7 @@ public class Tui : Toplevel
             Y = Pos.Bottom(playPauseButton),
             IsDefault = false,
             CanFocus = true,
-            Text = "Stop"
+            Text = "Stop",
         };
 
         var volumeIncreaseButton = new Button
@@ -202,6 +207,8 @@ public class Tui : Toplevel
             if (_player.IsStreamLoaded)
             {
                 _player.Stop();
+                _progressBar.Fraction = 0;
+                TimePlayedLabel();
             }
             
             e.Handled = true;

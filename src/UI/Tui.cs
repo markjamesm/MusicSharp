@@ -47,6 +47,7 @@ public class Tui : Toplevel
                                         Title = "Playlist",
                                         new MenuItemv2[]
                                         {
+                                            new("_Add to playlist", "Add track(s) to playlist", AddToPlaylist),
                                             new("Open _playlist", "Open a playlist", OpenPlaylist),
                                             new("_Save playlist", "Save files to playlist", SavePlaylist)
                                         }
@@ -393,6 +394,27 @@ public class Tui : Toplevel
         _nowPlayingLabel.Text = trackName;
     }
 
+    #region PlaylistMethods
+    private void AddToPlaylist()
+    {
+        var d = new OpenDialog()
+        {
+            AllowsMultipleSelection = true,
+            Title = "Add tracks to playlist",
+            AllowedTypes = [new AllowedType("Allowed filetypes", ".mp3", ".flac", ".wav")]
+        };
+        
+        Application.Run(d);
+
+        if (!d.Canceled)
+        {
+            foreach (var track in d.FilePaths)
+            {
+                _loadedPlaylist.Add(track);
+            }
+        }
+    }
+
     private void OpenPlaylist()
     {
         var d = new OpenDialog()
@@ -432,6 +454,8 @@ public class Tui : Toplevel
             Playlist.SavePlaylistToFile(d.FileName, currentTracks);
         }
     }
+    
+    #endregion
 
     private void TimePlayedLabel()
     {

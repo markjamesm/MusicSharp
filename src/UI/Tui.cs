@@ -250,8 +250,8 @@ public class Tui : Toplevel
             e.Handled = true;
         };
 
-        playbackControls.Add(playPauseButton, stopButton, volumeIncreaseButton, volumeDecreaseButton, seekForwardButton,
-            seekBackwardButton);
+        playbackControls.Add(playPauseButton, stopButton, volumeIncreaseButton, 
+                                         volumeDecreaseButton, seekForwardButton, seekBackwardButton);
 
         #endregion
 

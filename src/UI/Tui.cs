@@ -298,7 +298,7 @@ public class Tui : Toplevel
     {
         _player.Play(filePath);
         RunMainLoop();
-        NowPlaying(FileData.TrackData.GetTrackAndArtistName(filePath));
+        NowPlaying(FileData.TrackData.GetTrackData(filePath));
     }
 
     private void OpenFile()

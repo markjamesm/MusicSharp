@@ -3,6 +3,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using MusicSharp.AudioPlayer;
+using MusicSharp.FileData;
 using SoundFlow.Enums;
 using Terminal.Gui.App;
 using Terminal.Gui.Drawing;

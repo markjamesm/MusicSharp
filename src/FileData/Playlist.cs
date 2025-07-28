@@ -2,7 +2,7 @@
 using System.Linq;
 using ATL.Playlist;
 
-namespace MusicSharp;
+namespace MusicSharp.FileData;
 
 public static class Playlist
 {

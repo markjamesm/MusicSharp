@@ -99,7 +99,7 @@ public class Tui : Toplevel
             X = 0,
             Y = Pos.Bottom(menuBar),
             Width = Dim.Fill(),
-            Height = 12,
+            Height = Dim.Fill(10),
             CanFocus = true,
             BorderStyle = LineStyle.Rounded,
             Source = new ListWrapper<string>(_loadedPlaylist),

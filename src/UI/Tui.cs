@@ -9,6 +9,7 @@ using SoundFlow.Enums;
 using Terminal.Gui.App;
 using Terminal.Gui.Drawing;
 using Terminal.Gui.Input;
+using Terminal.Gui.Text;
 using Terminal.Gui.ViewBase;
 using Terminal.Gui.Views;
 using Attribute = Terminal.Gui.Drawing.Attribute;
@@ -267,9 +268,10 @@ public class Tui : Toplevel
             X = 0,
             Y = 0,
             Width = Dim.Fill(),
+            Height = Dim.Fill(),
+            TextDirection = TextDirection.LeftRight_TopBottom
         };
-
-      //  nowPlayingView?.Add(_nowPlayingLabel);
+        _nowPlayingLabel.TextFormatter.WordWrap = true;
 
         _timePlayedLabel = new Label
         {

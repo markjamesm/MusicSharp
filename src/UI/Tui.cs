@@ -281,8 +281,8 @@ public class Tui : Toplevel
         _timePlayedLabel = new Label
         {
             Text = $"00:00 / 00:00",
-            X = 0,
-            Y = Pos.Bottom(_nowPlayingLabel) + 1,
+            X = Pos.Align(Alignment.End),
+            Y = Pos.Align(Alignment.End),
         };
 
         nowPlayingView?.Add(_nowPlayingLabel, _timePlayedLabel);
@@ -299,7 +299,7 @@ public class Tui : Toplevel
     {
         _player.Play(filePath);
         RunMainLoop();
-        NowPlaying(FileData.TrackData.GetTrackData(filePath));
+        NowPlaying(TrackData.GetTrackData(filePath));
     }
 
     private void OpenFile()

@@ -10,6 +10,7 @@ using Terminal.Gui.Drawing;
 using Terminal.Gui.Input;
 using Terminal.Gui.ViewBase;
 using Terminal.Gui.Views;
+using Attribute = Terminal.Gui.Drawing.Attribute;
 
 namespace MusicSharp.UI;
 
@@ -19,7 +20,7 @@ public class Tui : Toplevel
     private readonly ProgressBar _progressBar;
     private readonly Label _nowPlayingLabel;
     private readonly Label _timePlayedLabel;
-    private readonly ListView? _playlistView;
+    private readonly ListView _playlistView;
     private readonly ObservableCollection<string> _loadedPlaylist = [];
     private object? _mainLoopTimeout;
 
@@ -113,7 +114,10 @@ public class Tui : Toplevel
             Source = new ListWrapper<string>(_loadedPlaylist),
             AllowsMarking = true,
         };
-
+        
+        _playlistView.RowRender += PlaylistView_RowRender;
+        _playlistView.VerticalScrollBar.AutoShow = true;
+        _playlistView.HorizontalScrollBar.AutoShow = true;
         _playlistView.OpenSelectedItem += (sender, args) =>
         {
             if (args.Value != null)
@@ -299,8 +303,6 @@ public class Tui : Toplevel
     }
 
     #endregion
-
-    #region ActionMethods
 
     private void PlayHandler(string filePath)
     {
@@ -518,6 +520,28 @@ public class Tui : Toplevel
 
         return sb.ToString();
     }
+    
+    private void PlaylistView_RowRender (object? sender, ListViewRowEventArgs obj)
+    {
+        if (obj.Row == _playlistView.SelectedItem)
+        {
+            return;
+        }
 
-    #endregion
+        if (_playlistView.AllowsMarking && _playlistView.Source.IsMarked (obj.Row))
+        {
+            obj.RowAttribute = new Attribute (Color.Black, Color.White);
+
+            return;
+        }
+
+        if (obj.Row % 2 == 0)
+        {
+            obj.RowAttribute = new Attribute (Color.Green, Color.Black);
+        }
+        else
+        {
+            obj.RowAttribute = new Attribute (Color.Black, Color.Green);
+        }
+    }
 }

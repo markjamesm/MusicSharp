@@ -3,5 +3,6 @@ namespace MusicSharp.Enums;
 public enum EFileType
 {
     File,
-    Stream
+    WebStream,
+    NotLoaded
 }

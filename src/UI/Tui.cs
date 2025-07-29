@@ -3,6 +3,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using MusicSharp.AudioPlayer;
+using MusicSharp.Enums;
 using MusicSharp.FileData;
 using SoundFlow.Enums;
 using Terminal.Gui.App;
@@ -159,6 +160,12 @@ public class Tui : Toplevel
             CanFocus = true,
             Text = "Play/Pause"
         };
+        
+        playPauseButton.Accepting += (s, e) =>
+        {
+            _player.PlayPause();
+            e.Handled = true;
+        };
 
         var stopButton = new Button
         {
@@ -167,6 +174,14 @@ public class Tui : Toplevel
             IsDefault = false,
             CanFocus = true,
             Text = "Stop",
+        };
+        
+        stopButton.Accepting += (s, e) =>
+        {
+            _player.Stop();
+            _progressBar.Fraction = 0;
+            TimePlayedLabel();
+            e.Handled = true;
         };
 
         var volumeIncreaseButton = new Button
@@ -177,6 +192,12 @@ public class Tui : Toplevel
             CanFocus = true,
             Text = "Volume +"
         };
+        
+        volumeIncreaseButton.Accepting += (s, e) =>
+        {
+            _player.IncreaseVolume();
+            e.Handled = true;
+        };
 
         var volumeDecreaseButton = new Button
         {
@@ -185,6 +206,12 @@ public class Tui : Toplevel
             CanFocus = true,
             IsDefault = false,
             Text = "Volume -"
+        };
+        
+        volumeDecreaseButton.Accepting += (s, e) =>
+        {
+            _player.DecreaseVolume();
+            e.Handled = true;
         };
 
         var seekForwardButton = new Button
@@ -195,6 +222,12 @@ public class Tui : Toplevel
             CanFocus = true,
             Text = "Seek 5s"
         };
+        
+        seekForwardButton.Accepting += (s, e) =>
+        {
+            _player.SeekForward();
+            e.Handled = true;
+        };
 
         var seekBackwardButton = new Button
         {
@@ -204,61 +237,10 @@ public class Tui : Toplevel
             CanFocus = true,
             Text = "Seek -5s"
         };
-
-        playPauseButton.Accepting += (s, e) =>
-        {
-            if (_player.IsStreamLoaded)
-            {
-                _player.PlayPause();
-            }
-
-            e.Handled = true;
-        };
-        stopButton.Accepting += (s, e) =>
-        {
-            if (_player.IsStreamLoaded)
-            {
-                _player.Stop();
-                _progressBar.Fraction = 0;
-                TimePlayedLabel();
-            }
-
-            e.Handled = true;
-        };
-        volumeIncreaseButton.Accepting += (s, e) =>
-        {
-            if (_player.IsStreamLoaded)
-            {
-                _player.IncreaseVolume();
-            }
-
-            e.Handled = true;
-        };
-        volumeDecreaseButton.Accepting += (s, e) =>
-        {
-            if (_player.IsStreamLoaded)
-            {
-                _player.DecreaseVolume();
-            }
-
-            e.Handled = true;
-        };
-        seekForwardButton.Accepting += (s, e) =>
-        {
-            if (_player.IsStreamLoaded)
-            {
-                _player.SeekForward();
-            }
-
-            e.Handled = true;
-        };
+        
         seekBackwardButton.Accepting += (s, e) =>
         {
-            if (_player.IsStreamLoaded)
-            {
-                _player.SeekBackward();
-            }
-
+            _player.SeekBackward();
             e.Handled = true;
         };
 
@@ -287,7 +269,7 @@ public class Tui : Toplevel
             Width = Dim.Fill(),
         };
 
-        nowPlayingView?.Add(_nowPlayingLabel);
+      //  nowPlayingView?.Add(_nowPlayingLabel);
 
         _timePlayedLabel = new Label
         {
@@ -303,13 +285,6 @@ public class Tui : Toplevel
     }
 
     #endregion
-
-    private void PlayHandler(string filePath)
-    {
-        _player.Play(filePath);
-        RunMainLoop();
-        NowPlaying(TrackData.GetTrackData(filePath));
-    }
 
     private void OpenFile()
     {
@@ -353,35 +328,36 @@ public class Tui : Toplevel
 
         var loadStreamButton = new Button
         {
-            Text = "Load stream",
+            Text = "Open stream",
             X = Pos.Center(),
             Y = Pos.Bottom(streamUrl),
         };
-
-        var cancelButton = new Button
-        {
-            Text = "Cancel",
-            X = Pos.Right(loadStreamButton),
-            Y = Pos.Bottom(streamUrl)
-        };
-
+        
         loadStreamButton.Accepting += (s, e) =>
         {
             if (streamUrl.Text != string.Empty)
             {
-                _player.Play(streamUrl.Text);
+                _player.Play(streamUrl.Text, EFileType.WebStream);
             }
 
             e.Handled = true;
-        };
-
-        cancelButton.Accepting += (s, e) =>
-        {
             RequestStop();
-            e.Handled = true;
         };
 
-        streamDialog.Add(uriLabel, streamUrl, loadStreamButton, cancelButton);
+        var closeButton = new Button
+        {
+            Text = "Close",
+            X = Pos.Right(loadStreamButton),
+            Y = Pos.Bottom(streamUrl)
+        };
+
+        closeButton.Accepting += (s, e) =>
+        {
+            e.Handled = true;
+            RequestStop();
+        };
+
+        streamDialog.Add(uriLabel, streamUrl, loadStreamButton, closeButton);
 
         Application.Run(streamDialog);
     }
@@ -500,25 +476,6 @@ public class Tui : Toplevel
             _timePlayedLabel.Text = $"00:00 / 00:00";
         }
     }
-
-    private static string GetAboutMessage()
-    {
-        var sb = new StringBuilder();
-        sb.AppendLine("""
-                          __  ___           _      _____ __                   
-                         /  |/  /_  _______(_)____/ ___// /_  ____ __________ 
-                        / /|_/ / / / / ___/ / ___/\__ \/ __ \/ __ `/ ___/ __ \
-                       / /  / / /_/ (__  ) / /__ ___/ / / / / /_/ / /  / /_/ /
-                      /_/  /_/\__,_/____/_/\___//____/_/ /_/\__,_/_/  / .___/ 
-                                                                     /_/      
-                      """);
-
-        sb.AppendLine();
-        sb.AppendLine("MusicSharp v2.0.0");
-        sb.AppendLine("Created by Mark-James M.");
-
-        return sb.ToString();
-    }
     
     private void PlaylistView_RowRender (object? sender, ListViewRowEventArgs obj)
     {
@@ -542,5 +499,34 @@ public class Tui : Toplevel
         {
             obj.RowAttribute = new Attribute (Color.Black, Color.Green);
         }
+    }
+    
+    private void PlayHandler(string filePath)
+    {
+        _player.Play(filePath, EFileType.File);
+
+        if (_player.State == PlaybackState.Playing)
+        {
+            RunMainLoop();
+            NowPlaying(TrackData.GetTrackData(filePath));
+        }
+    }
+    
+    private static string GetAboutMessage()
+    {
+        var sb = new StringBuilder();
+        sb.AppendLine("""
+                          __  ___           _      _____ __                   
+                         /  |/  /_  _______(_)____/ ___// /_  ____ __________ 
+                        / /|_/ / / / / ___/ / ___/\__ \/ __ \/ __ `/ ___/ __ \
+                       / /  / / /_/ (__  ) / /__ ___/ / / / / /_/ / /  / /_/ /
+                      /_/  /_/\__,_/____/_/\___//____/_/ /_/\__,_/_/  / .___/ 
+                                                                     /_/      
+                      """);
+        sb.AppendLine();
+        sb.AppendLine("MusicSharp v2.0.0");
+        sb.AppendLine("Created by Mark-James M.");
+
+        return sb.ToString();
     }
 }

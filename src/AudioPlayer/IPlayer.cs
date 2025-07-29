@@ -1,4 +1,5 @@
 ﻿using System;
+using MusicSharp.Enums;
 using SoundFlow.Enums;
 
 namespace MusicSharp.AudioPlayer;
@@ -27,12 +28,18 @@ public interface IPlayer: IDisposable
     /// Indicates whether an audio stream is loaded.
     /// </summary>
     bool IsStreamLoaded { get; }
+    
+    /// <summary>
+    /// Indicates the type of audio stream loaded.
+    /// </summary>
+    EFileType GetISoundDataProviderType { get; }
 
     /// <summary>
     /// Method to play audio.
     /// </summary>
-    /// <param name="path">The path to the file or stream.</param>
-    void Play(string path);
+    /// <param name="filepath">The filepath to the file or stream.</param>
+    /// <param name="fileType">The type of audio (File or WebStream).</param>
+    void Play(string filepath, EFileType  fileType);
     
     /// <summary>
     /// Method to pause audio playback.

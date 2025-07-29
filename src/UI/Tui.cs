@@ -78,12 +78,6 @@ public class Tui : Toplevel
         var statusBar = new StatusBar([
             new Shortcut
             {
-                Text = "Quit",
-                Key = Key.Esc,
-                Action = RequestStop
-            },
-            new Shortcut
-            {
                 Text = "Open file",
                 Key = Key.F1,
                 Action = OpenFile
@@ -99,7 +93,19 @@ public class Tui : Toplevel
                 Text = "Load playlist",
                 Key = Key.F3,
                 Action = OpenPlaylist
-            }
+            },
+            new Shortcut
+            {
+                Text = "Add file to playlist",
+                Key = Key.F4,
+                Action = OpenPlaylist
+            },
+            new Shortcut
+            {
+                Text = "Quit",
+                Key = Key.Esc,
+                Action = RequestStop
+            },
         ]);
 
         #endregion Menus

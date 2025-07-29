@@ -324,7 +324,6 @@ public class Tui : Toplevel
 
         if (!d.Canceled)
         {
-            _player.Play(d.FilePaths[0]);
             PlayHandler(d.FilePaths[0]);
         }
     }

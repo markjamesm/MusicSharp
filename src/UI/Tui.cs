@@ -22,7 +22,7 @@ public class Tui : Toplevel
     private readonly ListView? _playlistView;
     private readonly ObservableCollection<string> _loadedPlaylist = [];
     private object? _mainLoopTimeout;
-    
+
     private const uint MainLoopTimeoutTick = 100; // ms
 
     public Tui(IPlayer player)
@@ -30,39 +30,46 @@ public class Tui : Toplevel
         _player = player;
 
         #region Menus
-        
+
         var menuBar = new MenuBarv2()
         {
             Title = "MusicSharp",
             BorderStyle = LineStyle.Rounded,
-            Menus = 
-                [ 
-                    new MenuBarItemv2(
-                                        Title = "_File",
-                                        new MenuItemv2[]
-                                        {
-                                            new("_Open file", "Open audio file", OpenFile),
-                                            new("Open _stream", "Open stream", OpenStream),
-                                            new("_Quit", "Quit MusicSharp", RequestStop)
-                                        }
-                    ),
-                    new MenuBarItemv2(
-                                        Title = "Playlist",
-                                        new MenuItemv2[]
-                                        {
-                                            new("_Add to playlist", "Add track(s) to playlist", AddToPlaylist),
-                                            new("Open _playlist", "Open a playlist", OpenPlaylist),
-                                            new("_Save playlist", "Save files to playlist", SavePlaylist)
-                                        }
-                    ),
-                    new MenuBarItemv2(
-                                        Title = "About", 
-                                        new MenuItemv2[]
-                                        {
-                                            new("_About", "About MusicSharp", AboutDialog)
-                                        }
-                    ),
-                ]
+            Menus =
+            [
+                new MenuBarItemv2(
+                    Title = "_File",
+                    new MenuItemv2[]
+                    {
+                        new("_Open file", "Open audio file", OpenFile),
+                        new("Open _stream", "Open stream", OpenStream),
+                        new("_Quit", "Quit MusicSharp", RequestStop)
+                    }
+                ),
+                new MenuBarItemv2(
+                    Title = "Playlist",
+                    new MenuItemv2[]
+                    {
+                        new("_Add to playlist", "Add track(s) to playlist", AddToPlaylist),
+                        new("Open _playlist", "Open a playlist", OpenPlaylist),
+                        new("_Save playlist", "Save files to playlist", SavePlaylist)
+                    }
+                ),
+                new MenuBarItemv2(
+                    Title = "Help",
+                    new MenuItemv2[]
+                    {
+                        new("_About...", "About MusicSharp", () => MessageBox.Query(
+                                "",
+                                GetAboutMessage(),
+                                wrapMessage: false,
+                                buttons: "_Ok"
+                            ),
+                            Key.A.WithCtrl
+                        )
+                    }
+                ),
+            ]
         };
 
         var statusBar = new StatusBar([
@@ -91,7 +98,7 @@ public class Tui : Toplevel
                 Action = OpenPlaylist
             }
         ]);
-        
+
         #endregion Menus
 
         _playlistView = new ListView
@@ -200,7 +207,7 @@ public class Tui : Toplevel
             {
                 _player.PlayPause();
             }
-            
+
             e.Handled = true;
         };
         stopButton.Accepting += (s, e) =>
@@ -211,7 +218,7 @@ public class Tui : Toplevel
                 _progressBar.Fraction = 0;
                 TimePlayedLabel();
             }
-            
+
             e.Handled = true;
         };
         volumeIncreaseButton.Accepting += (s, e) =>
@@ -220,7 +227,7 @@ public class Tui : Toplevel
             {
                 _player.IncreaseVolume();
             }
-            
+
             e.Handled = true;
         };
         volumeDecreaseButton.Accepting += (s, e) =>
@@ -229,7 +236,7 @@ public class Tui : Toplevel
             {
                 _player.DecreaseVolume();
             }
-            
+
             e.Handled = true;
         };
         seekForwardButton.Accepting += (s, e) =>
@@ -238,7 +245,7 @@ public class Tui : Toplevel
             {
                 _player.SeekForward();
             }
-            
+
             e.Handled = true;
         };
         seekBackwardButton.Accepting += (s, e) =>
@@ -247,12 +254,12 @@ public class Tui : Toplevel
             {
                 _player.SeekBackward();
             }
-            
+
             e.Handled = true;
         };
 
-        playbackControls.Add(playPauseButton, stopButton, volumeIncreaseButton, 
-                                         volumeDecreaseButton, seekForwardButton, seekBackwardButton);
+        playbackControls.Add(playPauseButton, stopButton, volumeIncreaseButton,
+            volumeDecreaseButton, seekForwardButton, seekBackwardButton);
 
         #endregion
 
@@ -361,9 +368,9 @@ public class Tui : Toplevel
         {
             if (streamUrl.Text != string.Empty)
             {
-                _player.Play(streamUrl.Text); 
+                _player.Play(streamUrl.Text);
             }
-            
+
             e.Handled = true;
         };
 
@@ -403,6 +410,7 @@ public class Tui : Toplevel
     }
 
     #region PlaylistMethods
+
     private void AddToPlaylist()
     {
         var d = new OpenDialog()
@@ -411,7 +419,7 @@ public class Tui : Toplevel
             Title = "Add tracks to playlist",
             AllowedTypes = [new AllowedType("Allowed filetypes", ".mp3", ".flac", ".wav")]
         };
-        
+
         Application.Run(d);
 
         if (!d.Canceled)
@@ -462,7 +470,7 @@ public class Tui : Toplevel
             Playlist.SavePlaylistToFile(d.FileName, currentTracks);
         }
     }
-    
+
     #endregion
 
     private void TimePlayedLabel()
@@ -492,56 +500,23 @@ public class Tui : Toplevel
         }
     }
 
-    private void AboutDialog()
+    private static string GetAboutMessage()
     {
-        var aboutDialog = new Dialog
-        {
-            X = Pos.Center(),
-            Y = Pos.Center(),
-        };
-
         var sb = new StringBuilder();
-        sb.Append("""
-                      __  ___           _      _____ __                   
-                     /  |/  /_  _______(_)____/ ___// /_  ____ __________ 
-                    / /|_/ / / / / ___/ / ___/\__ \/ __ \/ __ `/ ___/ __ \
-                   / /  / / /_/ (__  ) / /__ ___/ / / / / /_/ / /  / /_/ /
-                  /_/  /_/\__,_/____/_/\___//____/_/ /_/\__,_/_/  / .___/ 
-                                                                 /_/      
-                  """);
+        sb.AppendLine("""
+                          __  ___           _      _____ __                   
+                         /  |/  /_  _______(_)____/ ___// /_  ____ __________ 
+                        / /|_/ / / / / ___/ / ___/\__ \/ __ \/ __ `/ ___/ __ \
+                       / /  / / /_/ (__  ) / /__ ___/ / / / / /_/ / /  / /_/ /
+                      /_/  /_/\__,_/____/_/\___//____/_/ /_/\__,_/_/  / .___/ 
+                                                                     /_/      
+                      """);
 
-        var asciiLabel = new Label
-        {
-            Text = sb.ToString(),
-            X = Pos.Center(),
-            Y = 0,
-        };
+        sb.AppendLine();
+        sb.AppendLine("MusicSharp v2.0.0");
+        sb.AppendLine("Created by Mark-James M.");
 
-        var infoLabel = new Label
-        {
-            Text = "MusicSharp v2.0.0\nCreated by Mark-James M.",
-            X = Pos.Center(),
-            Y = Pos.Bottom(asciiLabel),
-            Width = Dim.Auto(),
-            Height = Dim.Auto()
-        };
-
-        var closeButton = new Button
-        {
-            Text = "Close",
-            X = Pos.Center(),
-        };
-
-        closeButton.Accepting += (s, e) =>
-        {
-            RequestStop();
-            e.Handled = true;
-        };
-
-        aboutDialog.Add(asciiLabel, infoLabel);
-        aboutDialog.AddButton(closeButton);
-
-        Application.Run(aboutDialog);
+        return sb.ToString();
     }
 
     #endregion

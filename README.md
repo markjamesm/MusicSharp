@@ -3,6 +3,13 @@
 
 A cross-platform Terminal User Interface (TUI) music player written in C# (.NET 8) with the goal of being minimalistic and light on resources.
 
+**Note**: A major rewrite of MusicSharp (version 2) is actively being developed in the 
+[musicsharp-v2 branch](https://github.com/markjamesm/MusicSharp/tree/musicsharp-v2). This version will feature:
+
+- A completely rewritten UI, making use of Terminal.Gui 2.0.
+- Library functionality to manage audio files.
+- Standalone application (no .NET runtime required).
+
 ## Features
 
 - Cross-platform support (Windows, Mac, Linux).

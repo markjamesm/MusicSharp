@@ -286,7 +286,7 @@ public class Tui : Toplevel
             Y = Pos.Align(Alignment.End),
         };
 
-        nowPlayingView?.Add(_nowPlayingLabel, _timePlayedLabel);
+        nowPlayingView.Add(_nowPlayingLabel, _timePlayedLabel);
 
         // Add the views to the main window
         Add(menuBar, _playlistView, _progressBar, playbackControls, nowPlayingView, statusBar);

@@ -29,17 +29,12 @@ public sealed class SoundFlowPlayer : IPlayer
     {
         get
         {
-            if (_streamProvider?.GetType() == typeof(StreamDataProvider))
+            return _streamProvider switch
             {
-                return EFileType.File;
-            }
-
-            if (_streamProvider?.GetType() == typeof(NetworkDataProvider))
-            {
-                return EFileType.WebStream;
-            }
-
-            return EFileType.NotLoaded;
+                StreamDataProvider => EFileType.File,
+                NetworkDataProvider => EFileType.WebStream,
+                _ => EFileType.NotLoaded
+            };
         }
     }
     

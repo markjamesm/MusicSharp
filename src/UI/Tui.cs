@@ -96,12 +96,6 @@ public class Tui : Toplevel
             },
             new Shortcut
             {
-                Text = "Add file to playlist",
-                Key = Key.F4,
-                Action = OpenPlaylist
-            },
-            new Shortcut
-            {
                 Text = "Quit",
                 Key = Key.Esc,
                 Action = RequestStop

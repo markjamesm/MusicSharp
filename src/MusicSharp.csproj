@@ -16,7 +16,6 @@
   <ItemGroup>
     <TrimmerRootAssembly Include="MusicSharp" />
     <TrimmerRootAssembly Include="Terminal.Gui" />
-    <TrimmerRootAssembly Include="SoundFlow" />
   </ItemGroup>
 
   <ItemGroup>

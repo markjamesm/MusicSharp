@@ -14,7 +14,13 @@ public static class Program
     /// <summary>
     /// Entry point.
     /// </summary>
-    [UnconditionalSuppressMessage("AssemblyLoadTrimming", "IL2026:RequiresUnreferencedCode", Justification = "Application.Init doesn't actually require unreferenced code when given no arguments")]
+    [UnconditionalSuppressMessage("AssemblyLoadTrimming", 
+                                  "IL2104:Assembly 'SoundFlow' produced trim warnings.", 
+                                  Justification = """
+                                                  Can safely ignore as this is the only warning and the 
+                                                  method is only ever called with primitive types
+                                                  https://github.com/LSXPrime/SoundFlow/blob/master/Src/Utils/Extensions.cs#L49
+                                                  """)]
     public static void Main()
     {
         using var audioEngine = new MiniAudioEngine();

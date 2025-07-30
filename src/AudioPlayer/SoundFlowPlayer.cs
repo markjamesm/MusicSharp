@@ -24,18 +24,6 @@ public sealed class SoundFlowPlayer : IPlayer
     public PlaybackState State => _player?.State ?? PlaybackState.Stopped;
     public float TrackLength => _player?.Duration ?? 0;
     public float CurrentTime => _player?.Time ?? 0;
-    public EFileType GetISoundDataProviderType
-    {
-        get
-        {
-            return _streamDataProvider switch
-            {
-                StreamDataProvider => EFileType.File,
-                NetworkDataProvider => EFileType.WebStream,
-                _ => EFileType.NotLoaded
-            };
-        }
-    }
     
     public SoundFlowPlayer(MiniAudioEngine audioEngine)
     {
@@ -133,7 +121,7 @@ public sealed class SoundFlowPlayer : IPlayer
     
     public void SeekForward()
     {
-        if (GetISoundDataProviderType == EFileType.File && _player != null)
+        if (_streamDataProvider is StreamDataProvider && _player != null)
         {
             if (_player.State is PlaybackState.Playing or PlaybackState.Paused)
             {
@@ -144,7 +132,7 @@ public sealed class SoundFlowPlayer : IPlayer
 
     public void SeekBackward()
     {
-        if (GetISoundDataProviderType == EFileType.File && _player != null)
+        if (_streamDataProvider is StreamDataProvider && _player != null)
         {
             if (_player.State is PlaybackState.Playing or PlaybackState.Paused)
             {

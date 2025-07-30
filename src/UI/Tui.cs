@@ -122,7 +122,6 @@ public class Tui : Toplevel
             Source = new ListWrapper<string>(_loadedPlaylist),
             AllowsMarking = true,
         };
-        
         _playlistView.RowRender += PlaylistView_RowRender;
         _playlistView.VerticalScrollBar.AutoShow = true;
         _playlistView.HorizontalScrollBar.AutoShow = true;

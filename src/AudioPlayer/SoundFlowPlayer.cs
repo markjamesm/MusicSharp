@@ -105,7 +105,7 @@ public sealed class SoundFlowPlayer : IPlayer
     {
         if (_player !=null)
         {
-            // Need to verify what SoundFlow's max volume level is
+            // Verify what SoundFlow's max volume level is
             // For now this should be enough based on testing
             _player.Volume = Math.Clamp(_player.Volume + .1f, 0f, 2f);
         }

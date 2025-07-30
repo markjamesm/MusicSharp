@@ -181,7 +181,7 @@ public class Tui : Toplevel
             _player.Stop();
             _progressBar.Fraction = 0;
             TimePlayedLabel();
-            NowPlaying(string.Empty);
+            _nowPlayingLabel!.Text = string.Empty;
             e.Handled = true;
         };
 
@@ -275,7 +275,7 @@ public class Tui : Toplevel
 
         _timePlayedLabel = new Label
         {
-            Text = $"00:00 / 00:00",
+            Text = "00:00 / 00:00",
             X = Pos.Align(Alignment.End),
             Y = Pos.Align(Alignment.End),
         };
@@ -340,6 +340,7 @@ public class Tui : Toplevel
             if (streamUrl.Text != string.Empty)
             {
                 _player.Play(streamUrl.Text, EFileType.WebStream);
+                _nowPlayingLabel.Text = $"Web stream: {streamUrl.Text}";
             }
 
             e.Handled = true;
@@ -381,11 +382,6 @@ public class Tui : Toplevel
                 return false;
             }
         );
-    }
-
-    private void NowPlaying(string trackName)
-    {
-        _nowPlayingLabel.Text = trackName;
     }
 
     #region PlaylistMethods
@@ -510,7 +506,7 @@ public class Tui : Toplevel
         if (_player.State == PlaybackState.Playing)
         {
             RunMainLoop();
-            NowPlaying(TrackData.GetTrackData(filePath));
+            _nowPlayingLabel.Text = TrackData.GetTrackData(filePath);
         }
     }
     

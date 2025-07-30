@@ -475,7 +475,7 @@ public class Tui : Toplevel
         }
         else
         {
-            _timePlayedLabel.Text = $"00:00 / 00:00";
+            _timePlayedLabel.Text = "00:00 / 00:00";
         }
     }
     

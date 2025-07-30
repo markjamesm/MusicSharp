@@ -17,7 +17,7 @@ public sealed class SoundFlowPlayer : IPlayer
     private readonly MiniAudioEngine _audioEngine;
     private readonly AudioPlaybackDevice _audioPlaybackDevice;
     private readonly AudioFormat _audioFormat;
-    private ISoundDataProvider? _streamProvider;
+    private ISoundDataProvider? _streamDataProvider;
     private SoundPlayer? _player;
     
     // If we don't know the state of the player, default to stopped?
@@ -29,7 +29,7 @@ public sealed class SoundFlowPlayer : IPlayer
     {
         get
         {
-            return _streamProvider switch
+            return _streamDataProvider switch
             {
                 StreamDataProvider => EFileType.File,
                 NetworkDataProvider => EFileType.WebStream,
@@ -70,17 +70,17 @@ public sealed class SoundFlowPlayer : IPlayer
 
         if (fileType == EFileType.File)
         {
-            _streamProvider = new StreamDataProvider(_audioEngine, _audioFormat, File.OpenRead(filepath));
+            _streamDataProvider = new StreamDataProvider(_audioEngine, _audioFormat, File.OpenRead(filepath));
         }
 
         if (fileType == EFileType.WebStream)
         {
-            _streamProvider = new NetworkDataProvider(_audioEngine, _audioFormat, filepath);
+            _streamDataProvider = new NetworkDataProvider(_audioEngine, _audioFormat, filepath);
         }
 
-        if (_streamProvider != null)
+        if (_streamDataProvider != null)
         {
-            _player = new SoundPlayer(_audioEngine, _audioFormat, _streamProvider);
+            _player = new SoundPlayer(_audioEngine, _audioFormat, _streamDataProvider);
             _audioPlaybackDevice.MasterMixer.AddComponent(_player);
             _audioPlaybackDevice.Start();
             _player.Play();
@@ -158,7 +158,7 @@ public sealed class SoundFlowPlayer : IPlayer
     public void Dispose()
     {
         _audioPlaybackDevice.Dispose();
-        _streamProvider?.Dispose();
+        _streamDataProvider?.Dispose();
         _player?.Dispose();
     }
 }

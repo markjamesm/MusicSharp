@@ -23,16 +23,6 @@ public interface IPlayer: IDisposable
     /// Returns the current time played.
     /// </summary>
     float CurrentTime { get; }
-    
-    /// <summary>
-    /// Indicates whether an audio stream is loaded.
-    /// </summary>
-    bool IsStreamLoaded { get; }
-    
-    /// <summary>
-    /// Indicates the type of audio stream loaded.
-    /// </summary>
-    EFileType GetISoundDataProviderType { get; }
 
     /// <summary>
     /// Method to play audio.

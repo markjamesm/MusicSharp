@@ -378,7 +378,7 @@ public class Tui : Toplevel
                     return true;
                 }
 
-                return true;
+                return false;
             }
         );
     }

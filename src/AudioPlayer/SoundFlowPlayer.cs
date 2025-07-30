@@ -24,7 +24,6 @@ public sealed class SoundFlowPlayer : IPlayer
     public PlaybackState State => _player?.State ?? PlaybackState.Stopped;
     public float TrackLength => _player?.Duration ?? 0;
     public float CurrentTime => _player?.Time ?? 0;
-    public bool IsStreamLoaded => _player != null;
     public EFileType GetISoundDataProviderType
     {
         get
@@ -55,14 +54,13 @@ public sealed class SoundFlowPlayer : IPlayer
             SampleRate = 48000,
             Channels = 2
         };
-
-        // Initialize the playback device. This manages the connection to the physical audio hardware.
+        
         _audioPlaybackDevice = _audioEngine.InitializePlaybackDevice(defaultPlaybackDevice, _audioFormat);
     }
     
     public void Play(string filepath, EFileType fileType)
     {
-        if (_player?.State == PlaybackState.Playing)
+        if (_player != null && _player.State == PlaybackState.Playing)
         {
             _player.Stop();
             _audioPlaybackDevice.Stop();
@@ -94,11 +92,11 @@ public sealed class SoundFlowPlayer : IPlayer
             switch (_player.State)
             {
                 case PlaybackState.Playing:
-                    _player?.Pause();
+                    _player.Pause();
                     break;
                 case PlaybackState.Paused:
                 case PlaybackState.Stopped:
-                    _player?.Play();
+                    _player.Play();
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();

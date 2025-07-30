@@ -6,14 +6,8 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace MusicSharp;
 
-/// <summary>
-/// Entry Point class.
-/// </summary>
 public static class Program
 {
-    /// <summary>
-    /// Entry point.
-    /// </summary>
     [UnconditionalSuppressMessage("AssemblyLoadTrimming", 
                                   "IL2104:Assembly 'SoundFlow' produced trim warnings.", 
                                   Justification = """

@@ -2,7 +2,6 @@
 using MusicSharp.AudioPlayer;
 using SoundFlow.Backends.MiniAudio;
 using Terminal.Gui.App;
-using System.Diagnostics.CodeAnalysis;
 
 namespace MusicSharp;
 

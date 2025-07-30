@@ -2,6 +2,7 @@
 using MusicSharp.AudioPlayer;
 using SoundFlow.Backends.MiniAudio;
 using Terminal.Gui.App;
+using System.Diagnostics.CodeAnalysis;
 
 namespace MusicSharp;
 
@@ -13,6 +14,7 @@ public static class Program
     /// <summary>
     /// Entry point.
     /// </summary>
+    [UnconditionalSuppressMessage("AssemblyLoadTrimming", "IL2026:RequiresUnreferencedCode", Justification = "Application.Init doesn't actually require unreferenced code when given no arguments")]
     public static void Main()
     {
         using var audioEngine = new MiniAudioEngine();

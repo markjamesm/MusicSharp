@@ -188,6 +188,7 @@ public class Tui : Toplevel
             _player.Stop();
             _progressBar.Fraction = 0;
             TimePlayedLabel();
+            NowPlaying(string.Empty);
             e.Handled = true;
         };
 

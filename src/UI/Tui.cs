@@ -302,6 +302,24 @@ public class Tui : Toplevel
     }
 
     #endregion
+    
+    private void PlayHandler(AudioFile audioFile)
+    {
+        _player.Play(audioFile.Path, EFileType.File);
+
+        if (_player.State == PlaybackState.Playing)
+        {
+            _nowPlayingLabel.Text =
+                $"{(string.IsNullOrWhiteSpace(audioFile.TrackInfo.Title) ? "Unknown" : audioFile.TrackInfo.Title)} - " +
+                $"{(string.IsNullOrWhiteSpace(audioFile.TrackInfo.Artist) ? "Unknown" : audioFile.TrackInfo.Artist)} - " +
+                $"{(string.IsNullOrWhiteSpace(audioFile.TrackInfo.Album) ? "Unknown" : audioFile.TrackInfo.Album)}";
+
+            _playPauseButton.Text = "Pause";
+            RunMainLoop();
+        }
+    }
+
+    #region OpenMethods
 
     private void OpenFile()
     {
@@ -380,6 +398,8 @@ public class Tui : Toplevel
         streamDialog.Add(uriLabel, streamUrl, loadStreamButton, closeButton);
         Application.Run(streamDialog);
     }
+    
+    #endregion
 
     private void RunMainLoop()
     {
@@ -422,6 +442,12 @@ public class Tui : Toplevel
             }
         }
     }
+    
+    private void RemoveFromPlaylist()
+    {
+        var s = _playlistView.SelectedItem;
+        _loadedPlaylist.RemoveAt(s);
+    }
 
     private void OpenPlaylist()
     {
@@ -463,6 +489,30 @@ public class Tui : Toplevel
         }
     }
     
+    private void PlaylistView_RowRender(object? sender, ListViewRowEventArgs obj)
+    {
+        if (obj.Row == _playlistView.SelectedItem)
+        {
+            return;
+        }
+
+        if (_playlistView.AllowsMarking && _playlistView.Source.IsMarked(obj.Row))
+        {
+            obj.RowAttribute = new Attribute(Color.Black, Color.White);
+
+            return;
+        }
+
+        if (obj.Row % 2 == 0)
+        {
+            obj.RowAttribute = new Attribute(Color.Green, Color.Black);
+        }
+        else
+        {
+            obj.RowAttribute = new Attribute(Color.Black, Color.Green);
+        }
+    }
+    
     #endregion
     
     private void TimePlayedLabel()
@@ -493,52 +543,6 @@ public class Tui : Toplevel
         }
     }
 
-    private void PlaylistView_RowRender(object? sender, ListViewRowEventArgs obj)
-    {
-        if (obj.Row == _playlistView.SelectedItem)
-        {
-            return;
-        }
-
-        if (_playlistView.AllowsMarking && _playlistView.Source.IsMarked(obj.Row))
-        {
-            obj.RowAttribute = new Attribute(Color.Black, Color.White);
-
-            return;
-        }
-
-        if (obj.Row % 2 == 0)
-        {
-            obj.RowAttribute = new Attribute(Color.Green, Color.Black);
-        }
-        else
-        {
-            obj.RowAttribute = new Attribute(Color.Black, Color.Green);
-        }
-    }
-
-    private void PlayHandler(AudioFile audioFile)
-    {
-        _player.Play(audioFile.Path, EFileType.File);
-
-        if (_player.State == PlaybackState.Playing)
-        {
-            _nowPlayingLabel.Text =
-                $"{(string.IsNullOrWhiteSpace(audioFile.TrackInfo.Title) ? "Unknown" : audioFile.TrackInfo.Title)} - " +
-                $"{(string.IsNullOrWhiteSpace(audioFile.TrackInfo.Artist) ? "Unknown" : audioFile.TrackInfo.Artist)} - " +
-                $"{(string.IsNullOrWhiteSpace(audioFile.TrackInfo.Album) ? "Unknown" : audioFile.TrackInfo.Album)}";
-
-            _playPauseButton.Text = "Pause";
-            RunMainLoop();
-        }
-    }
-
-    private void RemoveFromPlaylist()
-    {
-        var s = _playlistView.SelectedItem;
-        _loadedPlaylist.RemoveAt(s);
-    }
-
     private static string GetAboutMessage()
     {
         var sb = new StringBuilder();
@@ -557,6 +561,8 @@ public class Tui : Toplevel
         return sb.ToString();
     }
 
+    #region IListDataSource
+    
     private class TrackListDataSource : IListDataSource
     {
         private const int TitleColumnWidth = 35;
@@ -723,4 +729,6 @@ public class Tui : Toplevel
             _loadedPlaylist = null;
         }
     }
+    
+    #endregion
 }

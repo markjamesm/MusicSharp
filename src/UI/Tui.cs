@@ -25,6 +25,7 @@ public class Tui : Toplevel
     private readonly ProgressBar _progressBar;
     private readonly Label _nowPlayingLabel;
     private readonly Label _timePlayedLabel;
+    private readonly Button _playPauseButton;
     private readonly ListView _playlistView;
     private readonly ObservableCollection<AudioFile> _loadedPlaylist = [];
     private object? _mainLoopTimeout;
@@ -155,25 +156,33 @@ public class Tui : Toplevel
             BorderStyle = LineStyle.Rounded
         };
 
-        var playPauseButton = new Button
+        _playPauseButton = new Button
         {
             X = 0,
             Y = 0,
             IsDefault = false,
             CanFocus = true,
-            Text = "Play/Pause"
+            Text = "Play"
         };
 
-        playPauseButton.Accepting += (s, e) =>
+        _playPauseButton.Accepting += (s, e) =>
         {
             _player.PlayPause();
+            _playPauseButton.Text = _player.State switch
+            {
+                PlaybackState.Stopped => "Play",
+                PlaybackState.Playing => "Pause",
+                PlaybackState.Paused => "Play",
+                _ => _playPauseButton.Text
+            };
+
             e.Handled = true;
         };
 
         var stopButton = new Button
         {
             X = 0,
-            Y = Pos.Bottom(playPauseButton),
+            Y = Pos.Bottom(_playPauseButton),
             IsDefault = false,
             CanFocus = true,
             Text = "Stop",
@@ -185,12 +194,13 @@ public class Tui : Toplevel
             _progressBar.Fraction = 0;
             TimePlayedLabel();
             _nowPlayingLabel!.Text = string.Empty;
+            _playPauseButton.Text = "Play";
             e.Handled = true;
         };
 
         var volumeIncreaseButton = new Button
         {
-            X = Pos.Right(playPauseButton),
+            X = Pos.Right(_playPauseButton),
             Y = 0,
             IsDefault = false,
             CanFocus = true,
@@ -205,7 +215,7 @@ public class Tui : Toplevel
 
         var volumeDecreaseButton = new Button
         {
-            X = Pos.Right(playPauseButton),
+            X = Pos.Right(_playPauseButton),
             Y = Pos.Bottom(volumeIncreaseButton),
             CanFocus = true,
             IsDefault = false,
@@ -248,7 +258,7 @@ public class Tui : Toplevel
             e.Handled = true;
         };
 
-        playbackControls.Add(playPauseButton, stopButton, volumeIncreaseButton,
+        playbackControls.Add(_playPauseButton, stopButton, volumeIncreaseButton,
             volumeDecreaseButton, seekForwardButton, seekBackwardButton);
 
         #endregion
@@ -344,6 +354,7 @@ public class Tui : Toplevel
             if (streamUrl.Text != string.Empty)
             {
                 _player.Play(streamUrl.Text, EFileType.WebStream);
+                _playPauseButton.Text = "Pause";
                 _nowPlayingLabel.Text = $"Web stream: {streamUrl.Text}";
             }
 
@@ -365,7 +376,6 @@ public class Tui : Toplevel
         };
 
         streamDialog.Add(uriLabel, streamUrl, loadStreamButton, closeButton);
-
         Application.Run(streamDialog);
     }
 
@@ -474,6 +484,7 @@ public class Tui : Toplevel
                 _timePlayedLabel.Text = $"{timePlayed} / {trackLength}";
             }
         }
+        
         else
         {
             _timePlayedLabel.Text = "00:00 / 00:00";
@@ -510,11 +521,13 @@ public class Tui : Toplevel
 
         if (_player.State == PlaybackState.Playing)
         {
-            RunMainLoop();
             _nowPlayingLabel.Text =
-                $"{(string.IsNullOrWhiteSpace(audioFile.TrackInfo.Artist) ? "Unknown" : audioFile.TrackInfo.Artist)} - " +
                 $"{(string.IsNullOrWhiteSpace(audioFile.TrackInfo.Title) ? "Unknown" : audioFile.TrackInfo.Title)} - " +
+                $"{(string.IsNullOrWhiteSpace(audioFile.TrackInfo.Artist) ? "Unknown" : audioFile.TrackInfo.Artist)} - " +
                 $"{(string.IsNullOrWhiteSpace(audioFile.TrackInfo.Album) ? "Unknown" : audioFile.TrackInfo.Album)}";
+            
+            _playPauseButton.Text = "Pause";
+            RunMainLoop();
         }
     }
 

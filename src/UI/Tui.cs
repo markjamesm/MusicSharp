@@ -426,9 +426,8 @@ public class Tui : Toplevel
         {
             var playlist = PlaylistHelpers.LoadPlaylist(d.FilePaths[0]);
 
-            foreach (var filepath in playlist)
+            foreach (var track in playlist.Select(filepath => new AudioFile(filepath)))
             {
-                var track = new AudioFile(filepath);
                 _loadedPlaylist.Add(track);
             }
         }
@@ -539,9 +538,9 @@ public class Tui : Toplevel
 
     private class TrackListDataSource : IListDataSource
     {
-        private const int TitleColumnWidth = 30;
-        private const int ArtistColumnWidth = 60;
-        private const int AlbumColumnWidth = 60;
+        private const int TitleColumnWidth = 50;
+        private const int ArtistColumnWidth = 30;
+        private const int AlbumColumnWidth = 40;
         private int _count;
         private BitArray _marks;
         private ObservableCollection<AudioFile> _loadedPlaylist;
@@ -600,13 +599,23 @@ public class Tui : Toplevel
         {
             container.Move(col, line);
 
-            // Equivalent to an interpolated string like $"{Scenarios[item].Name, -widtestname}"; if such a thing were possible
-            var s = string.Format(
+            // Equivalent to an interpolated string like $"{AudioFiles[item].Name, -widtestname}"; if it were possible
+            var trackTitle = string.Format(
                 string.Format("{{0,{0}}}", -TitleColumnWidth),
                 AudioFiles[item].TrackInfo.Title
             );
-            RenderUstr(container, $"{s} {AudioFiles[item].TrackInfo.Artist} {AudioFiles[item].TrackInfo.Album}", col,
-                line, width, start);
+            
+            var artist = string.Format(
+                string.Format("{{0,{0}}}", -ArtistColumnWidth),
+                AudioFiles[item].TrackInfo.Artist
+            );
+            
+            var album = string.Format(
+                string.Format("{{0,{0}}}", -AlbumColumnWidth),
+                AudioFiles[item].TrackInfo.Album
+            );
+            
+            RenderUstr(container, $"{trackTitle} {artist} {album}", col, line, width, start);
         }
 
         public void SetMark(int item, bool value)
@@ -633,12 +642,23 @@ public class Tui : Toplevel
 
             for (var i = 0; i < _loadedPlaylist.Count; i++)
             {
-                string s = string.Format(
+                var trackTitle = string.Format(
                     $"{{0,{-TitleColumnWidth}}}",
                     AudioFiles[i].TrackInfo.Title
                 );
-                var sc = $"{s}  {AudioFiles[i].TrackInfo.Artist} {AudioFiles[i].TrackInfo.Album}";
-                int l = sc.Length;
+                
+                var artist = string.Format(
+                    $"{{0,{-ArtistColumnWidth}}}",
+                    AudioFiles[i].TrackInfo.Artist
+                );
+                
+                var album = string.Format(
+                    $"{{0,{-AlbumColumnWidth}}}",
+                    AudioFiles[i].TrackInfo.Album
+                );
+                
+                var sc = $"{trackTitle} {artist} {album}";
+                var l = sc.Length;
 
                 if (l > maxLength)
                 {
@@ -657,7 +677,7 @@ public class Tui : Toplevel
 
             while (index < ustr.Length)
             {
-                (Rune rune, var size) = ustr.DecodeRune(index, index - ustr.Length);
+                var (rune, size) = ustr.DecodeRune(index, index - ustr.Length);
                 var count = rune.GetColumns();
 
                 if (used + count >= width)

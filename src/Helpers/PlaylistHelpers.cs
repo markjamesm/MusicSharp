@@ -1,10 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using ATL.Playlist;
+using MusicSharp.Data;
 
-namespace MusicSharp.FileData;
+namespace MusicSharp.Helpers;
 
-public static class Playlist
+public static class PlaylistHelpers
 {
     /// <summary>
     /// Load an M3U playlist.
@@ -19,10 +20,15 @@ public static class Playlist
         return theReader.FilePaths.Select(s => s.Replace("%20", " ")).ToList();
     }
 
-    public static void SavePlaylistToFile(string playlistFilePath, List<string> playlistFiles)
+    public static void SavePlaylistToFile(string playlistFilePath, List<AudioFile> filesForPlaylist)
     {
         var pls = PlaylistIOFactory.GetInstance().GetPlaylistIO(playlistFilePath);
-        pls.FilePaths = playlistFiles.ToList();
+        
+        foreach (var file in filesForPlaylist)
+        {
+            pls.FilePaths.Add(file.Path);    
+        }
+        
         pls.Save();
     }
 }

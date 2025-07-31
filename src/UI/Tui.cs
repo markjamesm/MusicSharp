@@ -1,10 +1,13 @@
 using System;
+using System.Collections;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Text;
 using MusicSharp.AudioPlayer;
+using MusicSharp.Data;
 using MusicSharp.Enums;
-using MusicSharp.FileData;
+using MusicSharp.Helpers;
 using SoundFlow.Enums;
 using Terminal.Gui.App;
 using Terminal.Gui.Drawing;
@@ -23,7 +26,7 @@ public class Tui : Toplevel
     private readonly Label _nowPlayingLabel;
     private readonly Label _timePlayedLabel;
     private readonly ListView _playlistView;
-    private readonly ObservableCollection<string> _loadedPlaylist = [];
+    private readonly ObservableCollection<AudioFile> _loadedPlaylist = [];
     private object? _mainLoopTimeout;
 
     private const uint MainLoopTimeoutTick = 100; // ms
@@ -113,7 +116,7 @@ public class Tui : Toplevel
             Height = Dim.Fill(10),
             CanFocus = true,
             BorderStyle = LineStyle.Rounded,
-            Source = new ListWrapper<string>(_loadedPlaylist),
+            Source = new TrackListDataSource(_loadedPlaylist),
             AllowsMarking = true,
         };
         _playlistView.RowRender += PlaylistView_RowRender;
@@ -123,7 +126,7 @@ public class Tui : Toplevel
         {
             if (args.Value != null)
             {
-                PlayHandler(args.Value.ToString()!);
+                PlayHandler((AudioFile)args.Value);
             }
         };
 
@@ -160,7 +163,7 @@ public class Tui : Toplevel
             CanFocus = true,
             Text = "Play/Pause"
         };
-        
+
         playPauseButton.Accepting += (s, e) =>
         {
             _player.PlayPause();
@@ -175,7 +178,7 @@ public class Tui : Toplevel
             CanFocus = true,
             Text = "Stop",
         };
-        
+
         stopButton.Accepting += (s, e) =>
         {
             _player.Stop();
@@ -193,7 +196,7 @@ public class Tui : Toplevel
             CanFocus = true,
             Text = "Volume +"
         };
-        
+
         volumeIncreaseButton.Accepting += (s, e) =>
         {
             _player.IncreaseVolume();
@@ -208,7 +211,7 @@ public class Tui : Toplevel
             IsDefault = false,
             Text = "Volume -"
         };
-        
+
         volumeDecreaseButton.Accepting += (s, e) =>
         {
             _player.DecreaseVolume();
@@ -223,7 +226,7 @@ public class Tui : Toplevel
             CanFocus = true,
             Text = "Seek 5s"
         };
-        
+
         seekForwardButton.Accepting += (s, e) =>
         {
             _player.SeekForward();
@@ -238,7 +241,7 @@ public class Tui : Toplevel
             CanFocus = true,
             Text = "Seek -5s"
         };
-        
+
         seekBackwardButton.Accepting += (s, e) =>
         {
             _player.SeekBackward();
@@ -301,7 +304,8 @@ public class Tui : Toplevel
 
         if (!d.Canceled)
         {
-            PlayHandler(d.FilePaths[0]);
+            var audioFile = new AudioFile(d.FilePaths[0]);
+            PlayHandler(audioFile);
         }
     }
 
@@ -334,7 +338,7 @@ public class Tui : Toplevel
             X = Pos.Center(),
             Y = Pos.Bottom(streamUrl),
         };
-        
+
         loadStreamButton.Accepting += (s, e) =>
         {
             if (streamUrl.Text != string.Empty)
@@ -399,8 +403,9 @@ public class Tui : Toplevel
 
         if (!d.Canceled)
         {
-            foreach (var track in d.FilePaths)
+            foreach (var filepath in d.FilePaths)
             {
+                var track = new AudioFile(filepath);
                 _loadedPlaylist.Add(track);
             }
         }
@@ -419,10 +424,11 @@ public class Tui : Toplevel
 
         if (!d.Canceled)
         {
-            var playlist = Playlist.LoadPlaylist(d.FilePaths[0]);
+            var playlist = PlaylistHelpers.LoadPlaylist(d.FilePaths[0]);
 
-            foreach (var track in playlist)
+            foreach (var filepath in playlist)
             {
+                var track = new AudioFile(filepath);
                 _loadedPlaylist.Add(track);
             }
         }
@@ -442,7 +448,7 @@ public class Tui : Toplevel
         if (!d.Canceled)
         {
             var currentTracks = _loadedPlaylist.ToList();
-            Playlist.SavePlaylistToFile(d.FileName, currentTracks);
+            PlaylistHelpers.SavePlaylistToFile(d.FileName, currentTracks);
         }
     }
 
@@ -474,42 +480,45 @@ public class Tui : Toplevel
             _timePlayedLabel.Text = "00:00 / 00:00";
         }
     }
-    
-    private void PlaylistView_RowRender (object? sender, ListViewRowEventArgs obj)
+
+    private void PlaylistView_RowRender(object? sender, ListViewRowEventArgs obj)
     {
         if (obj.Row == _playlistView.SelectedItem)
         {
             return;
         }
 
-        if (_playlistView.AllowsMarking && _playlistView.Source.IsMarked (obj.Row))
+        if (_playlistView.AllowsMarking && _playlistView.Source.IsMarked(obj.Row))
         {
-            obj.RowAttribute = new Attribute (Color.Black, Color.White);
+            obj.RowAttribute = new Attribute(Color.Black, Color.White);
 
             return;
         }
 
         if (obj.Row % 2 == 0)
         {
-            obj.RowAttribute = new Attribute (Color.Green, Color.Black);
+            obj.RowAttribute = new Attribute(Color.Green, Color.Black);
         }
         else
         {
-            obj.RowAttribute = new Attribute (Color.Black, Color.Green);
+            obj.RowAttribute = new Attribute(Color.Black, Color.Green);
         }
     }
-    
-    private void PlayHandler(string filePath)
+
+    private void PlayHandler(AudioFile audioFile)
     {
-        _player.Play(filePath, EFileType.File);
+        _player.Play(audioFile.Path, EFileType.File);
 
         if (_player.State == PlaybackState.Playing)
         {
             RunMainLoop();
-            _nowPlayingLabel.Text = TrackData.GetTrackData(filePath);
+            _nowPlayingLabel.Text =
+                $"{(string.IsNullOrWhiteSpace(audioFile.TrackInfo.Artist) ? "Unknown" : audioFile.TrackInfo.Artist)} - " +
+                $"{(string.IsNullOrWhiteSpace(audioFile.TrackInfo.Title) ? "Unknown" : audioFile.TrackInfo.Title)} - " +
+                $"{(string.IsNullOrWhiteSpace(audioFile.TrackInfo.Album) ? "Unknown" : audioFile.TrackInfo.Album)}";
         }
     }
-    
+
     private static string GetAboutMessage()
     {
         var sb = new StringBuilder();
@@ -526,5 +535,151 @@ public class Tui : Toplevel
         sb.AppendLine("Created by Mark-James M.");
 
         return sb.ToString();
+    }
+
+    private class TrackListDataSource : IListDataSource
+    {
+        private const int TitleColumnWidth = 30;
+        private const int ArtistColumnWidth = 60;
+        private const int AlbumColumnWidth = 60;
+        private int _count;
+        private BitArray _marks;
+        private ObservableCollection<AudioFile> _loadedPlaylist;
+
+        public TrackListDataSource(ObservableCollection<AudioFile> audioFiles)
+        {
+            AudioFiles = audioFiles;
+        }
+
+        private ObservableCollection<AudioFile> AudioFiles
+        {
+            get => _loadedPlaylist;
+            set
+            {
+                if (value != null)
+                {
+                    _count = value.Count;
+                    _marks = new BitArray(_count);
+                    _loadedPlaylist = value;
+                    Length = GetMaxLengthItem();
+                }
+            }
+        }
+
+        public bool IsMarked(int item)
+        {
+            if (item >= 0 && item < _count)
+            {
+                return _marks[item];
+            }
+
+            return false;
+        }
+#pragma warning disable CS0067
+        public event NotifyCollectionChangedEventHandler CollectionChanged;
+#pragma warning restore CS0067
+
+        public int Count => AudioFiles?.Count ?? 0;
+        public int Length { get; private set; }
+
+        public bool SuspendCollectionChangedEvent
+        {
+            get => throw new NotImplementedException();
+            set => throw new NotImplementedException();
+        }
+
+        public void Render(
+            ListView container,
+            bool selected,
+            int item,
+            int col,
+            int line,
+            int width,
+            int start = 0
+        )
+        {
+            container.Move(col, line);
+
+            // Equivalent to an interpolated string like $"{Scenarios[item].Name, -widtestname}"; if such a thing were possible
+            var s = string.Format(
+                string.Format("{{0,{0}}}", -TitleColumnWidth),
+                AudioFiles[item].TrackInfo.Title
+            );
+            RenderUstr(container, $"{s} {AudioFiles[item].TrackInfo.Artist} {AudioFiles[item].TrackInfo.Album}", col,
+                line, width, start);
+        }
+
+        public void SetMark(int item, bool value)
+        {
+            if (item >= 0 && item < _count)
+            {
+                _marks[item] = value;
+            }
+        }
+
+        public IList ToList()
+        {
+            return AudioFiles;
+        }
+
+        private int GetMaxLengthItem()
+        {
+            if (_loadedPlaylist?.Count == 0)
+            {
+                return 0;
+            }
+
+            var maxLength = 0;
+
+            for (var i = 0; i < _loadedPlaylist.Count; i++)
+            {
+                string s = string.Format(
+                    $"{{0,{-TitleColumnWidth}}}",
+                    AudioFiles[i].TrackInfo.Title
+                );
+                var sc = $"{s}  {AudioFiles[i].TrackInfo.Artist} {AudioFiles[i].TrackInfo.Album}";
+                int l = sc.Length;
+
+                if (l > maxLength)
+                {
+                    maxLength = l;
+                }
+            }
+
+            return maxLength;
+        }
+
+        // A slightly adapted method from: https://github.com/gui-cs/Terminal.Gui/blob/fc1faba7452ccbdf49028ac49f0c9f0f42bbae91/Terminal.Gui/Views/ListView.cs#L433-L461
+        private void RenderUstr(View view, string ustr, int col, int line, int width, int start = 0)
+        {
+            var used = 0;
+            var index = start;
+
+            while (index < ustr.Length)
+            {
+                (Rune rune, var size) = ustr.DecodeRune(index, index - ustr.Length);
+                var count = rune.GetColumns();
+
+                if (used + count >= width)
+                {
+                    break;
+                }
+
+                view.AddRune(rune);
+                used += count;
+                index += size;
+            }
+
+            while (used < width)
+            {
+                view.AddRune((Rune)' ');
+                used++;
+            }
+        }
+
+        public void Dispose()
+        {
+            _loadedPlaylist = null;
+        }
     }
 }

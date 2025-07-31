@@ -49,7 +49,7 @@ public class Tui : Toplevel
                     new MenuItemv2[]
                     {
                         new("_Open file", "Open audio file", OpenFile),
-                        new("Open _stream", "Open stream", OpenStream),
+                        new("Open _stream", "Open a stream URL", OpenStream),
                         new("_Quit", "Quit MusicSharp", RequestStop)
                     }
                 ),
@@ -58,8 +58,9 @@ public class Tui : Toplevel
                     new MenuItemv2[]
                     {
                         new("_Add to playlist", "Add track(s) to playlist", AddToPlaylist),
+                        new("_Remove from playlist", "Remove selected track from playlist", RemoveFromPlaylist),
                         new("Open _playlist", "Open a playlist", OpenPlaylist),
-                        new("_Save playlist", "Save files to playlist", SavePlaylist)
+                        new("_Save playlist", "Save to playlist", SavePlaylist)
                     }
                 ),
                 new MenuBarItemv2(
@@ -118,7 +119,8 @@ public class Tui : Toplevel
             CanFocus = true,
             BorderStyle = LineStyle.Rounded,
             Source = new TrackListDataSource(_loadedPlaylist),
-            AllowsMarking = true,
+            AllowsMarking = false,
+            AllowsMultipleSelection = false
         };
         _playlistView.RowRender += PlaylistView_RowRender;
         _playlistView.VerticalScrollBar.AutoShow = true;
@@ -460,9 +462,9 @@ public class Tui : Toplevel
             PlaylistHelpers.SavePlaylistToFile(d.FileName, currentTracks);
         }
     }
-
+    
     #endregion
-
+    
     private void TimePlayedLabel()
     {
         if (_player.State != PlaybackState.Stopped)
@@ -484,7 +486,7 @@ public class Tui : Toplevel
                 _timePlayedLabel.Text = $"{timePlayed} / {trackLength}";
             }
         }
-        
+
         else
         {
             _timePlayedLabel.Text = "00:00 / 00:00";
@@ -525,10 +527,16 @@ public class Tui : Toplevel
                 $"{(string.IsNullOrWhiteSpace(audioFile.TrackInfo.Title) ? "Unknown" : audioFile.TrackInfo.Title)} - " +
                 $"{(string.IsNullOrWhiteSpace(audioFile.TrackInfo.Artist) ? "Unknown" : audioFile.TrackInfo.Artist)} - " +
                 $"{(string.IsNullOrWhiteSpace(audioFile.TrackInfo.Album) ? "Unknown" : audioFile.TrackInfo.Album)}";
-            
+
             _playPauseButton.Text = "Pause";
             RunMainLoop();
         }
+    }
+
+    private void RemoveFromPlaylist()
+    {
+        var s = _playlistView.SelectedItem;
+        _loadedPlaylist.RemoveAt(s);
     }
 
     private static string GetAboutMessage()
@@ -551,7 +559,7 @@ public class Tui : Toplevel
 
     private class TrackListDataSource : IListDataSource
     {
-        private const int TitleColumnWidth = 50;
+        private const int TitleColumnWidth = 35;
         private const int ArtistColumnWidth = 30;
         private const int AlbumColumnWidth = 40;
         private int _count;
@@ -617,17 +625,17 @@ public class Tui : Toplevel
                 string.Format("{{0,{0}}}", -TitleColumnWidth),
                 AudioFiles[item].TrackInfo.Title
             );
-            
+
             var artist = string.Format(
                 string.Format("{{0,{0}}}", -ArtistColumnWidth),
                 AudioFiles[item].TrackInfo.Artist
             );
-            
+
             var album = string.Format(
                 string.Format("{{0,{0}}}", -AlbumColumnWidth),
                 AudioFiles[item].TrackInfo.Album
             );
-            
+
             RenderUstr(container, $"{trackTitle} {artist} {album}", col, line, width, start);
         }
 
@@ -659,17 +667,17 @@ public class Tui : Toplevel
                     $"{{0,{-TitleColumnWidth}}}",
                     AudioFiles[i].TrackInfo.Title
                 );
-                
+
                 var artist = string.Format(
                     $"{{0,{-ArtistColumnWidth}}}",
                     AudioFiles[i].TrackInfo.Artist
                 );
-                
+
                 var album = string.Format(
                     $"{{0,{-AlbumColumnWidth}}}",
                     AudioFiles[i].TrackInfo.Album
                 );
-                
+
                 var sc = $"{trackTitle} {artist} {album}";
                 var l = sc.Length;
 

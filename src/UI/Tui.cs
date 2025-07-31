@@ -697,7 +697,7 @@ public class Tui : Toplevel
         }
 
         // A slightly adapted method from: https://github.com/gui-cs/Terminal.Gui/blob/fc1faba7452ccbdf49028ac49f0c9f0f42bbae91/Terminal.Gui/Views/ListView.cs#L433-L461
-        private void RenderUstr(View view, string ustr, int col, int line, int width, int start = 0)
+        private static void RenderUstr(View view, string ustr, int col, int line, int width, int start = 0)
         {
             var used = 0;
             var index = start;

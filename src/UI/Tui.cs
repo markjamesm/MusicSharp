@@ -565,7 +565,7 @@ public class Tui : Toplevel
     
     private class TrackListDataSource : IListDataSource
     {
-        private const int TitleColumnWidth = 35;
+        private const int TitleColumnWidth = 40;
         private const int ArtistColumnWidth = 30;
         private const int AlbumColumnWidth = 40;
         private int _count;

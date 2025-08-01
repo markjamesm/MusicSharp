@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Linq;
+using MusicSharp.Data;
 using MusicSharp.Enums;
 using SoundFlow.Abstracts.Devices;
 using SoundFlow.Backends.MiniAudio;
@@ -46,7 +47,7 @@ public sealed class SoundFlowPlayer : IPlayer
         _audioPlaybackDevice = _audioEngine.InitializePlaybackDevice(defaultPlaybackDevice, _audioFormat);
     }
     
-    public void Play(string filepath, EFileType fileType)
+    public void Play(AudioFile audioFile)
     {
         if (_player != null && _player.State == PlaybackState.Playing)
         {
@@ -54,14 +55,14 @@ public sealed class SoundFlowPlayer : IPlayer
             _audioPlaybackDevice.Stop();
         }
 
-        if (fileType == EFileType.File)
+        if (audioFile.Type == EFileType.File)
         {
-            _streamDataProvider = new StreamDataProvider(_audioEngine, _audioFormat, File.OpenRead(filepath));
+            _streamDataProvider = new StreamDataProvider(_audioEngine, _audioFormat, File.OpenRead(audioFile.Path));
         }
 
-        if (fileType == EFileType.WebStream)
+        if (audioFile.Type == EFileType.Stream)
         {
-            _streamDataProvider = new NetworkDataProvider(_audioEngine, _audioFormat, filepath);
+            _streamDataProvider = new NetworkDataProvider(_audioEngine, _audioFormat, audioFile.Path);
         }
 
         if (_streamDataProvider != null)

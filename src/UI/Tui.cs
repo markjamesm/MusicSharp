@@ -305,7 +305,7 @@ public class Tui : Toplevel
     
     private void PlayHandler(AudioFile audioFile)
     {
-        _player.Play(audioFile.Path, EFileType.File);
+        _player.Play(audioFile);
 
         if (_player.State == PlaybackState.Playing)
         {
@@ -334,7 +334,7 @@ public class Tui : Toplevel
 
         if (!d.Canceled)
         {
-            var audioFile = new AudioFile(d.FilePaths[0]);
+            var audioFile = new AudioFile(d.FilePaths[0], EFileType.File);
             PlayHandler(audioFile);
         }
     }
@@ -373,8 +373,8 @@ public class Tui : Toplevel
         {
             if (streamUrl.Text != string.Empty)
             {
-                _player.Play(streamUrl.Text, EFileType.WebStream);
-                _playPauseButton.Text = "Pause";
+                var audioFile = new AudioFile(streamUrl.Text, EFileType.Stream);
+                PlayHandler(audioFile);
                 _nowPlayingLabel.Text = $"Web stream: {streamUrl.Text}";
             }
 
@@ -437,7 +437,7 @@ public class Tui : Toplevel
         {
             foreach (var filepath in d.FilePaths)
             {
-                var track = new AudioFile(filepath);
+                var track = new AudioFile(filepath, EFileType.File);
                 _loadedPlaylist.Add(track);
             }
         }
@@ -464,7 +464,7 @@ public class Tui : Toplevel
         {
             var playlist = PlaylistHelpers.LoadPlaylist(d.FilePaths[0]);
 
-            foreach (var track in playlist.Select(filepath => new AudioFile(filepath)))
+            foreach (var track in playlist.Select(filepath => new AudioFile(filepath, EFileType.File)))
             {
                 _loadedPlaylist.Add(track);
             }

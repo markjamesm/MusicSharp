@@ -1,4 +1,5 @@
 ﻿using System;
+using MusicSharp.Data;
 using MusicSharp.Enums;
 using SoundFlow.Enums;
 
@@ -27,9 +28,9 @@ public interface IPlayer: IDisposable
     /// <summary>
     /// Method to play audio.
     /// </summary>
-    /// <param name="filepath">The filepath to the file or stream.</param>
-    /// <param name="fileType">The type of audio (File or WebStream).</param>
-    void Play(string filepath, EFileType  fileType);
+    /// <param name="audioFile">The AudioFile.</param>
+    /// <param name="fileType">The type of audio (File or Stream).</param>
+    void Play(AudioFile audioFile);
     
     /// <summary>
     /// Method to pause audio playback.

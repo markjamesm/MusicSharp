@@ -29,7 +29,6 @@ public interface IPlayer: IDisposable
     /// Method to play audio.
     /// </summary>
     /// <param name="audioFile">The AudioFile.</param>
-    /// <param name="fileType">The type of audio (File or Stream).</param>
     void Play(AudioFile audioFile);
     
     /// <summary>

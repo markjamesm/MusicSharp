@@ -235,7 +235,7 @@ public class Tui : Toplevel
             Y = 0,
             IsDefault = false,
             CanFocus = true,
-            Text = "Seek 5s"
+            Text = "Seek 5s "
         };
 
         seekForwardButton.Accepting += (s, e) =>

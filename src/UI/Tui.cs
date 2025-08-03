@@ -321,10 +321,15 @@ public class Tui : Toplevel
 
         if (_player.State == PlaybackState.Playing)
         {
-            _nowPlayingLabel.Text =
-                $"{(string.IsNullOrWhiteSpace(audioFile.TrackInfo.Title) ? "Unknown" : audioFile.TrackInfo.Title)} - " +
-                $"{(string.IsNullOrWhiteSpace(audioFile.TrackInfo.Artist) ? "Unknown" : audioFile.TrackInfo.Artist)} - " +
-                $"{(string.IsNullOrWhiteSpace(audioFile.TrackInfo.Album) ? "Unknown" : audioFile.TrackInfo.Album)}";
+            _nowPlayingLabel.Text = audioFile.Type switch
+            {
+                EFileType.File =>
+                    $"{(string.IsNullOrWhiteSpace(audioFile.TrackInfo.Title) ? "Unknown" : audioFile.TrackInfo.Title)} - " +
+                    $"{(string.IsNullOrWhiteSpace(audioFile.TrackInfo.Artist) ? "Unknown" : audioFile.TrackInfo.Artist)} - " +
+                    $"{(string.IsNullOrWhiteSpace(audioFile.TrackInfo.Album) ? "Unknown" : audioFile.TrackInfo.Album)}",
+                EFileType.Stream => $"Web stream: {audioFile.Path}",
+                _ => _nowPlayingLabel.Text
+            };
 
             RunMainLoop();
         }
@@ -386,7 +391,6 @@ public class Tui : Toplevel
             {
                 var audioFile = new AudioFile(streamUrl.Text, EFileType.Stream);
                 PlayHandler(audioFile);
-                _nowPlayingLabel.Text = $"Web stream: {streamUrl.Text}";
             }
 
             e.Handled = true;

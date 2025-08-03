@@ -20,13 +20,13 @@ public sealed class SoundFlowPlayer : IPlayer
     private readonly AudioFormat _audioFormat;
     private ISoundDataProvider? _streamDataProvider;
     private SoundPlayer? _player;
-    private AudioFile? _nowPlaying;
     private float _volume;
     
     // If we don't know the state of the player, default to stopped?
     public PlaybackState State => _player?.State ?? PlaybackState.Stopped;
     public float TrackLength => _player?.Duration ?? 0;
     public float CurrentTime => _player?.Time ?? 0;
+    public AudioFile? NowPlaying { get; set; }
     
     public SoundFlowPlayer(MiniAudioEngine audioEngine)
     {
@@ -52,7 +52,7 @@ public sealed class SoundFlowPlayer : IPlayer
     
     public void PlayPause(AudioFile audioFile)
     {
-        if (_player != null && audioFile.Path.Equals(_nowPlaying?.Path))
+        if (_player != null && audioFile.Path.Equals(NowPlaying?.Path))
         {
             switch (_player.State)
             {
@@ -68,13 +68,13 @@ public sealed class SoundFlowPlayer : IPlayer
             }
         }
 
-        if (!audioFile.Path.Equals(_nowPlaying?.Path))
+        if (!audioFile.Path.Equals(NowPlaying?.Path))
         {
             if (_player != null && _player.State == PlaybackState.Playing)
             {
                 _player.Stop();
                 _audioPlaybackDevice.Stop();
-                _nowPlaying = null;
+                NowPlaying = null;
             }
             
             _streamDataProvider = audioFile.Type switch
@@ -91,7 +91,7 @@ public sealed class SoundFlowPlayer : IPlayer
                 _audioPlaybackDevice.Start();
                 _player.Volume = _volume;
                 _player.Play();
-                _nowPlaying = audioFile;
+                NowPlaying = audioFile;
             }
         }
     }
@@ -102,7 +102,7 @@ public sealed class SoundFlowPlayer : IPlayer
         {
             _player?.Stop();
             _audioPlaybackDevice.Stop();
-            _nowPlaying = null;
+            NowPlaying = null;
         }
     }
 

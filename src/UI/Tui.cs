@@ -170,11 +170,16 @@ public class Tui : Toplevel
         _playPauseButton.Accepting += (s, e) =>
         {
             var selected = _playlistView.SelectedItem;
-            
-            if (_loadedPlaylist != null)
+            var selectedTrack = _loadedPlaylist?.ElementAtOrDefault(selected);
+
+            if (selectedTrack != null)
             {
-                var selectedTrack = _loadedPlaylist.ElementAt(selected);
                 PlayHandler(selectedTrack);
+            }
+
+            if (_player.NowPlaying != null)
+            {
+                PlayHandler(_player.NowPlaying);
             }
 
             e.Handled = true;

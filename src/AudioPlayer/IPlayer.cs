@@ -23,6 +23,12 @@ public interface IPlayer: IDisposable
     /// Returns the current time played.
     /// </summary>
     float CurrentTime { get; }
+    
+    /// <summary>
+    /// Returns the currently playing track.
+    /// </summary>
+    AudioFile? NowPlaying { get; }
+
 
     /// <summary>
     /// Method to play and pause audio.

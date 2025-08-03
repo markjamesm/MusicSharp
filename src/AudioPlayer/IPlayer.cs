@@ -26,15 +26,10 @@ public interface IPlayer: IDisposable
     float CurrentTime { get; }
 
     /// <summary>
-    /// Method to play audio.
+    /// Method to play and pause audio.
     /// </summary>
     /// <param name="audioFile">The AudioFile.</param>
-    void Play(AudioFile audioFile);
-    
-    /// <summary>
-    /// Method to pause audio playback.
-    /// </summary>
-    void PlayPause();
+    void PlayPause(AudioFile audioFile);
     
     /// <summary>
     /// Method to stop audio playback.

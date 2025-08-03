@@ -169,15 +169,9 @@ public class Tui : Toplevel
 
         _playPauseButton.Accepting += (s, e) =>
         {
-            _player.PlayPause();
-            _playPauseButton.Text = _player.State switch
-            {
-                PlaybackState.Stopped => "Play",
-                PlaybackState.Playing => "Pause",
-                PlaybackState.Paused => "Play",
-                _ => _playPauseButton.Text
-            };
-
+            var selected = _playlistView.SelectedItem;
+            var selectedTrack = _loadedPlaylist.ElementAt(selected);
+            PlayHandler(selectedTrack);
             e.Handled = true;
         };
 
@@ -305,7 +299,7 @@ public class Tui : Toplevel
     
     private void PlayHandler(AudioFile audioFile)
     {
-        _player.Play(audioFile);
+        _player.PlayPause(audioFile);
 
         if (_player.State == PlaybackState.Playing)
         {
@@ -314,9 +308,16 @@ public class Tui : Toplevel
                 $"{(string.IsNullOrWhiteSpace(audioFile.TrackInfo.Artist) ? "Unknown" : audioFile.TrackInfo.Artist)} - " +
                 $"{(string.IsNullOrWhiteSpace(audioFile.TrackInfo.Album) ? "Unknown" : audioFile.TrackInfo.Album)}";
 
-            _playPauseButton.Text = "Pause";
             RunMainLoop();
         }
+        
+        _playPauseButton.Text = _player.State switch
+        {
+            PlaybackState.Stopped => "Play",
+            PlaybackState.Playing => "Pause",
+            PlaybackState.Paused => "Play",
+            _ => _playPauseButton.Text
+        };
     }
 
     #region OpenMethods

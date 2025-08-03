@@ -20,6 +20,7 @@ public sealed class SoundFlowPlayer : IPlayer
     private readonly AudioFormat _audioFormat;
     private ISoundDataProvider? _streamDataProvider;
     private SoundPlayer? _player;
+    private AudioFile? _nowPlaying;
     
     // If we don't know the state of the player, default to stopped?
     public PlaybackState State => _player?.State ?? PlaybackState.Stopped;
@@ -47,36 +48,9 @@ public sealed class SoundFlowPlayer : IPlayer
         _audioPlaybackDevice = _audioEngine.InitializePlaybackDevice(defaultPlaybackDevice, _audioFormat);
     }
     
-    public void Play(AudioFile audioFile)
+    public void PlayPause(AudioFile audioFile)
     {
-        if (_player != null && _player.State == PlaybackState.Playing)
-        {
-            _player.Stop();
-            _audioPlaybackDevice.Stop();
-        }
-
-        if (audioFile.Type == EFileType.File)
-        {
-            _streamDataProvider = new StreamDataProvider(_audioEngine, _audioFormat, File.OpenRead(audioFile.Path));
-        }
-
-        if (audioFile.Type == EFileType.Stream)
-        {
-            _streamDataProvider = new NetworkDataProvider(_audioEngine, _audioFormat, audioFile.Path);
-        }
-
-        if (_streamDataProvider != null)
-        {
-            _player = new SoundPlayer(_audioEngine, _audioFormat, _streamDataProvider);
-            _audioPlaybackDevice.MasterMixer.AddComponent(_player);
-            _audioPlaybackDevice.Start();
-            _player.Play();
-        }
-    }
-
-    public void PlayPause()
-    {
-        if (_player != null)
+        if (_player != null && audioFile.Path.Equals(_nowPlaying?.Path))
         {
             switch (_player.State)
             {
@@ -91,6 +65,32 @@ public sealed class SoundFlowPlayer : IPlayer
                     throw new ArgumentOutOfRangeException();
             }
         }
+
+        if (!audioFile.Path.Equals(_nowPlaying?.Path))
+        {
+            if (_player != null && _player.State == PlaybackState.Playing)
+            {
+                _player.Stop();
+                _audioPlaybackDevice.Stop();
+                _nowPlaying = null;
+            }
+            
+            _streamDataProvider = audioFile.Type switch
+            {
+                EFileType.File => new StreamDataProvider(_audioEngine, _audioFormat, File.OpenRead(audioFile.Path)),
+                EFileType.Stream => new NetworkDataProvider(_audioEngine, _audioFormat, audioFile.Path),
+                _ => _streamDataProvider
+            };
+
+            if (_streamDataProvider != null)
+            {
+                _player = new SoundPlayer(_audioEngine, _audioFormat, _streamDataProvider);
+                _audioPlaybackDevice.MasterMixer.AddComponent(_player);
+                _audioPlaybackDevice.Start();
+                _player.Play();
+                _nowPlaying = audioFile;
+            }
+        }
     }
 
     public void Stop()
@@ -99,6 +99,7 @@ public sealed class SoundFlowPlayer : IPlayer
         {
             _player?.Stop();
             _audioPlaybackDevice.Stop();
+            _nowPlaying = null;
         }
     }
 

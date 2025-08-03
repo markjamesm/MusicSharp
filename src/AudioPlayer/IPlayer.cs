@@ -1,6 +1,5 @@
 ﻿using System;
 using MusicSharp.Data;
-using MusicSharp.Enums;
 using SoundFlow.Enums;
 
 namespace MusicSharp.AudioPlayer;

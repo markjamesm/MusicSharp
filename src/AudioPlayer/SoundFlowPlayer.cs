@@ -21,6 +21,7 @@ public sealed class SoundFlowPlayer : IPlayer
     private ISoundDataProvider? _streamDataProvider;
     private SoundPlayer? _player;
     private AudioFile? _nowPlaying;
+    private float _volume;
     
     // If we don't know the state of the player, default to stopped?
     public PlaybackState State => _player?.State ?? PlaybackState.Stopped;
@@ -46,6 +47,7 @@ public sealed class SoundFlowPlayer : IPlayer
         };
         
         _audioPlaybackDevice = _audioEngine.InitializePlaybackDevice(defaultPlaybackDevice, _audioFormat);
+        _volume = 1f;
     }
     
     public void PlayPause(AudioFile audioFile)
@@ -87,6 +89,7 @@ public sealed class SoundFlowPlayer : IPlayer
                 _player = new SoundPlayer(_audioEngine, _audioFormat, _streamDataProvider);
                 _audioPlaybackDevice.MasterMixer.AddComponent(_player);
                 _audioPlaybackDevice.Start();
+                _player.Volume = _volume;
                 _player.Play();
                 _nowPlaying = audioFile;
             }
@@ -110,6 +113,7 @@ public sealed class SoundFlowPlayer : IPlayer
             // Verify what SoundFlow's max volume level is
             // For now this should be enough based on testing
             _player.Volume = Math.Clamp(_player.Volume + .1f, 0f, 2f);
+            _volume = _player.Volume;
         }
     }
 
@@ -118,6 +122,7 @@ public sealed class SoundFlowPlayer : IPlayer
         if (_player != null)
         {
             _player.Volume = Math.Clamp(_player.Volume - .1f, 0f, 2f);
+            _volume = _player.Volume;
         }
     }
     

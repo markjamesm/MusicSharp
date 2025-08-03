@@ -1,31 +1,21 @@
 # MusicSharp
 [![.NET](https://github.com/markjamesm/Baseball-Sharp/actions/workflows/dotnet.yml/badge.svg?branch=master)](https://github.com/markjamesm/MusicSharp/actions) [![C#](https://img.shields.io/badge/Language-CSharp-darkgreen.svg)](https://en.wikipedia.org/wiki/C_Sharp_(programming_language)) [![License](https://img.shields.io/badge/License-GPL-orange.svg)](https://www.gnu.org/licenses/gpl-3.0.en.html)
 
-A cross-platform Terminal User Interface (TUI) music player written in C# (.NET 8) with the goal of being minimalistic and light on resources.
+A cross-platform Terminal User Interface (TUI) music player written in C# with the goal of being minimalist 
+and light on resources.
 
-**Note**: A major rewrite of MusicSharp (version 2) is actively being developed in the 
-[musicsharp-v2 branch](https://github.com/markjamesm/MusicSharp/tree/musicsharp-v2). This version will feature:
-
-- A completely rewritten UI, making use of Terminal.Gui 2.0.
-- Library functionality to manage audio files.
-- Standalone application (no .NET runtime required).
+![Screenshot of MusicSharp](screenshots/musicsharp.png?raw=true)
 
 ## Features
 
-- Cross-platform support (Windows, Mac, Linux).
-- Play audio files.
-- Load and play from music playlists (M3U).
-- Streaming support.
+- Plays MP3, FLAC, and WAV files, with support for internet radio streams.
+- Cross-platform (Windows, Mac, Linux).
+- Standalone application (no .NET runtime required).
+- M3U playlist support.
 
 ## Installation
 
-Download the [latest release of MusicSharp](https://github.com/markjamesm/MusicSharp/releases) and follow the installation instructions.
-
-## Screenshot
-
-<img src="https://user-images.githubusercontent.com/20845425/99861949-06763200-2b66-11eb-9d5a-9bf2ea5151ee.png" alt="Screenshot of MusicSharp">
-
-MusicSharp makes use of the [SoundFlow](https://github.com/LSXPrime/SoundFlow) and [Terminal.Gui](https://github.com/migueldeicaza/gui.cs) libraries.
+Download and run the [latest release of MusicSharp](https://github.com/markjamesm/MusicSharp/releases).
 
 ## Want to Contribute?
 

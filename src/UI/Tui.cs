@@ -502,6 +502,8 @@ public class Tui : Toplevel
     {
         if (obj.Row == _playlistView.SelectedItem)
         {
+            obj.RowAttribute = new Attribute(Color.White, Color.Blue);
+            
             return;
         }
 

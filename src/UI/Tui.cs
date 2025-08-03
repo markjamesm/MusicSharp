@@ -177,7 +177,7 @@ public class Tui : Toplevel
                 PlayHandler(selectedTrack);
             }
 
-            if (_player.NowPlaying != null)
+            if (selectedTrack == null && _player.NowPlaying != null)
             {
                 PlayHandler(_player.NowPlaying);
             }
@@ -310,6 +310,14 @@ public class Tui : Toplevel
     private void PlayHandler(AudioFile audioFile)
     {
         _player.PlayPause(audioFile);
+        
+        _playPauseButton.Text = _player.State switch
+        {
+            PlaybackState.Stopped => "Play",
+            PlaybackState.Playing => "Pause",
+            PlaybackState.Paused => "Play",
+            _ => _playPauseButton.Text
+        };
 
         if (_player.State == PlaybackState.Playing)
         {
@@ -320,14 +328,6 @@ public class Tui : Toplevel
 
             RunMainLoop();
         }
-        
-        _playPauseButton.Text = _player.State switch
-        {
-            PlaybackState.Stopped => "Play",
-            PlaybackState.Playing => "Pause",
-            PlaybackState.Paused => "Play",
-            _ => _playPauseButton.Text
-        };
     }
 
     #region OpenMethods

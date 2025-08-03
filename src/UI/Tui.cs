@@ -27,7 +27,7 @@ public class Tui : Toplevel
     private readonly Label _timePlayedLabel;
     private readonly Button _playPauseButton;
     private readonly ListView _playlistView;
-    private readonly ObservableCollection<AudioFile> _loadedPlaylist = [];
+    private readonly ObservableCollection<AudioFile>? _loadedPlaylist = [];
     private object? _mainLoopTimeout;
 
     private const uint MainLoopTimeoutTick = 100; // ms
@@ -170,8 +170,13 @@ public class Tui : Toplevel
         _playPauseButton.Accepting += (s, e) =>
         {
             var selected = _playlistView.SelectedItem;
-            var selectedTrack = _loadedPlaylist.ElementAt(selected);
-            PlayHandler(selectedTrack);
+            
+            if (_loadedPlaylist != null)
+            {
+                var selectedTrack = _loadedPlaylist.ElementAt(selected);
+                PlayHandler(selectedTrack);
+            }
+
             e.Handled = true;
         };
 
@@ -439,7 +444,7 @@ public class Tui : Toplevel
             foreach (var filepath in d.FilePaths)
             {
                 var track = new AudioFile(filepath, EFileType.File);
-                _loadedPlaylist.Add(track);
+                _loadedPlaylist?.Add(track);
             }
         }
     }
@@ -447,7 +452,7 @@ public class Tui : Toplevel
     private void RemoveFromPlaylist()
     {
         var s = _playlistView.SelectedItem;
-        _loadedPlaylist.RemoveAt(s);
+        _loadedPlaylist?.RemoveAt(s);
     }
 
     private void OpenPlaylist()
@@ -467,7 +472,7 @@ public class Tui : Toplevel
 
             foreach (var track in playlist.Select(filepath => new AudioFile(filepath, EFileType.File)))
             {
-                _loadedPlaylist.Add(track);
+                _loadedPlaylist?.Add(track);
             }
         }
     }
@@ -485,8 +490,11 @@ public class Tui : Toplevel
 
         if (!d.Canceled)
         {
-            var currentTracks = _loadedPlaylist.ToList();
-            PlaylistHelpers.SavePlaylistToFile(d.FileName, currentTracks);
+            if (_loadedPlaylist != null)
+            {
+                var currentTracks = _loadedPlaylist.ToList();
+                PlaylistHelpers.SavePlaylistToFile(d.FileName, currentTracks);
+            }
         }
     }
     
@@ -571,14 +579,14 @@ public class Tui : Toplevel
         private const int AlbumColumnWidth = 40;
         private int _count;
         private BitArray _marks;
-        private ObservableCollection<AudioFile> _loadedPlaylist;
+        private ObservableCollection<AudioFile>? _loadedPlaylist;
 
-        public TrackListDataSource(ObservableCollection<AudioFile> audioFiles)
+        public TrackListDataSource(ObservableCollection<AudioFile>? audioFiles)
         {
             AudioFiles = audioFiles;
         }
 
-        private ObservableCollection<AudioFile> AudioFiles
+        private ObservableCollection<AudioFile>? AudioFiles
         {
             get => _loadedPlaylist;
             set
@@ -630,17 +638,17 @@ public class Tui : Toplevel
             // Equivalent to an interpolated string like $"{AudioFiles[item].Name, -widtestname}"; if it were possible
             var trackTitle = string.Format(
                 string.Format("{{0,{0}}}", -TitleColumnWidth),
-                AudioFiles[item].TrackInfo.Title
+                AudioFiles?[item].TrackInfo.Title
             );
 
             var artist = string.Format(
                 string.Format("{{0,{0}}}", -ArtistColumnWidth),
-                AudioFiles[item].TrackInfo.Artist
+                AudioFiles?[item].TrackInfo.Artist
             );
 
             var album = string.Format(
                 string.Format("{{0,{0}}}", -AlbumColumnWidth),
-                AudioFiles[item].TrackInfo.Album
+                AudioFiles?[item].TrackInfo.Album
             );
 
             RenderUstr(container, $"{trackTitle} {artist} {album}", col, line, width, start);
@@ -672,17 +680,17 @@ public class Tui : Toplevel
             {
                 var trackTitle = string.Format(
                     $"{{0,{-TitleColumnWidth}}}",
-                    AudioFiles[i].TrackInfo.Title
+                    AudioFiles?[i].TrackInfo.Title
                 );
 
                 var artist = string.Format(
                     $"{{0,{-ArtistColumnWidth}}}",
-                    AudioFiles[i].TrackInfo.Artist
+                    AudioFiles?[i].TrackInfo.Artist
                 );
 
                 var album = string.Format(
                     $"{{0,{-AlbumColumnWidth}}}",
-                    AudioFiles[i].TrackInfo.Album
+                    AudioFiles?[i].TrackInfo.Album
                 );
 
                 var sc = $"{trackTitle} {artist} {album}";

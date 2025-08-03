@@ -3,7 +3,7 @@ using System.Linq;
 using ATL.Playlist;
 using MusicSharp.Data;
 
-namespace MusicSharp.Helpers;
+namespace MusicSharp.Playlist;
 
 public static class PlaylistHelpers
 {

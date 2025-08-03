@@ -7,7 +7,7 @@ using System.Text;
 using MusicSharp.AudioPlayer;
 using MusicSharp.Data;
 using MusicSharp.Enums;
-using MusicSharp.Helpers;
+using MusicSharp.Playlist;
 using SoundFlow.Enums;
 using Terminal.Gui.App;
 using Terminal.Gui.Drawing;

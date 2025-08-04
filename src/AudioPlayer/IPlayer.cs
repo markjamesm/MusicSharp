@@ -27,7 +27,7 @@ public interface IPlayer: IDisposable
     /// <summary>
     /// Returns the currently playing track.
     /// </summary>
-    AudioFile? NowPlaying { get; }
+    AudioFile? NowPlaying { get; set; }
 
 
     /// <summary>

@@ -70,7 +70,7 @@ public sealed class SoundFlowPlayer : IPlayer
 
         if (!audioFile.Path.Equals(NowPlaying?.Path))
         {
-            if (_player != null && _player.State == PlaybackState.Playing)
+            if (_player != null && _player.State != PlaybackState.Stopped)
             {
                 _player.Stop();
                 _audioPlaybackDevice.Stop();

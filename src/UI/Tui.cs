@@ -28,6 +28,7 @@ public class Tui : Toplevel
     private readonly Button _playPauseButton;
     private readonly ListView _playlistView;
     private readonly ObservableCollection<AudioFile>? _loadedPlaylist = [];
+    private int _playlistIndex;
     private object? _mainLoopTimeout;
 
     private const uint MainLoopTimeoutTick = 100; // ms
@@ -129,6 +130,7 @@ public class Tui : Toplevel
         {
             if (args.Value != null)
             {
+                _playlistIndex = args.Item;
                 PlayHandler((AudioFile)args.Value);
             }
         };
@@ -170,6 +172,7 @@ public class Tui : Toplevel
         _playPauseButton.Accepting += (s, e) =>
         {
             var selected = _playlistView.SelectedItem;
+            _playlistIndex = selected;
             var selectedTrack = _loadedPlaylist?.ElementAtOrDefault(selected);
 
             if (selectedTrack != null)
@@ -335,6 +338,23 @@ public class Tui : Toplevel
         }
     }
 
+    private void AutoPlayNextTrack()
+    {
+        if (Math.Abs(_player.TrackLength - _player.CurrentTime) < 0.5f)
+        {
+            if (_playlistIndex + 1 < _loadedPlaylist?.Count)
+            {
+                var nextTrack = _loadedPlaylist.ElementAtOrDefault(_playlistIndex + 1);
+
+                if (nextTrack != null)
+                {
+                    PlayHandler(nextTrack);
+                    _playlistIndex++;
+                }
+            }
+        }
+    }
+
     #region OpenMethods
 
     private void OpenFile()
@@ -426,10 +446,10 @@ public class Tui : Toplevel
                 {
                     _progressBar.Fraction = _player.CurrentTime / _player.TrackLength;
                     TimePlayedLabel();
-
                     return true;
                 }
-
+                
+                AutoPlayNextTrack();
                 return false;
             }
         );

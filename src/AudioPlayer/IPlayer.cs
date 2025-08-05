@@ -42,14 +42,9 @@ public interface IPlayer: IDisposable
     void Stop();
 
     /// <summary>
-    /// Method to increase audio playback volume.
+    /// Change audio volume
     /// </summary>
-    void IncreaseVolume();
-
-    /// <summary>
-    /// Method to decrease audio playback volume.
-    /// </summary>
-    void DecreaseVolume();
+    void ChangeVolume(float amount);
 
     /// <summary>
     /// Skip ahead in the audio file 5s.

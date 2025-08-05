@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Linq;
@@ -116,7 +117,7 @@ public class Tui : Toplevel
             X = 0,
             Y = Pos.Bottom(menuBar),
             Width = Dim.Fill(),
-            Height = Dim.Fill(10),
+            Height = Dim.Fill(11),
             CanFocus = true,
             BorderStyle = LineStyle.Rounded,
             Source = new TrackListDataSource(_loadedPlaylist),
@@ -159,7 +160,7 @@ public class Tui : Toplevel
             CanFocus = true,
             BorderStyle = LineStyle.Rounded
         };
-        
+
         var seekBackwardButton = new Button
         {
             X = 0,
@@ -172,7 +173,7 @@ public class Tui : Toplevel
             _player.SeekBackward();
             e.Handled = true;
         };
-        
+
         _playPauseButton = new Button
         {
             X = Pos.Right(seekBackwardButton),
@@ -198,7 +199,7 @@ public class Tui : Toplevel
 
             e.Handled = true;
         };
-        
+
         var seekForwardButton = new Button
         {
             X = Pos.Right(_playPauseButton),
@@ -211,7 +212,7 @@ public class Tui : Toplevel
             _player.SeekForward();
             e.Handled = true;
         };
-        
+
         var stopButton = new Button
         {
             X = Pos.Right(seekForwardButton),
@@ -228,36 +229,36 @@ public class Tui : Toplevel
             _playPauseButton.Text = "▶";
             e.Handled = true;
         };
-        
-        var volumeIncreaseButton = new Button
+
+        // Verify what SoundFlow's max volume level is
+        // For now this should be enough based on testing
+        List<object> volumeOptions =
+        [
+            0f, .1f, .2f, .3f, .4f, .5f, .6f, .7f, .8f, 1.0f, 1.2f, 1.4f
+        ];
+
+        var volumeSlider = new Slider(volumeOptions)
         {
+            Title = "Volume",
             X = 0,
-            Y = Pos.Bottom(seekBackwardButton),
-            CanFocus = true,
-            Text = "Volume +"
+            Y = Pos.Bottom(_playPauseButton),
+            Width = Dim.Fill(),
+            Height = Dim.Auto(),
+            Type = SliderType.LeftRange,
+            AllowEmpty = false,
+            ShowLegends = false,
+            BorderStyle = LineStyle.Rounded,
         };
-        volumeIncreaseButton.Accepting += (s, e) =>
+        volumeSlider.OptionsChanged += (s, e) =>
         {
-            _player.IncreaseVolume();
-            e.Handled = true;
+            var value = e.Options.FirstOrDefault().Value;
+            var flo = (float)value.Data;
+            _player.ChangeVolume(flo);
         };
 
-        var volumeDecreaseButton = new Button
-        {
-            X = Pos.Right(volumeIncreaseButton),
-            Y = Pos.Bottom(seekForwardButton),
-            IsDefault = false,
-            Text = "Volume -"
-        };
-        volumeDecreaseButton.Accepting += (s, e) =>
-        {
-            _player.DecreaseVolume();
-            e.Handled = true;
-        };
-
-        playbackControls.Add(_playPauseButton, stopButton, volumeIncreaseButton,
-            volumeDecreaseButton, seekForwardButton, seekBackwardButton);
-
+        playbackControls.Add(_playPauseButton, stopButton, seekForwardButton, seekBackwardButton,
+            volumeSlider);
+        
         #endregion
 
         #region PlaybackInfo
@@ -297,11 +298,11 @@ public class Tui : Toplevel
     }
 
     #endregion
-    
+
     private void PlayHandler(AudioFile audioFile)
     {
         _player.PlayPause(audioFile);
-        
+
         _playPauseButton.Text = _player.State switch
         {
             PlaybackState.Stopped => "▶",
@@ -421,7 +422,7 @@ public class Tui : Toplevel
         streamDialog.Add(uriLabel, streamUrl, loadStreamButton, closeButton);
         Application.Run(streamDialog);
     }
-    
+
     #endregion
 
     private void RunMainLoop()
@@ -436,7 +437,7 @@ public class Tui : Toplevel
                     TimePlayedLabel();
                     return true;
                 }
-                
+
                 AutoPlayNextTrack();
                 return false;
             }
@@ -465,7 +466,7 @@ public class Tui : Toplevel
             }
         }
     }
-    
+
     private void RemoveFromPlaylist()
     {
         var s = _playlistView.SelectedItem;
@@ -514,13 +515,13 @@ public class Tui : Toplevel
             }
         }
     }
-    
+
     private void PlaylistView_RowRender(object? sender, ListViewRowEventArgs obj)
     {
         if (obj.Row == _playlistView.SelectedItem)
         {
             obj.RowAttribute = new Attribute(Color.White, Color.Blue);
-            
+
             return;
         }
 
@@ -540,9 +541,9 @@ public class Tui : Toplevel
             obj.RowAttribute = new Attribute(Color.Black, Color.Green);
         }
     }
-    
+
     #endregion
-    
+
     private void TimePlayedLabel()
     {
         if (_player.State != PlaybackState.Stopped)
@@ -590,7 +591,7 @@ public class Tui : Toplevel
     }
 
     #region IListDataSource
-    
+
     private class TrackListDataSource : IListDataSource
     {
         private const int TitleColumnWidth = 40;
@@ -757,6 +758,6 @@ public class Tui : Toplevel
             _loadedPlaylist = null;
         }
     }
-    
+
     #endregion
 }

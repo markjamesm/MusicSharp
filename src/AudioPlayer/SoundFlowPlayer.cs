@@ -106,22 +106,11 @@ public sealed class SoundFlowPlayer : IPlayer
         }
     }
 
-    public void IncreaseVolume()
-    {
-        if (_player !=null)
-        {
-            // Verify what SoundFlow's max volume level is
-            // For now this should be enough based on testing
-            _player.Volume = Math.Clamp(_player.Volume + .1f, 0f, 2f);
-            _volume = _player.Volume;
-        }
-    }
-
-    public void DecreaseVolume()
+    public void ChangeVolume(float amount)
     {
         if (_player != null)
         {
-            _player.Volume = Math.Clamp(_player.Volume - .1f, 0f, 2f);
+            _player.Volume = Math.Clamp(amount, 0f, 2f);
             _volume = _player.Volume;
         }
     }

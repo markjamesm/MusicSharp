@@ -159,16 +159,27 @@ public class Tui : Toplevel
             CanFocus = true,
             BorderStyle = LineStyle.Rounded
         };
-
-        _playPauseButton = new Button
+        
+        var seekBackwardButton = new Button
         {
             X = 0,
             Y = 0,
-            IsDefault = false,
             CanFocus = true,
-            Text = "Play"
+            Text = "<<"
         };
-
+        seekBackwardButton.Accepting += (s, e) =>
+        {
+            _player.SeekBackward();
+            e.Handled = true;
+        };
+        
+        _playPauseButton = new Button
+        {
+            X = Pos.Right(seekBackwardButton),
+            Y = 0,
+            CanFocus = true,
+            Text = "▶"
+        };
         _playPauseButton.Accepting += (s, e) =>
         {
             var selected = _playlistView.SelectedItem;
@@ -187,35 +198,44 @@ public class Tui : Toplevel
 
             e.Handled = true;
         };
-
+        
+        var seekForwardButton = new Button
+        {
+            X = Pos.Right(_playPauseButton),
+            Y = 0,
+            CanFocus = true,
+            Text = ">>"
+        };
+        seekForwardButton.Accepting += (s, e) =>
+        {
+            _player.SeekForward();
+            e.Handled = true;
+        };
+        
         var stopButton = new Button
         {
-            X = 0,
-            Y = Pos.Bottom(_playPauseButton),
-            IsDefault = false,
+            X = Pos.Right(seekForwardButton),
+            Y = 0,
             CanFocus = true,
-            Text = "Stop",
+            Text = "⏹︎",
         };
-
         stopButton.Accepting += (s, e) =>
         {
             _player.Stop();
             _progressBar.Fraction = 0;
             TimePlayedLabel();
             _nowPlayingLabel!.Text = string.Empty;
-            _playPauseButton.Text = "Play";
+            _playPauseButton.Text = "▶";
             e.Handled = true;
         };
-
+        
         var volumeIncreaseButton = new Button
         {
-            X = Pos.Right(_playPauseButton),
-            Y = 0,
-            IsDefault = false,
+            X = 0,
+            Y = Pos.Bottom(seekBackwardButton),
             CanFocus = true,
             Text = "Volume +"
         };
-
         volumeIncreaseButton.Accepting += (s, e) =>
         {
             _player.IncreaseVolume();
@@ -224,46 +244,14 @@ public class Tui : Toplevel
 
         var volumeDecreaseButton = new Button
         {
-            X = Pos.Right(_playPauseButton),
-            Y = Pos.Bottom(volumeIncreaseButton),
-            CanFocus = true,
+            X = Pos.Right(volumeIncreaseButton),
+            Y = Pos.Bottom(seekForwardButton),
             IsDefault = false,
             Text = "Volume -"
         };
-
         volumeDecreaseButton.Accepting += (s, e) =>
         {
             _player.DecreaseVolume();
-            e.Handled = true;
-        };
-
-        var seekForwardButton = new Button
-        {
-            X = Pos.Right(volumeIncreaseButton),
-            Y = 0,
-            IsDefault = false,
-            CanFocus = true,
-            Text = "Seek 5s "
-        };
-
-        seekForwardButton.Accepting += (s, e) =>
-        {
-            _player.SeekForward();
-            e.Handled = true;
-        };
-
-        var seekBackwardButton = new Button
-        {
-            X = Pos.Right(volumeDecreaseButton),
-            Y = Pos.Bottom(seekForwardButton),
-            IsDefault = false,
-            CanFocus = true,
-            Text = "Seek -5s"
-        };
-
-        seekBackwardButton.Accepting += (s, e) =>
-        {
-            _player.SeekBackward();
             e.Handled = true;
         };
 
@@ -316,9 +304,9 @@ public class Tui : Toplevel
         
         _playPauseButton.Text = _player.State switch
         {
-            PlaybackState.Stopped => "Play",
-            PlaybackState.Playing => "Pause",
-            PlaybackState.Paused => "Play",
+            PlaybackState.Stopped => "▶",
+            PlaybackState.Playing => "⏸︎",
+            PlaybackState.Paused => "▶",
             _ => _playPauseButton.Text
         };
 

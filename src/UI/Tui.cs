@@ -50,19 +50,19 @@ public class Tui : Toplevel
                     Title = "_File",
                     new MenuItemv2[]
                     {
-                        new("_Open file", "Open audio file", OpenFile),
-                        new("Open _stream", "Open a stream URL", OpenStream),
-                        new("_Quit", "Quit MusicSharp", RequestStop)
+                        new("_Open file", "Open audio file", OpenFile, Key.F1),
+                        new("Open _stream", "Open a stream URL", OpenStream, Key.F2),
+                        new("_Quit", "Quit MusicSharp", RequestStop, Key.Esc)
                     }
                 ),
                 new MenuBarItemv2(
                     Title = "Playlist",
                     new MenuItemv2[]
                     {
-                        new("_Add to playlist", "Add track(s) to playlist", AddToPlaylist),
-                        new("_Remove from playlist", "Remove selected track from playlist", RemoveFromPlaylist),
-                        new("Open _playlist", "Open a playlist", OpenPlaylist),
-                        new("_Save playlist", "Save to playlist", SavePlaylist)
+                        new("_Add to playlist", "Add track(s) to playlist", AddToPlaylist, Key.A.WithAlt),
+                        new("_Remove from playlist", "Remove selected track from playlist", RemoveFromPlaylist, Key.R.WithAlt),
+                        new("Load _playlist", "Load a playlist", OpenPlaylist, Key.L.WithAlt),
+                        new("_Save playlist", "Save to playlist", SavePlaylist, Key.S.WithAlt)
                     }
                 ),
                 new MenuBarItemv2(
@@ -98,7 +98,7 @@ public class Tui : Toplevel
             new Shortcut
             {
                 Text = "Load playlist",
-                Key = Key.F3,
+                Key = Key.L.WithAlt,
                 Action = OpenPlaylist
             },
             new Shortcut
@@ -235,7 +235,7 @@ public class Tui : Toplevel
         // For now this should be enough based on testing
         List<object> volumeOptions =
         [
-            0f, .1f, .2f, .3f, .4f, .5f, .6f, .7f, .8f, 1.0f, 1.2f, 1.4f
+            0f, .2f, .4f, .6f, .8f, 1.0f, 1.2f, 1.4f, 1.6f, 1.8f, 2.0f
         ];
 
         var volumeSlider = new Slider(volumeOptions)
@@ -250,7 +250,7 @@ public class Tui : Toplevel
             ShowLegends = false,
             BorderStyle = LineStyle.Rounded,
         };
-        volumeSlider.SetOption(6);
+        volumeSlider.SetOption(5);
         volumeSlider.OptionsChanged += (s, e) =>
         {
             var value = e.Options.FirstOrDefault().Value;

@@ -67,13 +67,6 @@ public class Tui : Toplevel
                     }
                 ),
                 new MenuBarItemv2(
-                    Title = "Audio",
-                    new MenuItemv2[]
-                    {
-                        new("Audio device", string.Empty, SelectAudioDevice, Key.N.WithAlt),
-                    }
-                ),
-                new MenuBarItemv2(
                     Title = "Playlist",
                     new MenuItemv2[]
                     {
@@ -82,6 +75,13 @@ public class Tui : Toplevel
                             Key.R.WithAlt),
                         new("Load _playlist", "Load a playlist", OpenPlaylist, Key.L.WithAlt),
                         new("_Save playlist", "Save to playlist", SavePlaylist, Key.S.WithAlt)
+                    }
+                ),
+                new MenuBarItemv2(
+                    Title = "Settings",
+                    new MenuItemv2[]
+                    {
+                        new("Audio device", "Select playback device", SelectAudioDevice, Key.N.WithAlt),
                     }
                 ),
                 new MenuBarItemv2(

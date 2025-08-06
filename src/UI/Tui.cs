@@ -10,6 +10,7 @@ using MusicSharp.Data;
 using MusicSharp.Enums;
 using MusicSharp.Playlist;
 using SoundFlow.Enums;
+using SoundFlow.Structs;
 using Terminal.Gui.App;
 using Terminal.Gui.Drawing;
 using Terminal.Gui.Input;
@@ -63,6 +64,13 @@ public class Tui : Toplevel
                         new("Seek forward", string.Empty, _player.SeekForward, Key.M.WithAlt),
                         new("Previous", string.Empty, SkipBackward, Key.CursorLeft.WithAlt),
                         new("Next", string.Empty, SkipForward, Key.CursorRight.WithAlt),
+                    }
+                ),
+                new MenuBarItemv2(
+                    Title = "Audio",
+                    new MenuItemv2[]
+                    {
+                        new("Audio device", string.Empty, SelectAudioDevice, Key.N.WithAlt),
                     }
                 ),
                 new MenuBarItemv2(
@@ -438,7 +446,6 @@ public class Tui : Toplevel
             X = Pos.Center(),
             Y = Pos.Bottom(streamUrl),
         };
-
         loadStreamButton.Accepting += (s, e) =>
         {
             if (streamUrl.Text != string.Empty)
@@ -457,7 +464,6 @@ public class Tui : Toplevel
             X = Pos.Right(loadStreamButton),
             Y = Pos.Bottom(streamUrl)
         };
-
         closeButton.Accepting += (s, e) =>
         {
             e.Handled = true;
@@ -617,6 +623,64 @@ public class Tui : Toplevel
         }
     }
 
+    private void SelectAudioDevice()
+    {
+        var deviceDialog = new Dialog
+        {
+            Title = "Select Audio Device",
+            Width = Dim.Auto(DimAutoStyle.Auto, 5),
+            Height = Dim.Auto(DimAutoStyle.Auto, 7)
+        };
+
+        var audioDeviceList = new ObservableCollection<DeviceInfo>();
+
+        foreach (var device in _player.PlaybackDevices)
+        {
+            audioDeviceList.Add(device);
+        }
+
+        var audioDeviceListView = new ListView()
+        {
+            Title = "Audio Devices",
+            X = 0,
+            Y = 0,
+            Width = Dim.Auto(),
+            Height = Dim.Auto(),
+            AllowsMarking = true
+        };
+        audioDeviceListView.SetSource(audioDeviceList);
+        
+        var setAudioDeviceButton = new Button
+        {
+            Text = "Select",
+            X = 2,
+            Y = Pos.Bottom(audioDeviceListView),
+        };
+        setAudioDeviceButton.Accepting += (s, e) =>
+        {
+            var selectedDevice = audioDeviceList.ElementAt(audioDeviceListView.SelectedItem);
+            _player.ChangePlaybackDevice(selectedDevice);
+            
+            e.Handled = true;
+            RequestStop();
+        };
+        
+        var closeButton = new Button
+        {
+            Text = "Close",
+            X = Pos.Right(setAudioDeviceButton),
+            Y = Pos.Bottom(audioDeviceListView)
+        };
+        closeButton.Accepting += (s, e) =>
+        {
+            e.Handled = true;
+            RequestStop();
+        };
+        
+        deviceDialog.Add(audioDeviceListView, setAudioDeviceButton, closeButton);
+        Application.Run(deviceDialog);
+    }
+
     private static string GetAboutMessage()
     {
         var sb = new StringBuilder();
@@ -637,6 +701,47 @@ public class Tui : Toplevel
 
     #region IListDataSource
 
+    private class AudioListDataSource : IListDataSource
+    {
+        public AudioListDataSource()
+        {
+            
+        }
+        
+        public bool IsMarked(int item)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Render(ListView listView, bool selected, int item, int col, int line, int width, int start = 0)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void SetMark(int item, bool value)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IList ToList()
+        {
+            throw new NotImplementedException();
+        }
+
+        public int Count { get; }
+        public int Length { get; }
+        public bool SuspendCollectionChangedEvent { get; set; }
+        
+#pragma warning disable CS0067
+        public event NotifyCollectionChangedEventHandler? CollectionChanged;
+#pragma warning restore CS0067
+        
+        public void Dispose()
+        {
+            throw new NotImplementedException();
+        }
+    }
+
     private class TrackListDataSource : IListDataSource
     {
         private const int TitleColumnWidth = 40;
@@ -645,12 +750,6 @@ public class Tui : Toplevel
         private int _count;
         private BitArray _marks;
         private ObservableCollection<AudioFile>? _loadedPlaylist;
-
-        public TrackListDataSource(ObservableCollection<AudioFile>? audioFiles)
-        {
-            AudioFiles = audioFiles;
-        }
-
         private ObservableCollection<AudioFile>? AudioFiles
         {
             get => _loadedPlaylist;
@@ -664,6 +763,11 @@ public class Tui : Toplevel
                     Length = GetMaxLengthItem();
                 }
             }
+        }
+        
+        public TrackListDataSource(ObservableCollection<AudioFile>? audioFiles)
+        {
+            AudioFiles = audioFiles;
         }
 
         public bool IsMarked(int item)

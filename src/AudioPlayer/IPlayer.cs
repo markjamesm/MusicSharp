@@ -1,6 +1,7 @@
 ﻿using System;
 using MusicSharp.Data;
 using SoundFlow.Enums;
+using SoundFlow.Structs;
 
 namespace MusicSharp.AudioPlayer;
 
@@ -13,6 +14,11 @@ public interface IPlayer: IDisposable
     /// Gets a value indicating whether the audio player is playing.
     /// </summary>
     PlaybackState State { get; }
+
+    /// <summary>
+    /// Gets the list of audio playback devices.
+    /// </summary>
+    DeviceInfo[] PlaybackDevices { get; }
     
     /// <summary>
     /// Returns the total length of the audio file.
@@ -29,7 +35,11 @@ public interface IPlayer: IDisposable
     /// </summary>
     AudioFile? NowPlaying { get; set; }
 
-
+    /// <summary>
+    /// Changes the current audio playback device.
+    /// </summary>
+    void ChangePlaybackDevice(DeviceInfo device);
+    
     /// <summary>
     /// Method to play and pause audio.
     /// </summary>

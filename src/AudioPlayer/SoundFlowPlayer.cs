@@ -27,6 +27,7 @@ public sealed class SoundFlowPlayer : IPlayer
     public float TrackLength => _player?.Duration ?? 0;
     public float CurrentTime => _player?.Time ?? 0;
     public AudioFile? NowPlaying { get; set; }
+    public DeviceInfo[] PlaybackDevices => _audioEngine.PlaybackDevices;
     
     public SoundFlowPlayer(MiniAudioEngine audioEngine)
     {
@@ -48,6 +49,11 @@ public sealed class SoundFlowPlayer : IPlayer
         
         _audioPlaybackDevice = _audioEngine.InitializePlaybackDevice(defaultPlaybackDevice, _audioFormat);
         _volume = 1f;
+    }
+
+    public void ChangePlaybackDevice(DeviceInfo device)
+    {
+        _audioEngine.SwitchDevice(_audioPlaybackDevice, device);
     }
     
     public void PlayPause(AudioFile audioFile)

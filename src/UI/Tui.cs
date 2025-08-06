@@ -249,11 +249,12 @@ public class Tui : Toplevel
             ShowLegends = false,
             BorderStyle = LineStyle.Rounded,
         };
+        volumeSlider.SetOption(6);
         volumeSlider.OptionsChanged += (s, e) =>
         {
             var value = e.Options.FirstOrDefault().Value;
-            var flo = (float)value.Data;
-            _player.ChangeVolume(flo);
+            var volumeLevel = (float)value.Data;
+            _player.ChangeVolume(volumeLevel);
         };
 
         playbackControls.Add(_playPauseButton, stopButton, seekForwardButton, seekBackwardButton,

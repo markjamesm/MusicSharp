@@ -145,6 +145,7 @@ public class Tui : Toplevel
             Height = 3,
             CanFocus = false,
             BorderStyle = LineStyle.Rounded,
+            ProgressBarStyle = ProgressBarStyle.Continuous,
             Fraction = 0f,
         };
 

@@ -56,11 +56,22 @@ public class Tui : Toplevel
                     }
                 ),
                 new MenuBarItemv2(
+                    Title = "_Playback",
+                    new MenuItemv2[]
+                    {
+                        new("Seek backward", string.Empty, _player.SeekBackward, Key.N.WithAlt),
+                        new("Seek forward", string.Empty, _player.SeekForward, Key.M.WithAlt),
+                        new("Previous", string.Empty, SkipBackward, Key.CursorLeft.WithAlt),
+                        new("Next", string.Empty, SkipForward, Key.CursorRight.WithAlt),
+                    }
+                ),
+                new MenuBarItemv2(
                     Title = "Playlist",
                     new MenuItemv2[]
                     {
                         new("_Add to playlist", "Add track(s) to playlist", AddToPlaylist, Key.A.WithAlt),
-                        new("_Remove from playlist", "Remove selected track from playlist", RemoveFromPlaylist, Key.R.WithAlt),
+                        new("_Remove from playlist", "Remove selected track from playlist", RemoveFromPlaylist,
+                            Key.R.WithAlt),
                         new("Load _playlist", "Load a playlist", OpenPlaylist, Key.L.WithAlt),
                         new("_Save playlist", "Save to playlist", SavePlaylist, Key.S.WithAlt)
                     }
@@ -235,7 +246,7 @@ public class Tui : Toplevel
         // For now this should be enough based on testing
         List<object> volumeOptions =
         [
-            0f, .2f, .4f, .6f, .8f, 1.0f, 1.2f, 1.4f, 1.6f, 1.8f, 2.0f
+            0f, .1f, .2f, .4f, .6f, .8f, 1.0f, 1.2f, 1.4f, 1.6f, 1.8f, 2.0f
         ];
 
         var volumeSlider = new Slider(volumeOptions)
@@ -250,7 +261,7 @@ public class Tui : Toplevel
             ShowLegends = false,
             BorderStyle = LineStyle.Rounded,
         };
-        volumeSlider.SetOption(5);
+        volumeSlider.SetOption(6);
         volumeSlider.OptionsChanged += (s, e) =>
         {
             var value = e.Options.FirstOrDefault().Value;
@@ -260,7 +271,7 @@ public class Tui : Toplevel
 
         playbackControls.Add(_playPauseButton, stopButton, seekForwardButton, seekBackwardButton,
             volumeSlider);
-        
+
         #endregion
 
         #region PlaybackInfo
@@ -300,6 +311,8 @@ public class Tui : Toplevel
     }
 
     #endregion
+    
+    #region PlaybackMethods
 
     private void PlayHandler(AudioFile audioFile)
     {
@@ -345,6 +358,36 @@ public class Tui : Toplevel
             }
         }
     }
+
+    private void SkipForward()
+    {
+        if (_playlistIndex + 1 < _loadedPlaylist?.Count)
+        {
+            var nextTrack = _loadedPlaylist?.ElementAtOrDefault(_playlistIndex + 1);
+
+            if (nextTrack != null)
+            {
+                PlayHandler(nextTrack);
+                _playlistIndex++;
+            }
+        }
+    }
+
+    private void SkipBackward()
+    {
+        if (_playlistIndex - 1 >= 0)
+        {
+            var nextTrack = _loadedPlaylist?.ElementAtOrDefault(_playlistIndex - 1);
+
+            if (nextTrack != null)
+            {
+                PlayHandler(nextTrack);
+                _playlistIndex--;
+            }
+        }
+    }
+    
+    #endregion
 
     #region OpenMethods
 

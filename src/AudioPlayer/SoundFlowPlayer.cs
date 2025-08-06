@@ -16,7 +16,7 @@ namespace MusicSharp.AudioPlayer;
 public sealed class SoundFlowPlayer : IPlayer
 {
     private readonly MiniAudioEngine _audioEngine;
-    private readonly AudioPlaybackDevice _audioPlaybackDevice;
+    private AudioPlaybackDevice _audioPlaybackDevice;
     private readonly AudioFormat _audioFormat;
     private ISoundDataProvider? _streamDataProvider;
     private SoundPlayer? _player;
@@ -40,20 +40,14 @@ public sealed class SoundFlowPlayer : IPlayer
         {
         }
         
-        _audioFormat = new AudioFormat
-        {
-            Format = SampleFormat.F32,
-            SampleRate = 48000,
-            Channels = 2
-        };
-        
+        _audioFormat = AudioFormat.DvdHq;
         _audioPlaybackDevice = _audioEngine.InitializePlaybackDevice(defaultPlaybackDevice, _audioFormat);
         _volume = 1f;
     }
 
     public void ChangePlaybackDevice(DeviceInfo device)
     {
-        _audioEngine.SwitchDevice(_audioPlaybackDevice, device);
+        _audioPlaybackDevice = _audioEngine.SwitchDevice(_audioPlaybackDevice, device);
     }
     
     public void PlayPause(AudioFile audioFile)

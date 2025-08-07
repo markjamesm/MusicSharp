@@ -628,8 +628,10 @@ public class Tui : Toplevel
         var deviceDialog = new Dialog
         {
             Title = "Select Audio Device",
-            Width = Dim.Auto(DimAutoStyle.Auto, 5),
-            Height = Dim.Auto(DimAutoStyle.Auto, 7)
+            X = Pos.Center(),
+            Y = Pos.Center(),
+            Width = Dim.Auto(),
+            Height = Dim.Auto()
         };
 
         var audioDeviceList = new ObservableCollection<DeviceInfo>();
@@ -644,17 +646,18 @@ public class Tui : Toplevel
             Title = "Audio Devices",
             X = 0,
             Y = 0,
-            Width = Dim.Auto(),
+            Width = Dim.Auto() + 10,
             Height = Dim.Auto(),
-            AllowsMarking = true
+            Source = new AudioDeviceListDataSource(audioDeviceList),
+            AllowsMarking = true,
+            AllowsMultipleSelection = false
         };
-        audioDeviceListView.SetSource(audioDeviceList);
         
         var setAudioDeviceButton = new Button
         {
             Text = "Select",
             X = 2,
-            Y = Pos.Bottom(audioDeviceListView),
+            Y = Pos.Bottom(audioDeviceListView) + 1
         };
         setAudioDeviceButton.Accepting += (s, e) =>
         {
@@ -669,7 +672,7 @@ public class Tui : Toplevel
         {
             Text = "Close",
             X = Pos.Right(setAudioDeviceButton),
-            Y = Pos.Bottom(audioDeviceListView)
+            Y = Pos.Bottom(audioDeviceListView) + 1
         };
         closeButton.Accepting += (s, e) =>
         {
@@ -701,35 +704,124 @@ public class Tui : Toplevel
 
     #region IListDataSource
 
-    private class AudioListDataSource : IListDataSource
+    private class AudioDeviceListDataSource : IListDataSource
     {
-        public AudioListDataSource()
+        private int _count;
+        private BitArray _marks;
+        private ObservableCollection<DeviceInfo>? _audioDeviceList;
+        private ObservableCollection<DeviceInfo>? AudioDeviceList
         {
-            
+            get => _audioDeviceList;
+            set
+            {
+                if (value != null)
+                {
+                    _count = value.Count;
+                    _marks = new BitArray(_count);
+                    _audioDeviceList = value;
+                    Length = GetMaxLengthItem();
+                }
+            }
+        }
+        
+        public AudioDeviceListDataSource(ObservableCollection<DeviceInfo> audioDeviceList)
+        {
+            AudioDeviceList = audioDeviceList;
         }
         
         public bool IsMarked(int item)
         {
-            throw new NotImplementedException();
+            if (item >= 0 && item < _count)
+            {
+                return _marks[item];
+            }
+
+            return false;
         }
 
-        public void Render(ListView listView, bool selected, int item, int col, int line, int width, int start = 0)
+        public void Render(
+            ListView container,
+            bool selected,
+            int item,
+            int col,
+            int line,
+            int width,
+            int start = 0
+        )
         {
-            throw new NotImplementedException();
+            container.Move(col, line);
+            var audioDevice = AudioDeviceList?[item].Name;
+            RenderUstr(container, $"{audioDevice}", col, line, width, start);
+        }
+        
+        // A slightly adapted method from: https://github.com/gui-cs/Terminal.Gui/blob/fc1faba7452ccbdf49028ac49f0c9f0f42bbae91/Terminal.Gui/Views/ListView.cs#L433-L461
+        private static void RenderUstr(View view, string ustr, int col, int line, int width, int start = 0)
+        {
+            var used = 0;
+            var index = start;
+
+            while (index < ustr.Length)
+            {
+                var (rune, size) = ustr.DecodeRune(index, index - ustr.Length);
+                var count = rune.GetColumns();
+
+                if (used + count >= width)
+                {
+                    break;
+                }
+
+                view.AddRune(rune);
+                used += count;
+                index += size;
+            }
+
+            while (used < width)
+            {
+                view.AddRune((Rune)' ');
+                used++;
+            }
+        }
+        
+        private int GetMaxLengthItem()
+        {
+            if (_audioDeviceList?.Count == 0)
+            {
+                return 0;
+            }
+
+            var maxLength = 0;
+
+            for (var i = 0; i < _audioDeviceList.Count; i++)
+            {
+                var trackTitle = AudioDeviceList?[i].Name;
+
+                var sc = $"{trackTitle}";
+                var l = sc.Length;
+
+                if (l > maxLength)
+                {
+                    maxLength = l;
+                }
+            }
+
+            return maxLength;
         }
 
         public void SetMark(int item, bool value)
         {
-            throw new NotImplementedException();
+            if (item >= 0 && item < _count)
+            {
+                _marks[item] = value;
+            }
         }
 
         public IList ToList()
         {
-            throw new NotImplementedException();
+            return AudioDeviceList;
         }
 
-        public int Count { get; }
-        public int Length { get; }
+        public int Count => AudioDeviceList?.Count ?? 0;
+        public int Length { get; private set; }
         public bool SuspendCollectionChangedEvent { get; set; }
         
 #pragma warning disable CS0067
@@ -738,7 +830,7 @@ public class Tui : Toplevel
         
         public void Dispose()
         {
-            throw new NotImplementedException();
+            _audioDeviceList = null;
         }
     }
 
@@ -779,6 +871,7 @@ public class Tui : Toplevel
 
             return false;
         }
+        
 #pragma warning disable CS0067
         public event NotifyCollectionChangedEventHandler CollectionChanged;
 #pragma warning restore CS0067

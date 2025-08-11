@@ -1,10 +1,7 @@
-﻿// <copyright file="IPlayer.cs" company="Mark-James McDougall">
-// Licensed under the GNU GPL v3 License. See LICENSE in the project root for license information.
-// </copyright>
-
-using System;
-using System.IO;
-using MusicSharp.Enums;
+﻿using System;
+using MusicSharp.Data;
+using SoundFlow.Enums;
+using SoundFlow.Structs;
 
 namespace MusicSharp.AudioPlayer;
 
@@ -14,25 +11,40 @@ namespace MusicSharp.AudioPlayer;
 public interface IPlayer: IDisposable
 {
     /// <summary>
-    /// Gets or sets a value indicating whether the audio player is playing.
+    /// Gets a value indicating whether the audio player is playing.
     /// </summary>
-    EPlayerStatus PlayerStatus { get; set; }
+    PlaybackState State { get; }
 
     /// <summary>
-    /// Gets or sets the last file opened by the player.
+    /// Gets the list of audio playback devices.
     /// </summary>
-    string LastFileOpened { get; set; }
-
-    /// <summary>
-    /// Method to play audio.
-    /// </summary>
-    /// <param name="stream">The audio stream.</param>
-    void Play(Stream stream);
+    DeviceInfo[] PlaybackDevices { get; }
     
     /// <summary>
-    /// Method to play or pause depending on state.
+    /// Returns the total length of the audio file.
     /// </summary>
-    void PlayPause();
+    float TrackLength { get; }
+    
+    /// <summary>
+    /// Returns the current time played.
+    /// </summary>
+    float CurrentTime { get; }
+    
+    /// <summary>
+    /// Returns the currently playing track.
+    /// </summary>
+    AudioFile? NowPlaying { get; set; }
+
+    /// <summary>
+    /// Changes the current audio playback device.
+    /// </summary>
+    void ChangePlaybackDevice(DeviceInfo device);
+    
+    /// <summary>
+    /// Method to play and pause audio.
+    /// </summary>
+    /// <param name="audioFile">The AudioFile.</param>
+    void PlayPause(AudioFile audioFile);
     
     /// <summary>
     /// Method to stop audio playback.
@@ -40,26 +52,9 @@ public interface IPlayer: IDisposable
     void Stop();
 
     /// <summary>
-    /// Method to increase audio playback volume.
+    /// Change audio volume
     /// </summary>
-    void IncreaseVolume();
-
-    /// <summary>
-    /// Method to decrease audio playback volume.
-    /// </summary>
-    void DecreaseVolume();
-
-    /// <summary>
-    /// Returns the current playtime of the audioFileReader instance.
-    /// </summary>
-    /// <returns>The current time played as TimeSpan.</returns>
-    float CurrentTime();
-
-    /// <summary>
-    /// Returns the total track length in timespan format.
-    /// </summary>
-    /// <returns>The length of the track in timespan format.</returns>
-    float TrackLength();
+    void ChangeVolume(float amount);
 
     /// <summary>
     /// Skip ahead in the audio file 5s.
@@ -69,5 +64,5 @@ public interface IPlayer: IDisposable
     /// <summary>
     /// Skip back in the audio file 5s.
     /// </summary>
-    public void SeekBackwards();
+    public void SeekBackward();
 }

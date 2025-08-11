@@ -1,103 +1,146 @@
 using System;
 using System.IO;
+using System.Linq;
+using MusicSharp.Data;
 using MusicSharp.Enums;
+using SoundFlow.Abstracts.Devices;
 using SoundFlow.Backends.MiniAudio;
 using SoundFlow.Components;
+using SoundFlow.Enums;
+using SoundFlow.Interfaces;
 using SoundFlow.Providers;
+using SoundFlow.Structs;
 
 namespace MusicSharp.AudioPlayer;
 
-// Cross-platform sound engine that works for all devices which
-//  the .NET platform runs on.
 public sealed class SoundFlowPlayer : IPlayer
 {
-    private readonly MiniAudioEngine _soundEngine;
-    private SoundPlayer _player;
-
-    public EPlayerStatus PlayerStatus { get; set; }
-    public string LastFileOpened { get; set; }
-
-
-    public SoundFlowPlayer(MiniAudioEngine soundEngine)
+    private readonly MiniAudioEngine _audioEngine;
+    private AudioPlaybackDevice _audioPlaybackDevice;
+    private readonly AudioFormat _audioFormat;
+    private ISoundDataProvider? _streamDataProvider;
+    private SoundPlayer? _player;
+    private float _volume;
+    
+    // If we don't know the state of the player, default to stopped?
+    public PlaybackState State => _player?.State ?? PlaybackState.Stopped;
+    public float TrackLength => _player?.Duration ?? 0;
+    public float CurrentTime => _player?.Time ?? 0;
+    public AudioFile? NowPlaying { get; set; }
+    public DeviceInfo[] PlaybackDevices => _audioEngine.PlaybackDevices;
+    
+    public SoundFlowPlayer(MiniAudioEngine audioEngine)
     {
-        _soundEngine = soundEngine;
+        _audioEngine = audioEngine;
+        
+        var defaultPlaybackDevice = _audioEngine.PlaybackDevices.FirstOrDefault(d => d.IsDefault);
+        
+        // Handle case no default playback device is found.
+        if (defaultPlaybackDevice.Id == IntPtr.Zero)
+        {
+        }
+        
+        _audioFormat = AudioFormat.DvdHq;
+        _audioPlaybackDevice = _audioEngine.InitializePlaybackDevice(defaultPlaybackDevice, _audioFormat);
+        _volume = 1f;
     }
 
-    public void Play(Stream stream)
+    public void ChangePlaybackDevice(DeviceInfo device)
     {
-        if (_player != null)
+        _audioPlaybackDevice = _audioEngine.SwitchDevice(_audioPlaybackDevice, device);
+    }
+    
+    public void PlayPause(AudioFile audioFile)
+    {
+        if (_player != null && audioFile.Path.Equals(NowPlaying?.Path))
         {
-            _player.Stop();
+            switch (_player.State)
+            {
+                case PlaybackState.Playing:
+                    _player.Pause();
+                    break;
+                case PlaybackState.Paused:
+                case PlaybackState.Stopped:
+                    _player.Play();
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
         }
 
-        _player = new SoundPlayer(new StreamDataProvider(stream));
-        Mixer.Master.AddComponent(_player);
-        _player.Play();
-        
-        PlayerStatus = EPlayerStatus.Playing;
-    }
-
-    public void PlayPause()
-    {
-        switch (PlayerStatus)
+        if (!audioFile.Path.Equals(NowPlaying?.Path))
         {
-            case EPlayerStatus.Playing:
-                _player.Pause();
-                PlayerStatus = EPlayerStatus.Paused;
-                break;
-            case EPlayerStatus.Paused:
-            case EPlayerStatus.Stopped:
+            if (_player != null && _player.State != PlaybackState.Stopped)
+            {
+                _player.Stop();
+                _audioPlaybackDevice.Stop();
+                NowPlaying = null;
+            }
+            
+            _streamDataProvider = audioFile.Type switch
+            {
+                EFileType.File => new StreamDataProvider(_audioEngine, _audioFormat, File.OpenRead(audioFile.Path)),
+                EFileType.Stream => new NetworkDataProvider(_audioEngine, _audioFormat, audioFile.Path),
+                _ => _streamDataProvider
+            };
+
+            if (_streamDataProvider != null)
+            {
+                _player = new SoundPlayer(_audioEngine, _audioFormat, _streamDataProvider);
+                _audioPlaybackDevice.MasterMixer.AddComponent(_player);
+                _audioPlaybackDevice.Start();
+                _player.Volume = _volume;
                 _player.Play();
-                PlayerStatus = EPlayerStatus.Playing;
-                break;
-            default:
-                throw new ArgumentOutOfRangeException();
+                NowPlaying = audioFile;
+            }
         }
     }
 
     public void Stop()
     {
-        if (PlayerStatus != EPlayerStatus.Stopped)
+        if (_player != null && _player.State != PlaybackState.Stopped)
         {
-            _player.Stop();
-            PlayerStatus = EPlayerStatus.Stopped;
+            _player?.Stop();
+            _audioPlaybackDevice.Stop();
+            NowPlaying = null;
         }
     }
 
-    public void IncreaseVolume()
+    public void ChangeVolume(float amount)
     {
-        // Need to verify what SoundFlow's max volume level is
-        // For now this should be enough based on testing
-        _player.Volume = Math.Clamp(_player.Volume + .1f, 0f, 2f);
-    }
-
-    public void DecreaseVolume()
-    {
-        _player.Volume = Math.Clamp(_player.Volume - .1f, 0f, 2f);
+        if (_player != null)
+        {
+            _player.Volume = Math.Clamp(amount, 0f, 2f);
+            _volume = _player.Volume;
+        }
     }
     
     public void SeekForward()
     {
-        _player.Seek(Math.Clamp(_player.Time + 5f, 0f, _player.Duration - 0.1f));
+        if (_streamDataProvider is StreamDataProvider && _player != null)
+        {
+            if (_player.State is PlaybackState.Playing or PlaybackState.Paused)
+            {
+                _player.Seek(Math.Clamp(_player.Time + 5f, 0f, _player.Duration - 0.1f));
+            }
+        }
     }
 
-    public void SeekBackwards()
+    public void SeekBackward()
     {
-        _player.Seek(Math.Clamp(_player.Time - 5f, 0f, _player.Duration));
-    }
-    
-    public float CurrentTime()
-    {
-        return _player.Time;
-    }
-
-    public float TrackLength()
-    {
-        return _player.Duration;
+        if (_streamDataProvider is StreamDataProvider && _player != null)
+        {
+            if (_player.State is PlaybackState.Playing or PlaybackState.Paused)
+            {
+                _player.Seek(Math.Clamp(_player.Time - 5f, 0f, _player.Duration));
+            }
+        }
     }
 
     public void Dispose()
     {
-        _soundEngine.Dispose();
+        _audioPlaybackDevice.Dispose();
+        _streamDataProvider?.Dispose();
+        _player?.Dispose();
     }
 }

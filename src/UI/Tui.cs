@@ -1,397 +1,1008 @@
-﻿// <copyright file="Tui.cs" company="Mark-James McDougall">
-// Licensed under the GNU GPL v3 License. See LICENSE in the project root for license information.
-// </copyright>
-
 using System;
+using System.Collections;
 using System.Collections.Generic;
-using System.IO;
-using MusicSharp.Enums;
-using MusicSharp.PlaylistHandlers;
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
+using System.Linq;
+using System.Text;
 using MusicSharp.AudioPlayer;
-using Terminal.Gui;
+using MusicSharp.Data;
+using MusicSharp.Enums;
+using MusicSharp.Playlist;
+using SoundFlow.Enums;
+using SoundFlow.Structs;
+using Terminal.Gui.App;
+using Terminal.Gui.Drawing;
+using Terminal.Gui.Input;
+using Terminal.Gui.Text;
+using Terminal.Gui.ViewBase;
+using Terminal.Gui.Views;
+using Attribute = Terminal.Gui.Drawing.Attribute;
 
 namespace MusicSharp.UI;
 
-/// <summary>
-/// The Gui class houses the CLI elements of MusicSharp.
-/// </summary>
-public class Tui
+public class Tui : Toplevel
 {
-    private static List<string> _playlistTracks;
-    private static ListView _playlistView;
-    private static FrameView _playlistPane;
-    private static FrameView _playbackControls;
-    private static FrameView _nowPlaying;
-    private static StatusBar _statusBar;
-    private static Label _trackName;
-
-    /// <summary>
-    /// Create a new instance of the audio player engine.
-    /// </summary>
     private readonly IPlayer _player;
+    private readonly ProgressBar _progressBar;
+    private readonly Label _nowPlayingLabel;
+    private readonly Label _timePlayedLabel;
+    private readonly Button _playPauseButton;
+    private readonly ListView _playlistView;
+    private readonly ObservableCollection<AudioFile>? _loadedPlaylist = [];
+    private int _playlistIndex;
+    private object? _mainLoopTimeout;
 
-    private object _mainLoopTimeout = null;
+    private const uint MainLoopTimeoutTick = 100; // ms
 
-    private List<string> _playlist = new List<string>();
-    
-    private readonly IStreamConverter _streamConverter;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="Tui"/> class.
-    /// </summary>
-    /// <param name="player">The player to be injected.</param>
-    /// <param name="streamConverter">Helper class to convert files and urls to Stream type.</param>
-    public Tui(IPlayer player, IStreamConverter streamConverter)
+    public Tui(IPlayer player)
     {
         _player = player;
-        _streamConverter = streamConverter;
-    }
 
-    /// <summary>
-    ///  Gets and sets the current audio file play progress.
-    /// </summary>
-    internal ProgressBar AudioProgressBar { get; private set; }
+        #region Menus
 
-    /// <summary>
-    /// Start the UI.
-    /// </summary>
-    public void Start()
-    {
-        // Creates an instance of MainLoop to process input events, handle timers and other sources of data.
-        Application.Init();
-
-        var top = Application.Top;
-        var tframe = top.Frame;
-
-        // Create the menubar.
-        var menu = new MenuBar(new MenuBarItem[]
+        var menuBar = new MenuBarv2()
         {
-            new MenuBarItem("_File", new MenuItem[]
-            {
-                new MenuItem("_Open", "Open a music file", () => OpenFile()),
-
-                new MenuItem("Open S_tream", "Open a music stream", () => OpenStream()),
-
-                new MenuItem("Open Pla_ylist", "Load a playlist", () => LoadPlaylist()),
-
-                new MenuItem("_Quit", "Exit MusicSharp", () => Application.RequestStop()),
-            }),
-
-            new MenuBarItem("_Help", new MenuItem[]
-            {
-                new MenuItem("_About MusicSharp", string.Empty, () =>
-                {
-                    MessageBox.Query("Music Sharp 1.0.0", "\nMusic Sharp is a lightweight CLI\n music player written in C#.\n\nDeveloped by Mark-James McDougall\nand licensed under the GPL v3.\n ", "Close");
-                }),
-            }),
-        });
-
-        _statusBar = new StatusBar(new StatusItem[]
-        {
-                new StatusItem(Key.F1, "~F1~ Open file", () => OpenFile()),
-                new StatusItem(Key.F2, "~F2~ Open stream", () => OpenStream()),
-                new StatusItem(Key.F3, "~F3~ Load playlist", () => LoadPlaylist()),
-                new StatusItem(Key.F4, "~F4~ Quit", () => Application.RequestStop()),
-                new StatusItem(Key.Space, "~Space~ Play/Pause", () => PlayPause()),
-        });
-
-        // Create the playback controls frame.
-        _playbackControls = new FrameView("Playback")
-        {
-            X = 0,
-            Y = 24,
-            Width = 55,
-            Height = 5,
-            CanFocus = true,
+            Title = "MusicSharp",
+            BorderStyle = LineStyle.Rounded,
+            Menus =
+            [
+                new MenuBarItemv2(
+                    Title = "_File",
+                    new MenuItemv2[]
+                    {
+                        new("_Open file", "Open audio file", OpenFile, Key.F1),
+                        new("Open _stream", "Open a stream URL", OpenStream, Key.F2),
+                        new("_Quit", "Quit MusicSharp", RequestStop, Key.Esc)
+                    }
+                ),
+                new MenuBarItemv2(
+                    Title = "_Playback",
+                    new MenuItemv2[]
+                    {
+                        new("Seek backward", string.Empty, _player.SeekBackward, Key.N.WithCtrl),
+                        new("Seek forward", string.Empty, _player.SeekForward, Key.M.WithCtrl),
+                        new("Previous", string.Empty, SkipBackward, Key.CursorLeft.WithShift),
+                        new("Next", string.Empty, SkipForward, Key.CursorRight.WithShift),
+                    }
+                ),
+                new MenuBarItemv2(
+                    Title = "Playlist",
+                    new MenuItemv2[]
+                    {
+                        new("_Add to playlist", "Add track(s) to playlist", AddToPlaylist, Key.A.WithCtrl),
+                        new("_Remove from playlist", "Remove selected track from playlist", RemoveFromPlaylist,
+                            Key.R.WithCtrl),
+                        new("Load _playlist", "Load a playlist", OpenPlaylist, Key.L.WithCtrl),
+                        new("_Save playlist", "Save to playlist", SavePlaylist, Key.S.WithCtrl)
+                    }
+                ),
+                new MenuBarItemv2(
+                    Title = "Settings",
+                    new MenuItemv2[]
+                    {
+                        new("Audio device", "Select playback device", SelectAudioDevice, Key.D.WithCtrl),
+                    }
+                ),
+                new MenuBarItemv2(
+                    Title = "Help",
+                    new MenuItemv2[]
+                    {
+                        new("_About...", "About MusicSharp", () => MessageBox.Query(
+                                "",
+                                GetAboutMessage(),
+                                wrapMessage: false,
+                                buttons: "_Ok"
+                            ),
+                            Key.I.WithCtrl
+                        )
+                    }
+                ),
+            ]
         };
 
-        var playPauseButton = new Button(1, 1, "Play/Pause");
-        playPauseButton.Clicked += () =>
-        {
-            PlayPause();
-
-            if (_player.PlayerStatus != EPlayerStatus.Stopped)
+        var statusBar = new StatusBar([
+            new Shortcut
             {
-                UpdateProgressBar();
+                Text = "Open file",
+                Key = Key.F1,
+                Action = OpenFile
+            },
+            new Shortcut
+            {
+                Text = "Open stream",
+                Key = Key.F2,
+                Action = OpenStream
+            },
+            new Shortcut
+            {
+                Text = "Load playlist",
+                Key = Key.L.WithCtrl,
+                Action = OpenPlaylist
+            },
+            new Shortcut
+            {
+                Text = "Quit",
+                Key = Key.Esc,
+                Action = RequestStop
+            },
+        ]);
+
+        #endregion Menus
+
+        _playlistView = new ListView
+        {
+            Title = "Playlist",
+            X = 0,
+            Y = Pos.Bottom(menuBar),
+            Width = Dim.Fill(),
+            Height = Dim.Fill(11),
+            CanFocus = true,
+            BorderStyle = LineStyle.Rounded,
+            Source = new TrackListDataSource(_loadedPlaylist),
+            AllowsMarking = false,
+            AllowsMultipleSelection = false
+        };
+        _playlistView.RowRender += PlaylistView_RowRender;
+        _playlistView.VerticalScrollBar.AutoShow = true;
+        _playlistView.HorizontalScrollBar.AutoShow = true;
+        _playlistView.OpenSelectedItem += (sender, args) =>
+        {
+            if (args.Value != null)
+            {
+                _playlistIndex = args.Item;
+                PlayHandler((AudioFile)args.Value);
             }
         };
 
-        var stopButton = new Button(16, 1, "Stop");
-        stopButton.Clicked += () =>
+        _progressBar = new ProgressBar()
         {
-            _player.Stop();
-            AudioProgressBar.Fraction = 0F;
-            TimePlayedLabel();
+            Title = "Progress",
+            X = 0,
+            Y = Pos.Bottom(_playlistView),
+            Width = Dim.Fill(),
+            Height = 3,
+            CanFocus = false,
+            BorderStyle = LineStyle.Rounded,
+            ProgressBarStyle = ProgressBarStyle.Continuous,
+            Fraction = 0f,
         };
 
-        var seekForward = new Button(26, 0, "Seek  5s");
-        seekForward.Clicked += () =>
+        #region PlayBackControls
+
+        var playbackControls = new View()
+        {
+            Title = "Playback",
+            X = 0,
+            Y = Pos.Bottom(_progressBar),
+            Width = Dim.Auto(),
+            Height = Dim.Auto(),
+            CanFocus = true,
+            BorderStyle = LineStyle.Rounded
+        };
+
+        var seekBackwardButton = new Button
+        {
+            X = 0,
+            Y = 0,
+            CanFocus = true,
+            Text = "<<"
+        };
+        seekBackwardButton.Accepting += (s, e) =>
+        {
+            _player.SeekBackward();
+            e.Handled = true;
+        };
+
+        _playPauseButton = new Button
+        {
+            X = Pos.Right(seekBackwardButton),
+            Y = 0,
+            CanFocus = true,
+            Text = "▶"
+        };
+        _playPauseButton.Accepting += (s, e) =>
+        {
+            var selected = _playlistView.SelectedItem;
+            _playlistIndex = selected;
+            var selectedTrack = _loadedPlaylist?.ElementAtOrDefault(selected);
+
+            if (selectedTrack != null)
+            {
+                PlayHandler(selectedTrack);
+            }
+
+            if (selectedTrack == null && _player.NowPlaying != null)
+            {
+                PlayHandler(_player.NowPlaying);
+            }
+
+            e.Handled = true;
+        };
+
+        var seekForwardButton = new Button
+        {
+            X = Pos.Right(_playPauseButton),
+            Y = 0,
+            CanFocus = true,
+            Text = ">>"
+        };
+        seekForwardButton.Accepting += (s, e) =>
         {
             _player.SeekForward();
+            e.Handled = true;
         };
 
-        var seekBackward = new Button(26, 2, "Seek -5s");
-        seekBackward.Clicked += () =>
+        var stopButton = new Button
         {
-            _player.SeekBackwards();
+            X = Pos.Right(seekForwardButton),
+            Y = 0,
+            CanFocus = true,
+            Text = "⏹︎",
+        };
+        stopButton.Accepting += (s, e) =>
+        {
+            _player.Stop();
+            _progressBar.Fraction = 0;
+            TimePlayedLabel();
+            _nowPlayingLabel!.Text = string.Empty;
+            _playPauseButton.Text = "▶";
+            e.Handled = true;
         };
 
-        var increaseVolumeButton = new Button(39, 0, "+ Volume");
-        increaseVolumeButton.Clicked += () =>
-        {
-            _player.IncreaseVolume();
-        };
+        // Verify what SoundFlow's max volume level is
+        // For now this should be enough based on testing
+        List<object> volumeOptions =
+        [
+            0f, .1f, .2f, .4f, .6f, .8f, 1.0f, 1.2f, 1.4f, 1.6f, 1.8f, 2.0f
+        ];
 
-        var decreaseVolumeButton = new Button(39, 2, "- Volume");
-        decreaseVolumeButton.Clicked += () =>
+        var volumeSlider = new Slider(volumeOptions)
         {
-            _player.DecreaseVolume();
-        };
-
-        _playbackControls.Add(playPauseButton, stopButton, increaseVolumeButton, decreaseVolumeButton, seekBackward, seekForward);
-
-        // Create the left-hand playlists view.
-        _playlistPane = new FrameView("Playlist Tracks")
-        {
+            Title = "Volume",
             X = 0,
-            Y = 1, // for menu
+            Y = Pos.Bottom(_playPauseButton),
             Width = Dim.Fill(),
-            Height = 23,
-            CanFocus = false,
+            Height = Dim.Auto(),
+            Type = SliderType.LeftRange,
+            AllowEmpty = false,
+            ShowLegends = false,
+            BorderStyle = LineStyle.Rounded,
+        };
+        volumeSlider.SetOption(6);
+        volumeSlider.OptionsChanged += (s, e) =>
+        {
+            var value = e.Options.FirstOrDefault().Value;
+            var volumeLevel = (float)value.Data;
+            _player.ChangeVolume(volumeLevel);
         };
 
-        // The list of tracks in the playlist.
-        _playlistTracks = new List<string>();
+        playbackControls.Add(_playPauseButton, stopButton, seekForwardButton, seekBackwardButton,
+            volumeSlider);
 
-        _playlistView = new ListView(_playlistTracks)
+        #endregion
+
+        #region PlaybackInfo
+
+        var nowPlayingView = new View
         {
+            Title = "Now playing",
+            X = Pos.Right(playbackControls),
+            Y = Pos.Bottom(_progressBar),
+            Width = Dim.Fill(),
+            Height = Dim.Height(playbackControls),
+            BorderStyle = LineStyle.Rounded,
+        };
+
+        _nowPlayingLabel = new Label
+        {
+            Text = string.Empty,
             X = 0,
             Y = 0,
             Width = Dim.Fill(),
-            Height = 23,
-            AllowsMarking = false,
-            CanFocus = true,
+            Height = Dim.Fill(),
+            TextDirection = TextDirection.LeftRight_TopBottom
         };
+        _nowPlayingLabel.TextFormatter.WordWrap = true;
 
-        // Play the selection when a playlist path is clicked.
-        _playlistView.OpenSelectedItem += (a) =>
+        _timePlayedLabel = new Label
         {
-            try
-            {
-                _player.LastFileOpened = a.Value.ToString();
-                _player.Play(_streamConverter.ConvertFileToStream(a.Value.ToString()));
-                NowPlaying(_player.LastFileOpened);
-                UpdateProgressBar();
-            }
-            catch (FileNotFoundException ex)
-            {
-                MessageBox.Query("Warning", "Invalid file path.", "Close");
-            }
+            Text = "00:00 / 00:00",
+            X = Pos.Align(Alignment.End),
+            Y = Pos.Align(Alignment.End),
         };
 
-        _playlistPane.Add(_playlistView);
+        nowPlayingView.Add(_nowPlayingLabel, _timePlayedLabel);
 
-        // Create the audio progress bar frame.
-        _nowPlaying = new FrameView("Now Playing")
-        {
-            X = 55,
-            Y = 24,
-            Width = Dim.Fill(),
-            Height = 5,
-            CanFocus = false,
-        };
-
-        AudioProgressBar = new ProgressBar()
-        {
-            X = 0,
-            Y = 2,
-            Width = Dim.Fill() - 15,
-            Height = 1,
-            ColorScheme = Colors.Base,
-        };
-
-        _nowPlaying.Add(AudioProgressBar);
-
-        // Add the layout elements and run the app.
-        top.Add(menu, _playlistPane, _playbackControls, _nowPlaying, _statusBar);
-
-        Application.Run();
+        // Add the views to the main window
+        Add(menuBar, _playlistView, _progressBar, playbackControls, nowPlayingView, statusBar);
     }
 
-    private void PlayPause()
+    #endregion
+    
+    #region PlaybackMethods
+
+    private void PlayHandler(AudioFile audioFile)
     {
-        try
-        {
-            _player.PlayPause();
+        _player.PlayPause(audioFile);
 
-            if (_player.PlayerStatus == EPlayerStatus.Playing)
-            {
-                UpdateProgressBar();
-            }
-        }
-        catch (Exception)
+        _playPauseButton.Text = _player.State switch
         {
-            MessageBox.Query("Warning", "Select a file or stream first.", "Close");
+            PlaybackState.Stopped => "▶",
+            PlaybackState.Playing => "⏸︎",
+            PlaybackState.Paused => "▶",
+            _ => _playPauseButton.Text
+        };
+
+        if (_player.State == PlaybackState.Playing)
+        {
+            _nowPlayingLabel.Text = audioFile.Type switch
+            {
+                EFileType.File =>
+                    $"{(string.IsNullOrWhiteSpace(audioFile.TrackInfo.Title) ? "Unknown" : audioFile.TrackInfo.Title)} - " +
+                    $"{(string.IsNullOrWhiteSpace(audioFile.TrackInfo.Artist) ? "Unknown" : audioFile.TrackInfo.Artist)} - " +
+                    $"{(string.IsNullOrWhiteSpace(audioFile.TrackInfo.Album) ? "Unknown" : audioFile.TrackInfo.Album)}",
+                EFileType.Stream => $"Web stream: {audioFile.Path}",
+                _ => _nowPlayingLabel.Text
+            };
+
+            RunMainLoop();
         }
     }
 
-    // Display a file open dialog and return the path of the user selected file.
+    private void AutoPlayNextTrack()
+    {
+        if (Math.Abs(_player.TrackLength - _player.CurrentTime) < 0.5f)
+        {
+            if (_playlistIndex + 1 < _loadedPlaylist?.Count)
+            {
+                var nextTrack = _loadedPlaylist.ElementAtOrDefault(_playlistIndex + 1);
+
+                if (nextTrack != null)
+                {
+                    PlayHandler(nextTrack);
+                    _playlistIndex++;
+                    _playlistView.SelectedItem = _playlistIndex;
+                }
+            }
+        }
+    }
+
+    private void SkipForward()
+    {
+        if (_playlistIndex + 1 < _loadedPlaylist?.Count)
+        {
+            var nextTrack = _loadedPlaylist?.ElementAtOrDefault(_playlistIndex + 1);
+
+            if (nextTrack != null)
+            {
+                PlayHandler(nextTrack);
+                _playlistIndex++;
+                _playlistView.SelectedItem = _playlistIndex;
+            }
+        }
+    }
+
+    private void SkipBackward()
+    {
+        if (_playlistIndex - 1 >= 0)
+        {
+            var nextTrack = _loadedPlaylist?.ElementAtOrDefault(_playlistIndex - 1);
+
+            if (nextTrack != null)
+            {
+                PlayHandler(nextTrack);
+                _playlistIndex--;
+                _playlistView.SelectedItem = _playlistIndex;
+            }
+        }
+    }
+    
+    #endregion
+
+    #region OpenMethods
+
     private void OpenFile()
     {
-        var d = new OpenDialog("Open", "Open an audio file") { AllowsMultipleSelection = false };
+        var d = new OpenDialog()
+        {
+            AllowsMultipleSelection = false,
+            Title = "Open an audio file",
+            AllowedTypes = [new AllowedType("Allowed filetypes", ".mp3", ".flac", ".wav")]
+        };
 
-        d.DirectoryPath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-
-        // This will filter the dialog on basis of the allowed file types in the array.
-        d.AllowedFileTypes = [".mp3", ".wav", ".flac"];
         Application.Run(d);
 
         if (!d.Canceled)
         {
-            if (File.Exists(d.FilePath.ToString()))
-            {
-                try
-                {
-                    _player.LastFileOpened = d.FilePath.ToString();
-                    var stream = _streamConverter.ConvertFileToStream(d.FilePath.ToString());
-                    _player.Play(stream);
-                    NowPlaying(_player.LastFileOpened);
-                    AudioProgressBar.Fraction = 0F;
-                    UpdateProgressBar();
-                    TimePlayedLabel();
-                }
-                catch (FileNotFoundException ex)
-                {
-                    MessageBox.Query("Warning", "Invalid file path.", "Close");
-                }
-            }
+            var audioFile = new AudioFile(d.FilePaths[0], EFileType.File);
+            PlayHandler(audioFile);
         }
     }
 
-    // Open and play an audio stream.
     private void OpenStream()
     {
-        var d = new Dialog("Open Stream", 50, 15);
-
-        var editLabel = new Label("Enter the url of the audio stream to load\n (.mp3 streams only):")
+        var streamDialog = new Dialog
         {
-            X = 0,
+            Title = "Open an audio stream",
+        };
+
+        var uriLabel = new Label
+        {
+            Text = "Enter the stream URI",
+            X = Pos.Center(),
             Y = 0,
+            Width = Dim.Auto(),
+        };
+
+        var streamUrl = new TextField
+        {
+            X = Pos.Center(),
+            Y = Pos.Bottom(uriLabel),
             Width = Dim.Fill(),
+            BorderStyle = LineStyle.Rounded,
         };
 
-        var streamUrl = new TextField(string.Empty)
+        var loadStreamButton = new Button
         {
-            X = 3,
-            Y = 4,
-            Width = 42,
+            Text = "Open stream",
+            X = Pos.Center(),
+            Y = Pos.Bottom(streamUrl),
         };
-
-        var loadStream = new Button(12, 7, "Load Stream");
-        loadStream.Clicked += async () =>
+        loadStreamButton.Accepting += (s, e) =>
         {
-            try
+            if (streamUrl.Text != string.Empty)
             {
-                var stream = await _streamConverter.ConvertUrlToStream(streamUrl.Text.ToString());
-                _player.Play(stream);
+                var audioFile = new AudioFile(streamUrl.Text, EFileType.Stream);
+                PlayHandler(audioFile);
             }
-            catch (Exception ex)
-            {
-                MessageBox.Query("Warning", "Invalid URL.", "Close");
-            }
+
+            e.Handled = true;
+            RequestStop();
         };
 
-        var cancelStream = new Button(29, 7, "Close");
-        cancelStream.Clicked += () =>
+        var closeButton = new Button
         {
-            Application.RequestStop();
+            Text = "Close",
+            X = Pos.Right(loadStreamButton),
+            Y = Pos.Bottom(streamUrl)
+        };
+        closeButton.Accepting += (s, e) =>
+        {
+            e.Handled = true;
+            RequestStop();
         };
 
-        d.AddButton(loadStream);
-        d.AddButton(cancelStream);
-        d.Add(editLabel, streamUrl);
-        Application.Run(d);
+        streamDialog.Add(uriLabel, streamUrl, loadStreamButton, closeButton);
+        Application.Run(streamDialog);
     }
 
-    // Load a playlist file. Currently, only M3U is supported.
-    private void LoadPlaylist()
-    {
-        var d = new OpenDialog("Open", "Open a playlist") { AllowsMultipleSelection = false };
+    #endregion
 
-        // This will filter the dialog on basis of the allowed file types in the array.
-        d.AllowedFileTypes = [".m3u"];
+    private void RunMainLoop()
+    {
+        _mainLoopTimeout = Application.AddTimeout(
+            TimeSpan.FromMilliseconds(MainLoopTimeoutTick),
+            () =>
+            {
+                while (_player.CurrentTime < _player.TrackLength && _player.State != PlaybackState.Stopped)
+                {
+                    _progressBar.Fraction = _player.CurrentTime / _player.TrackLength;
+                    TimePlayedLabel();
+                    return true;
+                }
+
+                AutoPlayNextTrack();
+                return false;
+            }
+        );
+    }
+
+    #region PlaylistMethods
+
+    private void AddToPlaylist()
+    {
+        var d = new OpenDialog()
+        {
+            AllowsMultipleSelection = true,
+            Title = "Add tracks to playlist",
+            AllowedTypes = [new AllowedType("Allowed filetypes", ".mp3", ".flac", ".wav")]
+        };
+
         Application.Run(d);
 
         if (!d.Canceled)
         {
-            _playlist = PlaylistLoader.LoadPlaylist(d.FilePath.ToString());
-
-            if (_playlist == null)
+            foreach (var filepath in d.FilePaths)
             {
-                Application.RequestStop();
-            }
-            else
-            {
-                foreach (var track in _playlist)
-                {
-                    _playlistTracks.Add(track);
-                }
-
-                Application.Run();
+                var track = new AudioFile(filepath, EFileType.File);
+                _loadedPlaylist?.Add(track);
             }
         }
     }
 
-    private static void NowPlaying(string track)
+    private void RemoveFromPlaylist()
     {
-        _trackName = new Label(track)
-        {
-            X = 0,
-            Y = 0,
-            Width = Dim.Fill(),
-        };
-
-        _nowPlaying.Add(_trackName);
+        var s = _playlistView.SelectedItem;
+        _loadedPlaylist?.RemoveAt(s);
     }
 
-    private void TimePlayedLabel()
+    private void OpenPlaylist()
     {
-        if (_player.PlayerStatus != EPlayerStatus.Stopped)
+        var d = new OpenDialog()
         {
-            var timePlayed = TimeSpan.FromSeconds((double)(new decimal(_player.CurrentTime()))).ToString(@"hh\:mm\:ss");
-            var trackLength = TimeSpan.FromSeconds((double)(new decimal(_player.TrackLength()))).ToString(@"hh\:mm\:ss");
-            
-            _trackName = new Label($"{timePlayed} / {trackLength}")
+            AllowsMultipleSelection = false,
+            Title = "Open a playlist",
+            AllowedTypes = [new AllowedType("Allowed filetypes", ".m3u")]
+        };
+
+        Application.Run(d);
+
+        if (!d.Canceled)
+        {
+            var playlist = PlaylistHelpers.LoadPlaylist(d.FilePaths[0]);
+
+            foreach (var track in playlist.Select(filepath => new AudioFile(filepath, EFileType.File)))
             {
-                X = Pos.Right(AudioProgressBar),
-                Y = 2,
-            };
+                _loadedPlaylist?.Add(track);
+            }
+        }
+    }
+
+    private void SavePlaylist()
+    {
+        var d = new SaveDialog
+        {
+            AllowsMultipleSelection = false,
+            AllowedTypes = [new AllowedType("Allowed filetypes", ".m3u")],
+            Title = "Save playlist in M3U format"
+        };
+
+        Application.Run(d);
+
+        if (!d.Canceled)
+        {
+            if (_loadedPlaylist != null)
+            {
+                var currentTracks = _loadedPlaylist.ToList();
+                PlaylistHelpers.SavePlaylistToFile(d.FileName, currentTracks);
+            }
+        }
+    }
+
+    private void PlaylistView_RowRender(object? sender, ListViewRowEventArgs obj)
+    {
+        if (obj.Row == _playlistView.SelectedItem)
+        {
+            obj.RowAttribute = new Attribute(Color.White, Color.Blue);
+
+            return;
+        }
+
+        if (_playlistView.AllowsMarking && _playlistView.Source.IsMarked(obj.Row))
+        {
+            obj.RowAttribute = new Attribute(Color.Black, Color.White);
+
+            return;
+        }
+
+        if (obj.Row % 2 == 0)
+        {
+            obj.RowAttribute = new Attribute(Color.Green, Color.Black);
         }
         else
         {
-            _trackName = new Label($"00:00 / 00:00")
-            {
-                X = Pos.Right(AudioProgressBar),
-                Y = 2,
-            };
+            obj.RowAttribute = new Attribute(Color.Black, Color.Green);
         }
-
-        _nowPlaying.Add(_trackName);
     }
 
-    private void UpdateProgressBar()
-    {
-        _mainLoopTimeout = Application.MainLoop.AddTimeout(TimeSpan.FromSeconds(1), (updateTimer) =>
-        {
-            while (_player.CurrentTime() < _player.TrackLength() && _player.PlayerStatus is not EPlayerStatus.Stopped)
-            {
-                AudioProgressBar.Fraction = _player.CurrentTime() / _player.TrackLength();
-                TimePlayedLabel();
+    #endregion
 
-                return true;
+    private void TimePlayedLabel()
+    {
+        if (_player.State != PlaybackState.Stopped)
+        {
+            if (_player.TrackLength > 3599)
+            {
+                var timePlayed = TimeSpan.FromSeconds((double)new decimal(_player.CurrentTime)).ToString(@"hh\:mm\:ss");
+                var trackLength = TimeSpan.FromSeconds((double)new decimal(_player.TrackLength))
+                    .ToString(@"hh\:mm\:ss");
+
+                _timePlayedLabel.Text = $"{timePlayed} / {trackLength}";
+            }
+
+            else
+            {
+                var timePlayed = TimeSpan.FromSeconds((double)new decimal(_player.CurrentTime)).ToString(@"mm\:ss");
+                var trackLength = TimeSpan.FromSeconds((double)new decimal(_player.TrackLength)).ToString(@"mm\:ss");
+
+                _timePlayedLabel.Text = $"{timePlayed} / {trackLength}";
+            }
+        }
+
+        else
+        {
+            _timePlayedLabel.Text = "00:00 / 00:00";
+        }
+    }
+
+    private void SelectAudioDevice()
+    {
+        var deviceDialog = new Dialog
+        {
+            Title = "Select Audio Device",
+            X = Pos.Center(),
+            Y = Pos.Center(),
+            Width = Dim.Auto(),
+            Height = Dim.Auto()
+        };
+
+        var audioDeviceList = new ObservableCollection<DeviceInfo>();
+
+        foreach (var device in _player.PlaybackDevices)
+        {
+            audioDeviceList.Add(device);
+        }
+
+        var audioDeviceListView = new ListView()
+        {
+            Title = "Audio Devices",
+            X = 0,
+            Y = 0,
+            Width = Dim.Auto() + 10,
+            Height = Dim.Auto(),
+            Source = new AudioDeviceListDataSource(audioDeviceList),
+            AllowsMarking = true,
+            AllowsMultipleSelection = false
+        };
+        
+        var setAudioDeviceButton = new Button
+        {
+            Text = "Select",
+            X = 2,
+            Y = Pos.Bottom(audioDeviceListView) + 1
+        };
+        setAudioDeviceButton.Accepting += (s, e) =>
+        {
+            var selectedDevice = audioDeviceList.ElementAt(audioDeviceListView.SelectedItem);
+            _player.ChangePlaybackDevice(selectedDevice);
+            
+            e.Handled = true;
+            RequestStop();
+        };
+        
+        var closeButton = new Button
+        {
+            Text = "Close",
+            X = Pos.Right(setAudioDeviceButton),
+            Y = Pos.Bottom(audioDeviceListView) + 1
+        };
+        closeButton.Accepting += (s, e) =>
+        {
+            e.Handled = true;
+            RequestStop();
+        };
+        
+        deviceDialog.Add(audioDeviceListView, setAudioDeviceButton, closeButton);
+        Application.Run(deviceDialog);
+    }
+
+    private static string GetAboutMessage()
+    {
+        var sb = new StringBuilder();
+        sb.AppendLine("""
+                          __  ___           _      _____ __                   
+                         /  |/  /_  _______(_)____/ ___// /_  ____ __________ 
+                        / /|_/ / / / / ___/ / ___/\__ \/ __ \/ __ `/ ___/ __ \
+                       / /  / / /_/ (__  ) / /__ ___/ / / / / /_/ / /  / /_/ /
+                      /_/  /_/\__,_/____/_/\___//____/_/ /_/\__,_/_/  / .___/ 
+                                                                     /_/      
+                      """);
+        sb.AppendLine();
+        sb.AppendLine("MusicSharp v2.0.0");
+        sb.AppendLine("Created by Mark-James M.");
+
+        return sb.ToString();
+    }
+
+    #region IListDataSource
+
+    private class AudioDeviceListDataSource : IListDataSource
+    {
+        private int _count;
+        private BitArray _marks;
+        private ObservableCollection<DeviceInfo>? _audioDeviceList;
+        private ObservableCollection<DeviceInfo>? AudioDeviceList
+        {
+            get => _audioDeviceList;
+            set
+            {
+                if (value != null)
+                {
+                    _count = value.Count;
+                    _marks = new BitArray(_count);
+                    _audioDeviceList = value;
+                    Length = GetMaxLengthItem();
+                }
+            }
+        }
+        
+        public AudioDeviceListDataSource(ObservableCollection<DeviceInfo> audioDeviceList)
+        {
+            AudioDeviceList = audioDeviceList;
+        }
+        
+        public bool IsMarked(int item)
+        {
+            if (item >= 0 && item < _count)
+            {
+                return _marks[item];
             }
 
             return false;
-        });
+        }
+
+        public void Render(
+            ListView container,
+            bool selected,
+            int item,
+            int col,
+            int line,
+            int width,
+            int start = 0
+        )
+        {
+            container.Move(col, line);
+            var audioDevice = AudioDeviceList?[item].Name;
+            RenderUstr(container, $"{audioDevice}", col, line, width, start);
+        }
+        
+        // A slightly adapted method from: https://github.com/gui-cs/Terminal.Gui/blob/fc1faba7452ccbdf49028ac49f0c9f0f42bbae91/Terminal.Gui/Views/ListView.cs#L433-L461
+        private static void RenderUstr(View view, string ustr, int col, int line, int width, int start = 0)
+        {
+            var used = 0;
+            var index = start;
+
+            while (index < ustr.Length)
+            {
+                var (rune, size) = ustr.DecodeRune(index, index - ustr.Length);
+                var count = rune.GetColumns();
+
+                if (used + count >= width)
+                {
+                    break;
+                }
+
+                view.AddRune(rune);
+                used += count;
+                index += size;
+            }
+
+            while (used < width)
+            {
+                view.AddRune((Rune)' ');
+                used++;
+            }
+        }
+        
+        private int GetMaxLengthItem()
+        {
+            if (_audioDeviceList?.Count == 0)
+            {
+                return 0;
+            }
+
+            var maxLength = 0;
+
+            for (var i = 0; i < _audioDeviceList.Count; i++)
+            {
+                var trackTitle = AudioDeviceList?[i].Name;
+
+                var sc = $"{trackTitle}";
+                var l = sc.Length;
+
+                if (l > maxLength)
+                {
+                    maxLength = l;
+                }
+            }
+
+            return maxLength;
+        }
+
+        public void SetMark(int item, bool value)
+        {
+            if (item >= 0 && item < _count)
+            {
+                _marks[item] = value;
+            }
+        }
+
+        public IList ToList()
+        {
+            return AudioDeviceList;
+        }
+
+        public int Count => AudioDeviceList?.Count ?? 0;
+        public int Length { get; private set; }
+        public bool SuspendCollectionChangedEvent { get; set; }
+        
+#pragma warning disable CS0067
+        public event NotifyCollectionChangedEventHandler? CollectionChanged;
+#pragma warning restore CS0067
+        
+        public void Dispose()
+        {
+            _audioDeviceList = null;
+        }
     }
+
+    private class TrackListDataSource : IListDataSource
+    {
+        private const int TitleColumnWidth = 40;
+        private const int ArtistColumnWidth = 30;
+        private const int AlbumColumnWidth = 40;
+        private int _count;
+        private BitArray _marks;
+        private ObservableCollection<AudioFile>? _loadedPlaylist;
+        private ObservableCollection<AudioFile>? AudioFiles
+        {
+            get => _loadedPlaylist;
+            set
+            {
+                if (value != null)
+                {
+                    _count = value.Count;
+                    _marks = new BitArray(_count);
+                    _loadedPlaylist = value;
+                    Length = GetMaxLengthItem();
+                }
+            }
+        }
+        
+        public TrackListDataSource(ObservableCollection<AudioFile>? audioFiles)
+        {
+            AudioFiles = audioFiles;
+        }
+
+        public bool IsMarked(int item)
+        {
+            if (item >= 0 && item < _count)
+            {
+                return _marks[item];
+            }
+
+            return false;
+        }
+        
+#pragma warning disable CS0067
+        public event NotifyCollectionChangedEventHandler CollectionChanged;
+#pragma warning restore CS0067
+
+        public int Count => AudioFiles?.Count ?? 0;
+        public int Length { get; private set; }
+
+        public bool SuspendCollectionChangedEvent
+        {
+            get => throw new NotImplementedException();
+            set => throw new NotImplementedException();
+        }
+
+        public void Render(
+            ListView container,
+            bool selected,
+            int item,
+            int col,
+            int line,
+            int width,
+            int start = 0
+        )
+        {
+            container.Move(col, line);
+
+            // Equivalent to an interpolated string like $"{AudioFiles[item].Name, -widtestname}"; if it were possible
+            var trackTitle = string.Format(
+                string.Format("{{0,{0}}}", -TitleColumnWidth),
+                AudioFiles?[item].TrackInfo.Title
+            );
+
+            var artist = string.Format(
+                string.Format("{{0,{0}}}", -ArtistColumnWidth),
+                AudioFiles?[item].TrackInfo.Artist
+            );
+
+            var album = string.Format(
+                string.Format("{{0,{0}}}", -AlbumColumnWidth),
+                AudioFiles?[item].TrackInfo.Album
+            );
+
+            RenderUstr(container, $"{trackTitle} {artist} {album}", col, line, width, start);
+        }
+
+        public void SetMark(int item, bool value)
+        {
+            if (item >= 0 && item < _count)
+            {
+                _marks[item] = value;
+            }
+        }
+
+        public IList ToList()
+        {
+            return AudioFiles;
+        }
+
+        private int GetMaxLengthItem()
+        {
+            if (_loadedPlaylist?.Count == 0)
+            {
+                return 0;
+            }
+
+            var maxLength = 0;
+
+            for (var i = 0; i < _loadedPlaylist.Count; i++)
+            {
+                var trackTitle = string.Format(
+                    $"{{0,{-TitleColumnWidth}}}",
+                    AudioFiles?[i].TrackInfo.Title
+                );
+
+                var artist = string.Format(
+                    $"{{0,{-ArtistColumnWidth}}}",
+                    AudioFiles?[i].TrackInfo.Artist
+                );
+
+                var album = string.Format(
+                    $"{{0,{-AlbumColumnWidth}}}",
+                    AudioFiles?[i].TrackInfo.Album
+                );
+
+                var sc = $"{trackTitle} {artist} {album}";
+                var l = sc.Length;
+
+                if (l > maxLength)
+                {
+                    maxLength = l;
+                }
+            }
+
+            return maxLength;
+        }
+
+        // A slightly adapted method from: https://github.com/gui-cs/Terminal.Gui/blob/fc1faba7452ccbdf49028ac49f0c9f0f42bbae91/Terminal.Gui/Views/ListView.cs#L433-L461
+        private static void RenderUstr(View view, string ustr, int col, int line, int width, int start = 0)
+        {
+            var used = 0;
+            var index = start;
+
+            while (index < ustr.Length)
+            {
+                var (rune, size) = ustr.DecodeRune(index, index - ustr.Length);
+                var count = rune.GetColumns();
+
+                if (used + count >= width)
+                {
+                    break;
+                }
+
+                view.AddRune(rune);
+                used += count;
+                index += size;
+            }
+
+            while (used < width)
+            {
+                view.AddRune((Rune)' ');
+                used++;
+            }
+        }
+
+        public void Dispose()
+        {
+            _loadedPlaylist = null;
+        }
+    }
+
+    #endregion
 }

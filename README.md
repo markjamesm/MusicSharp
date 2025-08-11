@@ -15,7 +15,19 @@ and light on resources.
 
 ## Installation
 
-Download and run the [latest release of MusicSharp](https://github.com/markjamesm/MusicSharp/releases).
+Download the [latest release of MusicSharp](https://github.com/markjamesm/MusicSharp/releases) for your platform and follow the instructions below to launch it:
+
+### Windows
+
+Open MusicSharp.exe.
+
+### Linux & Mac
+
+Execute MusicSharp from your preferred terminal:
+
+```bash
+./MusicSharp
+```
 
 ## Want to Contribute?
 

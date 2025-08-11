@@ -60,28 +60,28 @@ public class Tui : Toplevel
                     Title = "_Playback",
                     new MenuItemv2[]
                     {
-                        new("Seek backward", string.Empty, _player.SeekBackward, Key.N.WithAlt),
-                        new("Seek forward", string.Empty, _player.SeekForward, Key.M.WithAlt),
-                        new("Previous", string.Empty, SkipBackward, Key.CursorLeft.WithAlt),
-                        new("Next", string.Empty, SkipForward, Key.CursorRight.WithAlt),
+                        new("Seek backward", string.Empty, _player.SeekBackward, Key.N.WithCtrl),
+                        new("Seek forward", string.Empty, _player.SeekForward, Key.M.WithCtrl),
+                        new("Previous", string.Empty, SkipBackward, Key.CursorLeft.WithCtrl),
+                        new("Next", string.Empty, SkipForward, Key.CursorRight.WithCtrl),
                     }
                 ),
                 new MenuBarItemv2(
                     Title = "Playlist",
                     new MenuItemv2[]
                     {
-                        new("_Add to playlist", "Add track(s) to playlist", AddToPlaylist, Key.A.WithAlt),
+                        new("_Add to playlist", "Add track(s) to playlist", AddToPlaylist, Key.A.WithCtrl),
                         new("_Remove from playlist", "Remove selected track from playlist", RemoveFromPlaylist,
-                            Key.R.WithAlt),
-                        new("Load _playlist", "Load a playlist", OpenPlaylist, Key.L.WithAlt),
-                        new("_Save playlist", "Save to playlist", SavePlaylist, Key.S.WithAlt)
+                            Key.R.WithCtrl),
+                        new("Load _playlist", "Load a playlist", OpenPlaylist, Key.L.WithCtrl),
+                        new("_Save playlist", "Save to playlist", SavePlaylist, Key.S.WithCtrl)
                     }
                 ),
                 new MenuBarItemv2(
                     Title = "Settings",
                     new MenuItemv2[]
                     {
-                        new("Audio device", "Select playback device", SelectAudioDevice, Key.N.WithAlt),
+                        new("Audio device", "Select playback device", SelectAudioDevice, Key.N.WithCtrl),
                     }
                 ),
                 new MenuBarItemv2(
@@ -94,7 +94,7 @@ public class Tui : Toplevel
                                 wrapMessage: false,
                                 buttons: "_Ok"
                             ),
-                            Key.A.WithCtrl
+                            Key.I.WithCtrl
                         )
                     }
                 ),
@@ -117,7 +117,7 @@ public class Tui : Toplevel
             new Shortcut
             {
                 Text = "Load playlist",
-                Key = Key.L.WithAlt,
+                Key = Key.L.WithCtrl,
                 Action = OpenPlaylist
             },
             new Shortcut

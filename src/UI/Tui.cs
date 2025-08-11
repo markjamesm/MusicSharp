@@ -362,6 +362,7 @@ public class Tui : Toplevel
                 {
                     PlayHandler(nextTrack);
                     _playlistIndex++;
+                    _playlistView.SelectedItem = _playlistIndex;
                 }
             }
         }
@@ -377,6 +378,7 @@ public class Tui : Toplevel
             {
                 PlayHandler(nextTrack);
                 _playlistIndex++;
+                _playlistView.SelectedItem = _playlistIndex;
             }
         }
     }
@@ -391,6 +393,7 @@ public class Tui : Toplevel
             {
                 PlayHandler(nextTrack);
                 _playlistIndex--;
+                _playlistView.SelectedItem = _playlistIndex;
             }
         }
     }

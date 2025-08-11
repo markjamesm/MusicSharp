@@ -15,7 +15,8 @@ and light on resources.
 
 ## Installation
 
-Download the [latest release of MusicSharp](https://github.com/markjamesm/MusicSharp/releases) for your platform and follow the instructions below to launch it:
+Download and extract the [latest release of MusicSharp](https://github.com/markjamesm/MusicSharp/releases) for your 
+platform and follow the instructions below to launch it:
 
 ### Windows
 

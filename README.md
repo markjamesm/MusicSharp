@@ -4,7 +4,7 @@
 A cross-platform Terminal User Interface (TUI) music player written in C# with the goal of being minimalist 
 and light on resources.
 
-![Screenshot of MusicSharp](screenshots/musicsharp.png?raw=true)
+![Screenshot of MusicSharp](screenshots/musicsharp.png)
 
 ## Features
 

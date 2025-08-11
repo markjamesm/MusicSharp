@@ -62,8 +62,8 @@ public class Tui : Toplevel
                     {
                         new("Seek backward", string.Empty, _player.SeekBackward, Key.N.WithCtrl),
                         new("Seek forward", string.Empty, _player.SeekForward, Key.M.WithCtrl),
-                        new("Previous", string.Empty, SkipBackward, Key.CursorLeft.WithCtrl),
-                        new("Next", string.Empty, SkipForward, Key.CursorRight.WithCtrl),
+                        new("Previous", string.Empty, SkipBackward, Key.CursorLeft.WithShift),
+                        new("Next", string.Empty, SkipForward, Key.CursorRight.WithShift),
                     }
                 ),
                 new MenuBarItemv2(
@@ -81,7 +81,7 @@ public class Tui : Toplevel
                     Title = "Settings",
                     new MenuItemv2[]
                     {
-                        new("Audio device", "Select playback device", SelectAudioDevice, Key.N.WithCtrl),
+                        new("Audio device", "Select playback device", SelectAudioDevice, Key.D.WithCtrl),
                     }
                 ),
                 new MenuBarItemv2(
